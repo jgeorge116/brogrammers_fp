@@ -27,10 +27,34 @@ input[type=text], input[type=password], input[type=email] {
     width:40%;
     margin:0 0 15px;
 }
-#login {
+#logout {
     font-family: 'Roboto', sans-serif;
     position:absolute; top:0; right:0;
     right:5%;
+    top:5%;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:14px;
+    padding:15px;
+    background-color: #A2E3C4;
+    border:0;
+}
+#login  {
+    font-family: 'Roboto', sans-serif;
+    position:absolute; top:0; right:0;
+    right:5%;
+    top:5%;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:14px;
+    padding:15px;
+    background-color: #A2E3C4;
+    border:0;
+}
+#register {
+    font-family: 'Roboto', sans-serif;
+    position:absolute; top:0; right:0;
+    right:13%;
     top:5%;
     font-weight:bold;
     cursor:pointer;

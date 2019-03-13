@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import {Redirect} from 'react-router-dom'
 
-class App extends Component {
+class login extends Component {
 
   constructor(){
     super()
     this.state={
       username: '',
-      email: '',
       pwd: '',
       isValidated: false
     }
@@ -16,7 +15,6 @@ class App extends Component {
   handleRequest = (e) => {
     e.preventDefault();
     this.setState({isValidated: true})
-    // console.log(this.state.email)
     // console.log(this.state.pwd)
     // console.log(this.state.username)
   }
@@ -26,25 +24,18 @@ class App extends Component {
     this.setState({[name]: value})
   }
 
-  handleLogin = () => {
-    this.props.history.push('/login')
-  }
-
   render() {
     if(this.state.isValidated)
-      return <Redirect push to="/verify" />;
+      return <Redirect push to="/home" />;
     
-    return (//gotta add login component
-      <div className="App">
-        <header className="App-header">
-          <h1> Register For StackOverFlow!!</h1>
+    return (
+      <div>
+        <header>
+          <h1>Login boi!!</h1>
           <link rel="stylesheet" href="style/styles.css"></link>
         </header>
-        <button id="login" onClick={this.handleLogin}>Login</button>
         <form onSubmit={this.handleRequest}> 
           <input type="text" name="username" placeholder='username' onChange={this.handleChange}/>
-          <br/>
-          <input type="email" name="email" placeholder='email' onChange={this.handleChange}/>
           <br/>
           <input type="password" name="pwd" placeholder='password' onChange={this.handleChange}/>
           <br/>
@@ -55,4 +46,4 @@ class App extends Component {
   } 
 }
 
-export default App
+export default login
