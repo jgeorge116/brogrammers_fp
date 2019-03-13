@@ -3,9 +3,7 @@ const app = express();
 const MongoClient = require('mongodb').MongoClient
 
 MongoClient.connect('mongodb://130.245.171.174:27017/test', { useNewUrlParser: true })
-  .then(function (db){
-    console.log("YEEEEEE, CONNECTED!!")
-  }).catch(function (err){console.log("NOOOOOO",err)})
+  .then((db) => console.log("YEEEEEE, CONNECTED!!")).catch((err) => console.log("NOOOOOO",err))
 
   /*
     * made db on an open stack instance
