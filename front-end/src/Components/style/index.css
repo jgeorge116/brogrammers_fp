@@ -24,8 +24,8 @@ input[type=text], input[type=password], input[type=email] {
     box-sizing: border-box;
     background-color: #d9e0dd;
     border:0;
-    width:40%;
-    margin:0 0 15px;
+    width:20%;
+    margin:0 0 10px;
 }
 #logout {
     font-family: 'Roboto', sans-serif;
@@ -83,4 +83,3 @@ input[type=submit] {
     background-color: #A2E3C4;
     border:0;
 }
-
