@@ -14,15 +14,30 @@ class App extends Component {
   }
 
   handleRequest = (e) => {
-    e.preventDefault();
-    this.setState({isValidated: true})
-    // console.log(this.state.email)
-    // console.log(this.state.pwd)
-    // console.log(this.state.username)
+    e.preventDefault()
+    if (this.state.username === '' || this.state.email === '' || this.state.pwd === '')
+      alert("ONE OR MORE OF THE FIELDS ARE EMPTY!")
+    else 
+      (async () => {const res = await fetch('http://localhost:4000/adduser', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+          username : this.state.username, 
+          pwd : this.state.pwd, 
+          email : this.state.email
+        })
+      })
+      const content = await res.json();
+      console.log(content);
+      })()
+      this.setState({isValidated: true})
   }
 
   handleChange = (e) => {
-    const {name, value} = e.target
+    const {name, value} = e.target  //deconstruct to get state
     this.setState({[name]: value})
   }
 
@@ -32,7 +47,9 @@ class App extends Component {
 
   render() {
     if(this.state.isValidated)
-      return <Redirect push to="/verify" />;
+      return <Redirect to={{
+        pathname: '/verify', 
+        state: {username: this.state.username, pwd: this.state.pwd, email: this.state.email}}}/>; //not null
     
     return (//gotta add login component
       <div className="App">

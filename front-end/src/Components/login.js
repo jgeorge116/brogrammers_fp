@@ -13,10 +13,12 @@ class login extends Component {
   }
 
   handleRequest = (e) => {
-    e.preventDefault();
-    this.setState({isValidated: true})
-    // console.log(this.state.pwd)
-    // console.log(this.state.username)
+    e.preventDefault()
+    if( this.state.username === '' || this.state.pwd === '')
+      alert("ONE OR MORE OF THE FIELDS ARE EMPTY!")
+    else
+      //post to db
+      this.setState({isValidated: true})
   }
 
   handleChange = (e) => {
@@ -26,7 +28,7 @@ class login extends Component {
 
   render() {
     if(this.state.isValidated)
-      return <Redirect push to="/home" />;
+      return <Redirect push to="/home"/>;
     
     return (
       <div>
