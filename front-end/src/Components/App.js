@@ -32,6 +32,7 @@ class App extends Component {
       })
         let content = await res.json();
         if(content.data === "exists") alert("EMAIL ALREADY EXISTS")
+        else if(content.data === "usr") alert("USERNAME ALREADY EXISTS")
         else if(content.status === "error") alert("UNEXPECTED ERROR:(")
         else{
           this.props.history.push({

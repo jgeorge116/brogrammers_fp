@@ -29,7 +29,7 @@ class verify extends Component{
                         body: JSON.stringify({
                             username : this.props.location.state.username, 
                             pwd : this.props.location.state.pwd, 
-                            email : this.props.location.state.email,
+                            email : this.props.location.state.email
                         })
                     })
                     let content = await res.json();
@@ -37,8 +37,7 @@ class verify extends Component{
                         pathname: '/home', 
                         state: {
                             username: this.props.location.state.username, 
-                            pwd: this.props.location.state.pwd, 
-                            email: this.props.location.state.email,
+                            pwd: this.props.location.state.pwd
                         }
                     })
                 })()
