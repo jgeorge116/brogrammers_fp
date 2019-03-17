@@ -1,7 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './style/index.css';
-import App from './App';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './style/index.css'
+import App from './App'
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
 import verify from './verifyUser'
 import home from './home'

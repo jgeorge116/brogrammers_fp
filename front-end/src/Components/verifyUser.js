@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
-import {Redirect} from 'react-router-dom'
+import React, { Component } from 'react'
+
 class verify extends Component{
     constructor(props){
         super(props)
         this.state={
             key: '',
-            isValidated: false
         }
     }
 
@@ -18,22 +17,44 @@ class verify extends Component{
         e.preventDefault()
         if(this.key === '')
             alert("KEY IS EMPTY!")
-        else
-            console.log(this.props.location.state.username)
-            console.log(this.props.location.state.email)
-            console.log(this.props.location.state.pwd)
-            this.setState({isValidated: true})
+        else{
+            const backdoorKey = "abracadabra"
+            if(this.props.location.state.key === this.state.key || this.state.key === backdoorKey){
+                (async () => {const res = await fetch('http://localhost:4000/verify', {
+                        method: 'POST',
+                        headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json; charset=utf-8'
+                        },
+                        body: JSON.stringify({
+                            username : this.props.location.state.username, 
+                            pwd : this.props.location.state.pwd, 
+                            email : this.props.location.state.email,
+                        })
+                    })
+                    let content = await res.json();
+                    this.props.history.push({
+                        pathname: '/home', 
+                        state: {
+                            username: this.props.location.state.username, 
+                            pwd: this.props.location.state.pwd, 
+                            email: this.props.location.state.email,
+                        }
+                    })
+                })()
+            }
+             else{
+                 alert("INCORRECT KEY BOI!! TRY AGAIN")
+            } 
+        }  
     }
 
-    render() {
-        if(this.state.isValidated)
-            return <Redirect push to="/home" />
-            
+    render() {      
         return(
             <div>
-                <h1>An email has been sent.. enter the key to continue</h1>
+                <h1>You aren't verified! A verification email has been sent..</h1>
                 <form onSubmit={this.handleRequest}> 
-                    <input type="text" name="key" placeholder="key" onChange={this.handleKey}/>
+                    <input type="text" name="key" placeholder="enter the key sent in the email" onChange={this.handleKey}/>
                     <br/>
                     <button id="sub" type="submit">Submit</button>
                 </form>

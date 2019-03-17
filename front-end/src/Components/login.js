@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {Redirect} from 'react-router-dom'
 
 class login extends Component {

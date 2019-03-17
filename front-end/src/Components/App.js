@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import {Redirect} from 'react-router-dom'
+import React, { Component } from 'react'
 
 class App extends Component {
 
@@ -8,8 +7,7 @@ class App extends Component {
     this.state={
       username: '',
       email: '',
-      pwd: '',
-      isValidated: false
+      pwd: ''
     }
   }
 
@@ -17,7 +15,9 @@ class App extends Component {
     e.preventDefault()
     if (this.state.username === '' || this.state.email === '' || this.state.pwd === '')
       alert("ONE OR MORE OF THE FIELDS ARE EMPTY!")
-    else 
+    else if (this.state.username === this.state.email)
+      alert("USERNAME AND EMAIL MUST BE UNIQUE")
+    else {
       (async () => {const res = await fetch('http://localhost:4000/adduser', {
         method: 'POST',
         headers: {
@@ -30,10 +30,22 @@ class App extends Component {
           email : this.state.email
         })
       })
-      const content = await res.json();
-      console.log(content);
+        let content = await res.json();
+        if(content.data === "exists") alert("EMAIL ALREADY EXISTS")
+        else if(content.status === "error") alert("UNEXPECTED ERROR:(")
+        else{
+          this.props.history.push({
+            pathname: '/verify', 
+            state: {
+              username: this.state.username, 
+              pwd: this.state.pwd, 
+              email: this.state.email,
+              key: content.data
+            }
+          })
+        }
       })()
-      this.setState({isValidated: true})
+    }
   }
 
   handleChange = (e) => {
@@ -46,12 +58,7 @@ class App extends Component {
   }
 
   render() {
-    if(this.state.isValidated)
-      return <Redirect to={{
-        pathname: '/verify', 
-        state: {username: this.state.username, pwd: this.state.pwd, email: this.state.email}}}/>; //not null
-    
-    return (//gotta add login component
+    return (
       <div className="App">
         <header className="App-header">
           <h1> Register For StackOverFlow!!</h1>
