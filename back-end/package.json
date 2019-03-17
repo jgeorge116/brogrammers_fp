@@ -24,7 +24,7 @@
     "express": "^4.16.4",
     "helmet": "^3.15.1",
     "jsonwebtoken": "^8.5.0",
-    "mongodb": "^3.1.13",
+    "mongoose": "^5.4.19",
     "nodemailer": "^5.1.1",
     "shortid": "^2.2.14",
     "uniqueid": "^1.0.0"
