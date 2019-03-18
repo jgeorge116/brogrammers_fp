@@ -16,11 +16,11 @@ module.export = class Authentication {
     /**
      * Generate a JWT token with an expiration time
      */
-    generate(userModel) {
+    generate(username, password) {
         return jwt.sign(
             {
-                email: userModel.email,
-                username: userModel.username
+                username: username,
+                password: password
             },
             this.secret,
             {
