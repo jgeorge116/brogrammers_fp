@@ -27,6 +27,7 @@
     "mongoose": "^5.4.19",
     "nodemailer": "^5.1.1",
     "shortid": "^2.2.14",
-    "uniqueid": "^1.0.0"
+    "uniqueid": "^1.0.0",
+    "uuid": "^3.3.2"
   }
 }
