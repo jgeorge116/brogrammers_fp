@@ -5,7 +5,7 @@ var UserModelSchema = new Schema({
     username: String,
     email: String,
     password: String,
-    verification_key: String,
+    verificationKey: String,
     isVerified: Boolean
 });
 
