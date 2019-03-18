@@ -19,7 +19,8 @@ app.use(parser.json());
 
 // const routes = require("./routes/index");
 const UserRouter = require("./routes/userRouter");
-app.use("/", UserRouter);
+const QuestionRouter = require("./routes/questionRouter");
+app.use("/", [UserRouter, QuestionRouter]);
 // const routs = new UserRouter();
 
 const portNum = process.env.PORT || 4000;

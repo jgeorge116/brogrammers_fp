@@ -3,6 +3,7 @@ const UserModel = require("../models/userModel");
 const Hash = require("./../utils/hash");
 const hash = new Hash();
 const shortid = require("shortid");
+const uuidv4 = require("uuid/v4");
 const nodemailer = require("nodemailer");
 
 module.exports = class UserRepository {
@@ -48,11 +49,11 @@ module.exports = class UserRepository {
     const hashedPassword = await hash.hashPassword(password);
     const key = shortid.generate();
     const new_user = new UserModel({
+      id: uuidv4(),
       username: username,
       password: hashedPassword,
       email: email,
-      verificationKey: key,
-      isVerified: false
+      verificationKey: key
     });
 
     await new_user.save();
@@ -76,7 +77,10 @@ module.exports = class UserRepository {
       user_info.save();
       return { status: "OK", data: "User verified." };
     }
-    return { status: "error", data: "Verification key and email comnbination incorrect" };
+    return {
+      status: "error",
+      data: "Verification key and email comnbination incorrect"
+    };
   }
 
   /**
@@ -89,8 +93,8 @@ module.exports = class UserRepository {
     if (!found_user) return { status: "error", data: "User not found." };
     var verified_user = found_user.isVerified;
     if (!verified_user) {
-        await this.send_verifcation(username);
-        return { status: "error", data: "Not verified" };
+      await this.send_verifcation(username);
+      return { status: "error", data: "Not verified" };
     }
     const check_password = await hash.verifyPassword(
       password,

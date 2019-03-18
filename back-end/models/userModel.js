@@ -1,13 +1,15 @@
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 var UserModelSchema = new Schema({
-    username: String,
-    email: String,
-    password: String,
-    verificationKey: String,
-    isVerified: Boolean
+  id: String,
+  username: String,
+  email: String,
+  password: String,
+  verificationKey: String,
+  isVerified: { type: Boolean, default: false },
+  reputation: { type: Number, default: 0 }
 });
 
-UserModelSchema.set('collection', 'users');
+UserModelSchema.set("collection", "users");
 module.exports = mongoose.model("UserModel", UserModelSchema);
