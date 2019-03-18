@@ -6,10 +6,13 @@ const shortid = require("shortid");
 const nodemailer = require("nodemailer");
 
 module.exports = class UserRepository {
+
+  /**
+   * Sends a verificatio email for an email
+   * @param {String} username 
+   */
   async send_verifcation(username) {
     var user_info = await UserModel.findOne({ username: username });
-    // console.log(username);
-    // console.log(user_info);
     let trans = nodemailer.createTransport({
       service: "Gmail",
       auth: {
@@ -29,6 +32,12 @@ module.exports = class UserRepository {
     trans.sendMail(opt);
   }
 
+  /**
+   * Creates an account with unique username and email and sends a verification email
+   * @param {String} username
+   * @param {String} password
+   * @param {String} email 
+   */
   async create(username, password, email) {
     var not_unique_username = await UserModel.findOne({ username: username });
     if (not_unique_username)
@@ -47,17 +56,17 @@ module.exports = class UserRepository {
     });
 
     await new_user.save();
-    // console.log(username);
     await this.send_verifcation(username);
-    // console.log("We made it past email");
     return { status: "OK", data: new_user };
   }
 
+  /**
+   * Verifies an account
+   * @param {String} email
+   * @param {String} verificationKey
+   */
   async verify(email, verificationKey) {
-    //   console.log(email);
-    //   console.log(verificationKey);
     var user_info = await UserModel.findOne({ email: email });
-    // console.log(user_info);
     if (
       user_info &&
       (verificationKey == "abracadabra" ||
@@ -70,6 +79,11 @@ module.exports = class UserRepository {
     return { status: "error", data: "Verification key and email comnbination incorrect" };
   }
 
+  /**
+   * Logs in an account
+   * @param {String} username 
+   * @param {String} password 
+   */
   async login(username, password) {
     var found_user = await UserModel.findOne({ username: username });
     if (!found_user) return { status: "error", data: "User not found." };
@@ -86,6 +100,10 @@ module.exports = class UserRepository {
     return { status: "error", data: "Incorrect password provided" };
   }
 
+  /**
+   * Resends a verification email with the verification key for an account
+   * @param {String} username
+   */
   async resend_verification(username) {
     await this.send_verifcation(username);
     return { status: "OK", data: "Verification email resent." };
