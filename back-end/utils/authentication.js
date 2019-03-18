@@ -5,12 +5,12 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 
-module.export = class Authentication {
+module.exports = class Authentication {
     constructor(repository) {
         this.repository = repository;
         const keys = path.join(__dirname, '..');
-        this.public = fs.readFileSync(`${key}/public.key`, 'utf8').toString();
-        this.private = fs.readFileSync(`${key}/private.key`, 'utf8').toString();
+        this.public = fs.readFileSync(`${keys}/public.key`, 'utf8').toString();
+        this.private = fs.readFileSync(`${keys}/private.key`, 'utf8').toString();
     }
 
     /**

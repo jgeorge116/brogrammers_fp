@@ -1,7 +1,7 @@
 const UserRepository = require("../repositories/userRepository");
 const UR = new UserRepository();
 const Authentication = require('../utils/authentication');
-const JWT = new Authentication();
+const JWT = new Authentication(UR);
 
 exports.add_user = async function(req, res) {
   var result = await UR.create(
