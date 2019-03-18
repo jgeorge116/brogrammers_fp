@@ -7,7 +7,7 @@ exports.add_user = async function(req, res) {
     req.body.password,
     req.body.email
   );
-  console.log(result);
+//   console.log(result);
   res.send({ status: result.status, error: result.data });
 };
 

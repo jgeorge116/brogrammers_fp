@@ -33,13 +33,15 @@ class verify extends Component {
         });
         let content = await res.json();
         if (content.status === "error") alert("Error: " + content.error);
-        this.props.history.push({
-            pathname: '/home',
+        else {
+          this.props.history.push({
+            pathname: "/home"
             // state: {
             //     username: this.props.location.state.username,
             //     pwd: this.props.location.state.pwd
             // }
-        })
+          });
+        }
       })();
     }
     //  else{

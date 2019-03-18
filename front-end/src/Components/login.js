@@ -33,9 +33,11 @@ class login extends Component {
             pathname: "/verify"
           });
         } else if (content.status === "error") alert("Error: " + content.error);
-        this.props.history.push({
-          pathname: "/home"
-        });
+        else {
+            this.props.history.push({
+            pathname: "/home"
+            });
+        }
         //   if(content.data === "pwd") alert("USER DOESN'T EXIST OR WRONG PASSWORD")
         //   else if(content1.data === "not"){ //user exists but isn't verifed.. redirect to verify page
         //       (async () => {const res = await fetch('http://localhost:4000/send', {
