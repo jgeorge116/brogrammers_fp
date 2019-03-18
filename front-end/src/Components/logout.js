@@ -16,7 +16,7 @@ class logout extends Component {
         <header>
           <link rel="stylesheet" href="style/styles.css"></link>
         </header>
-        <h1>YOU ARE LOGGED OUT...</h1>
+        <h1 id="logoutText">YOU ARE LOGGED OUT...</h1>
         <button id="login" onClick={this.handleLogin}>Log Back In!</button> 
         <br/>
         <button id="register" onClick={this.handleRegister}>Register</button> 

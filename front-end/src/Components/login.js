@@ -87,11 +87,11 @@ class login extends Component {
 
   render() {
     return (
-      <div>
+      <div className="loginContainer">
         <header>
-          <h1>Login boi!!</h1>
           <link rel="stylesheet" href="style/styles.css" />
         </header>
+        <h1>Login boi!!</h1>
         <form onSubmit={this.handleRequest}>
           <input
             type="text"

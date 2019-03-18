@@ -51,8 +51,8 @@ class verify extends Component {
 
   render() {
     return (
-      <div>
-        <h1>You aren't verified! A verification email has been sent..</h1>
+      <div className="verifyContainer">
+        <h1>Verify your Account</h1>
         <form onSubmit={this.handleRequest}>
           <input
             type="email"
@@ -64,7 +64,7 @@ class verify extends Component {
           <input
             type="text"
             name="key"
-            placeholder="enter the key sent in the email"
+            placeholder="key"
             onChange={this.handleChange}
           />
           <br />

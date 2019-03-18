@@ -64,38 +64,40 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1> Register For StackOverFlow!!</h1>
           <link rel="stylesheet" href="style/styles.css" />
         </header>
         <button id="login" onClick={this.handleLogin}>
           Login
         </button>
-        <form onSubmit={this.handleRequest}>
-          <input
-            type="text"
-            name="username"
-            placeholder="username"
-            onChange={this.handleChange}
-          />
-          <br />
-          <input
-            type="email"
-            name="email"
-            placeholder="email"
-            onChange={this.handleChange}
-          />
-          <br />
-          <input
-            type="password"
-            name="pwd"
-            placeholder="password"
-            onChange={this.handleChange}
-          />
-          <br />
-          <button id="sub" type="submit">
-            Submit
-          </button>
-        </form>
+        <div className="registerContainer">
+          <h1> Register For StackOverFlow!!</h1>
+          <form onSubmit={this.handleRequest}>
+            <input
+              type="text"
+              name="username"
+              placeholder="username"
+              onChange={this.handleChange}
+            />
+            <br />
+            <input
+              type="email"
+              name="email"
+              placeholder="email"
+              onChange={this.handleChange}
+            />
+            <br />
+            <input
+              type="password"
+              name="pwd"
+              placeholder="password"
+              onChange={this.handleChange}
+            />
+            <br />
+            <button id="sub" type="submit">
+              Submit
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
