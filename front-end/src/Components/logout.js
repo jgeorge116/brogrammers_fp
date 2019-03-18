@@ -18,6 +18,7 @@ class logout extends Component {
         </header>
         <h1>YOU ARE LOGGED OUT...</h1>
         <button id="login" onClick={this.handleLogin}>Log Back In!</button> 
+        <br/>
         <button id="register" onClick={this.handleRegister}>Register</button> 
       </div>
     );

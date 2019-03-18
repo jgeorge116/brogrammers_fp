@@ -32,10 +32,10 @@ module.exports = class UserRepository {
   async create(username, password, email) {
     var not_unique_username = await UserModel.findOne({ username: username });
     if (not_unique_username)
-      return { status: "error", data: "username exists" };
+      return { status: "error", data: "Username exists" };
 
     var not_unique_email = await UserModel.findOne({ email: email });
-    if (not_unique_email) return { status: "error", data: "email exists" };
+    if (not_unique_email) return { status: "error", data: "Email exists" };
     const hashedPassword = await hash.hashPassword(password);
     const key = shortid.generate();
     const new_user = new UserModel({
@@ -49,10 +49,13 @@ module.exports = class UserRepository {
     await new_user.save();
     // console.log(username);
     await this.send_verifcation(username);
+    // console.log("We made it past email");
     return { status: "OK", data: new_user };
   }
 
   async verify(email, verificationKey) {
+    //   console.log(email);
+    //   console.log(verificationKey);
     var user_info = await UserModel.findOne({ email: email });
     // console.log(user_info);
     if (
@@ -71,7 +74,10 @@ module.exports = class UserRepository {
     var found_user = await UserModel.findOne({ username: username });
     if (!found_user) return { status: "error", data: "User not found." };
     var verified_user = found_user.isVerified;
-    if (!verified_user) return { status: "error", data: "Not verified" };
+    if (!verified_user) {
+        await this.send_verifcation(username);
+        return { status: "error", data: "Not verified" };
+    }
     const check_password = await hash.verifyPassword(
       password,
       found_user.password
@@ -82,6 +88,6 @@ module.exports = class UserRepository {
 
   async resend_verification(username) {
     await this.send_verifcation(username);
-    return { status: "OK", data: "Verification email resent" };
+    return { status: "OK", data: "Verification email resent." };
   }
 };
