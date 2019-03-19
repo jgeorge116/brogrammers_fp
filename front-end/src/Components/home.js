@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Button from '@material-ui/core/Button';
 class home extends Component{ //add logic
     handleLogout = () => {
         (async () => {const res = await fetch('http://localhost:4000/logout', { 
@@ -19,10 +20,10 @@ class home extends Component{ //add logic
         return( //add logic..
             <div>
                 <header className="App-header">
-                    <h1>HOMEEEE...</h1>
                     <link rel="stylesheet" href="style/styles.css"></link>
                 </header>  
-                <button id="logout" onClick={this.handleLogout}>Logout</button> 
+                <h1 id="homeText">HOMEEEE...</h1>
+                <Button id="logout" onClick={this.handleLogout}>Logout</Button> 
             </div>
         )
     }

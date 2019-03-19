@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 
 class login extends Component {
   constructor() {
@@ -94,23 +96,29 @@ class login extends Component {
         </header>
         <h1>Login boi!!</h1>
         <form onSubmit={this.handleRequest}>
-          <input
+          <TextField
             type="text"
             name="username"
-            placeholder="username"
+            label="Username"
             onChange={this.handleChange}
+            margin="normal"
+            variant="outlined"
+            fullWidth
           />
           <br />
-          <input
+          <TextField
             type="password"
             name="pwd"
-            placeholder="password"
+            label="Password"
             onChange={this.handleChange}
+            margin="normal"
+            variant="outlined"
+            fullWidth
           />
           <br />
-          <button id="sub" type="submit">
+          <Button id="sub" type="submit">
             Submit
-          </button>
+          </Button>
         </form>
       </div>
     );

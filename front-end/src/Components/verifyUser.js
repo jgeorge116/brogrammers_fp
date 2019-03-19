@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 class verify extends Component {
   constructor(props) {
     super(props);
@@ -54,23 +55,29 @@ class verify extends Component {
       <div className="verifyContainer">
         <h1>Verify your Account</h1>
         <form onSubmit={this.handleRequest}>
-          <input
+          <TextField
             type="email"
             name="email"
-            placeholder="email"
+            label="Email"
             onChange={this.handleChange}
+            margin="normal"
+            variant="outlined"
+            fullWidth
           />
           <br />
-          <input
+          <TextField
             type="text"
             name="key"
-            placeholder="key"
+            label="Key"
             onChange={this.handleChange}
+            margin="normal"
+            variant="outlined"
+            fullWidth
           />
           <br />
-          <button id="sub" type="submit">
+          <Button id="sub" type="submit">
             Submit
-          </button>
+          </Button>
         </form>
       </div>
     );

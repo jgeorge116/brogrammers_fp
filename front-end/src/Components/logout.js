@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import Button from '@material-ui/core/Button';
 class logout extends Component {
 
   handleLogin = () => {
@@ -17,9 +17,9 @@ class logout extends Component {
           <link rel="stylesheet" href="style/styles.css"></link>
         </header>
         <h1 id="logoutText">YOU ARE LOGGED OUT...</h1>
-        <button id="login" onClick={this.handleLogin}>Log Back In!</button> 
+        <Button id="login" onClick={this.handleLogin}>Log Back In!</Button> 
         <br/>
-        <button id="register" onClick={this.handleRegister}>Register</button> 
+        <Button id="register" onClick={this.handleRegister}>Register</Button> 
       </div>
     );
   } 

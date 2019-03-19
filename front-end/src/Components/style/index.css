@@ -17,18 +17,7 @@ code {
 
 input[type=text], input[type=password], input[type=email] {
     text-decoration: none;
-    font-size:14px;
-    padding: 15px;
-    box-sizing: border-box;
     background-color: #f2f2f2;
-    border:1px solid #CCF4F4;
-    width:100%;
-    border-radius:5px;
-    margin:0 0 10px;
-}
-
-input:hover {
-    background-color:#ffffff;
 }
 
 h1 {
@@ -81,17 +70,8 @@ h1 {
     background-color:#CCF4F4;
 }
 
-#logoutText {
+#logoutText, #homeText {
     position:absolute;
     left:5%;
     top:5%;
-}
-
-input[type=submit] {
-    padding:15px;
-    cursor:pointer;
-    font-size:14px;
-    width:100%;
-    background-color: #A2E3C4;
-    border:0;
 }
