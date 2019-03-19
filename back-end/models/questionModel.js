@@ -8,7 +8,6 @@ var QuestionModelSchema = new Schema(
     title: String,
     body: String,
     tags: [String],
-    // view_count: { type: Number, default: 0 },
     media: { type: [String], default: [] },
     accepted_answer_id: { type: String, default: null },
     timestamp: {type: Number, default: new Date().getTime()}

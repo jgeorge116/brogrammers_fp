@@ -54,3 +54,16 @@ exports.get_question_by_id = async function(req, res) {
     res.send({ status: result.status, error: result.data });
   } else res.send({ status: "OK", question: result.data });
 };
+
+exports.search_questions = async function(req, res) {
+  var result = await QR.search_questions(
+    req.body.timestamp,
+    req.body.limit,
+    req.body.accepted
+  );
+  if (result.status == "error") {
+    res.send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status, questions: result.data });
+  }
+};
