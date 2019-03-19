@@ -20,7 +20,7 @@ exports.verify = async function(req, res) {
 
 exports.login = async function(req, res) {
   var result = await UR.login(req.body.username, req.body.password);
-  if (result.status === 'error') {
+  if (result.status !== 'error') {
     const token = JWT.generate(req.body.username, req.body.password);
     res.cookie('jwt', token, { httpOnly: true });
   }

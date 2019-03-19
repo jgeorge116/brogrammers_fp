@@ -18,6 +18,7 @@ class login extends Component {
       (async () => {
         const res = await fetch("http://localhost:4000/login", {
           method: "POST",
+          credentials: 'include',
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json; charset=utf-8"

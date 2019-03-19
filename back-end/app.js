@@ -13,9 +13,17 @@ mongoose.connect('mongodb://localhost:27017/stackOverflowDB', {useNewUrlParser: 
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-app.use(cors());
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true
+}
+
+app.use(cors(corsOptions));
 app.use(parser.urlencoded({ extended: true }));
 app.use(parser.json());
+
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 // const routes = require("./routes/index");
 const UserRouter = require("./routes/userRouter");
