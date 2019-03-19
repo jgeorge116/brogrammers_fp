@@ -9,7 +9,6 @@ exports.add_user = async function(req, res) {
     req.body.password,
     req.body.email
   );
-//   console.log(result);
   res.send({ status: result.status, error: result.data });
 };
 
@@ -29,6 +28,7 @@ exports.login = async function(req, res) {
 
 exports.logout = async function(req, res) {
   res.clearCookie('jwt', { httpOnly: true });
+  res.send({ status: "OK" });
 };
 
 exports.resend_verification = async function(req, res) {

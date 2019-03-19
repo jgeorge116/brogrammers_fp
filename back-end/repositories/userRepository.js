@@ -9,11 +9,17 @@ const nodemailer = require("nodemailer");
 module.exports = class UserRepository {
 
   /**
-   * Sends a verificatio email for an email
+   * Sends a verification email for an user
    * @param {String} username 
    */
-  async send_verifcation(username) {
+  async send_verification(username) {
+    if (!username) {
+      return { status: "error", data: "Username cannot be empty!" };
+    }
     var user_info = await UserModel.findOne({ username: username });
+    if (!user_info) {
+      return { status: "error", data: "User does not exist to send verification email." };
+    }
     let trans = nodemailer.createTransport({
       service: "Gmail",
       auth: {
@@ -31,6 +37,7 @@ module.exports = class UserRepository {
       }>`
     };
     trans.sendMail(opt);
+    return { status: "OK", data: "" };
   }
 
   /**
@@ -40,12 +47,26 @@ module.exports = class UserRepository {
    * @param {String} email 
    */
   async create(username, password, email) {
+    // Check if fields exist
+    if (!username) {
+      return { status: "error", data: "Username cannot be empty!" };
+    }
+    if (!password) {
+      return { status: "error", data: "Password cannot be empty!" };
+    }
+    if (!email) {
+      return { status: "error", data: "Email cannot be empty!" };
+    }
+    // Check if username and email are unique
     var not_unique_username = await UserModel.findOne({ username: username });
-    if (not_unique_username)
-      return { status: "error", data: "Username exists" };
-
+    if (not_unique_username) {
+      return { status: "error", data: "Username exists." };
+    }
     var not_unique_email = await UserModel.findOne({ email: email });
-    if (not_unique_email) return { status: "error", data: "Email exists" };
+    if (not_unique_email) {
+      return { status: "error", data: "Email exists." };
+    }
+    // Store new user
     const hashedPassword = await hash.hashPassword(password);
     const key = shortid.generate();
     const new_user = new UserModel({
@@ -57,8 +78,8 @@ module.exports = class UserRepository {
     });
 
     await new_user.save();
-    await this.send_verifcation(username);
-    return { status: "OK", data: new_user };
+    await this.send_verification(username);
+    return { status: "OK", error: "" };
   }
 
   /**
@@ -67,6 +88,13 @@ module.exports = class UserRepository {
    * @param {String} verificationKey
    */
   async verify(email, verificationKey) {
+    // Check if fields exist
+    if (!email) {
+      return { status: "error", data: "Email cannot be empty!" };
+    }
+    if (!verificationKey) {
+      return { status: "error", data: "Verification key cannot be empty!" };
+    }
     var user_info = await UserModel.findOne({ email: email });
     if (
       user_info &&
@@ -79,7 +107,7 @@ module.exports = class UserRepository {
     }
     return {
       status: "error",
-      data: "Verification key and email comnbination incorrect"
+      data: "Verification key and email comnbination incorrect."
     };
   }
 
@@ -89,18 +117,29 @@ module.exports = class UserRepository {
    * @param {String} password 
    */
   async login(username, password) {
+    // Check if fields exist
+    if (!username) {
+      return { status: "error", data: "Username cannot be empty!" };
+    }
+    if (!password) {
+      return { status: "error", data: "Password cannot be empty!" };
+    }
     var found_user = await UserModel.findOne({ username: username });
-    if (!found_user) return { status: "error", data: "User not found." };
+    if (!found_user) {
+      return { status: "error", data: "User not found." };
+    }
     var verified_user = found_user.isVerified;
     if (!verified_user) {
-      await this.send_verifcation(username);
+      await this.send_verification(username);
       return { status: "error", data: "Not verified" };
     }
     const check_password = await hash.verifyPassword(
       password,
       found_user.password
     );
-    if (check_password) return { status: "OK", data: "User logged in" };
+    if (check_password) {
+      return { status: "OK", data: "User logged in" };
+    }
     return { status: "error", data: "Incorrect password provided" };
   }
 
@@ -109,7 +148,14 @@ module.exports = class UserRepository {
    * @param {String} username
    */
   async resend_verification(username) {
-    await this.send_verifcation(username);
+    // Check if username exists
+    if (!username) {
+      return { status: "error", data: "Username cannot be empty!" };
+    }
+    const result = await this.send_verification(username);
+    if (result.status == 'error') {
+      return { status: result.status, data: result.data };
+    }
     return { status: "OK", data: "Verification email resent." };
   }
 };
