@@ -28,9 +28,11 @@ exports.add_question = async function(req, res) {
 
 exports.get_question_by_id = async function(req, res) {
   if (!req.cookies.jwt) {
+    var ip = req.header("x-forwarded-for");
+    if (!ip) ip = req.ip;
     await QR.add_view_to_question(req.params.id, {
       type: "IP",
-      query: req.ip
+      query: ip
     });
   } else {
     var jwt = await JWT.validate(req.cookies.jwt);
