@@ -6,8 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = class Authentication {
-    constructor(repository) {
-        this.repository = repository;
+    constructor() {
         const keys = path.join(__dirname, '..');
         this.public = fs.readFileSync(`${keys}/public.key`, 'utf8').toString();
         this.private = fs.readFileSync(`${keys}/private.key`, 'utf8').toString();
