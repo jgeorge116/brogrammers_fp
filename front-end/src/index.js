@@ -7,6 +7,7 @@ import verify from "./Components/verifyUser";
 import home from "./Components/home";
 import login from "./Components/login";
 import logout from "./Components/logout";
+import Search from "./Components/search";
 
 ReactDOM.render(
   <BrowserRouter>
@@ -16,7 +17,8 @@ ReactDOM.render(
       <Route path="/home" component={home} />
       <Route path="/login" component={login} />
       <Route path="/logout" component={logout} />
-      <Redirect from="/" exact to="/adduser" />
+      <Route path="/search" component={Search} />
+      <Redirect from="/" exact to="/adduser" /> 
     </Switch>
   </BrowserRouter>,
   document.getElementById("root")
