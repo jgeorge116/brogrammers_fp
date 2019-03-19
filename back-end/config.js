@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 const password = fs.readFileSync(path.join(__dirname, 'emailpassword'), 'utf8').toString();
 
 export default {

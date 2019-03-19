@@ -5,7 +5,6 @@ const JWT = new Authentication();
 
 exports.add_answer = async function(req, res) {
   if (!req.cookies.jwt) {
-    res.clearCookie("jwt", { httpOnly: true });
     res.send({ status: "error", error: "No token provided" });
   } else {
     var jwt = await JWT.validate(req.cookies.jwt);
