@@ -1,5 +1,6 @@
 const Mongoose = require("mongoose");
 const QuestionModel = require("../models/questionModel");
+const AnswerModel = require("../models/answerModel");
 const UserModel = require("../models/userModel");
 const ViewQuestionModel = require("../models/viewQuestionModel");
 const uuidv4 = require("uuid/v4");
@@ -93,7 +94,10 @@ module.exports = class QuestionRepository {
         status: "error",
         data: "User who created question does not exist"
       };
-    const views = await ViewQuestionModel.countDocuments({
+    const view_count = await ViewQuestionModel.countDocuments({
+      question_id: format_question.id
+    });
+    const answer_count = await AnswerModel.countDocuments({
       question_id: format_question.id
     });
     var question = {
@@ -106,8 +110,8 @@ module.exports = class QuestionRepository {
       title: format_question.title,
       body: format_question.body,
       score: 0, // TODO: IMPLEMENT THIS
-      view_count: views,
-      answer_count: 0, // TODO: BE IMPLEMENT THIS
+      view_count: view_count,
+      answer_count: answer_count,
       timestamp: format_question.timestamp,
       media: format_question.media,
       tags: format_question.tags,
