@@ -14,7 +14,6 @@ module.exports = class QuestionRepository {
       tags: tags
     });
     await new_question.save();
-
     return { status: "OK", data: new_id };
   }
 
