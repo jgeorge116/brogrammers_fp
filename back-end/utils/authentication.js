@@ -22,7 +22,7 @@ module.exports = class Authentication {
                 username: username,
                 password: password
             },
-            this.secret,
+            this.private,
             {
                 algorithm: 'RS256',
                 expiresIn: '1 day'
