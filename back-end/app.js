@@ -17,11 +17,11 @@ app.use(cors());
 app.use(parser.urlencoded({ extended: true }));
 app.use(parser.json());
 
-// const routes = require("./routes/index");
+
 const UserRouter = require("./routes/userRouter");
 const QuestionRouter = require("./routes/questionRouter");
-app.use("/", [UserRouter, QuestionRouter]);
-// const routs = new UserRouter();
+const AnswerRouter = require("./routes/answerRouters");
+app.use("/", [UserRouter, QuestionRouter, AnswerRouter]);
 
 const portNum = process.env.PORT || 4000;
 app.listen(portNum, () => console.log("Web server listening on port 4000..."));

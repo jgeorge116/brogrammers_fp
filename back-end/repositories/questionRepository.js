@@ -3,7 +3,7 @@ const QuestionModel = require("../models/questionModel");
 const UserModel = require("../models/userModel");
 const uuidv4 = require("uuid/v4");
 
-module.exports = class UserRepository {
+module.exports = class QuestionRepository {
   async create(username, title, body, tags) {
     const new_id = uuidv4();
     const new_question = new QuestionModel({
