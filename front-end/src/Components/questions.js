@@ -72,6 +72,7 @@ class questions extends Component {
             margin="normal"
             variant="outlined"
             fullWidth
+            multiline
           />
           <br />
           <TextField

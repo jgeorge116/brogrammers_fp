@@ -33,6 +33,36 @@ h1 {
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 
+p {
+    margin-top: 1px;
+}
+
+.question{
+    margin: 5%;
+    background-color: white;
+    padding: 50px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    overflow:hidden;
+}
+
+.answer {
+    overflow:hidden;
+}
+
+.questionInfo, .answerInfo {
+    float:right;
+}
+
+.submitAnswer, .answers {
+    clear:both;
+}
+
+.tag {
+    border:1px solid black;
+    padding:5px;
+    margin-left:5px;
+}
+
 #logout, #login {
     position:absolute;
     right:5%;
