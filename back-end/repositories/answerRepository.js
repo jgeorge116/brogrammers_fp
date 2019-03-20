@@ -4,7 +4,25 @@ const UserModel = require("../models/userModel");
 const uuidv4 = require("uuid/v4");
 
 module.exports = class AnswerRepository {
+  /**
+   * Creates an answer authored by the username to a specific
+   * question. Includes media.
+   * @param {String} question_id
+   * @param {String} username
+   * @param {String} body
+   * @param {Array of Strings} media
+   */
   async create(question_id, username, body, media) {
+    if (!username) {
+      return { status: "error", data: "Username is required" };
+    }
+    if (!body) {
+      return { status: "error", data: "Body is required" };
+    }
+    var found_question = await QuestionModel.findOne({ id: id });
+    if (!found_question) {
+      return { status: "error", data: "Question does not exist" };
+    }
     const new_id = uuidv4();
     const new_answer = new AnswerModel({
       id: new_id,
@@ -14,19 +32,23 @@ module.exports = class AnswerRepository {
       tags: media
     });
     await new_answer.save();
-
     return { status: "OK", data: new_id };
   }
-
+  
+  /**
+   * Gets all the answers associated with a question.
+   * @param {String} question_id 
+   */
   async get_answers(question_id) {
-    // console.log(id);
+    var found_question = await QuestionModel.findOne({ id: id });
+    if (!found_question) {
+      return { status: "error", data: "Question does not exist" };
+    }
     var found_answers = await AnswerModel.find({ question_id: question_id });
     if (!found_answers)
       return { status: "error", data: "Question does not exist" };
     var all_answers = [];
-    // console.log(found_answers);
     for (var answer in found_answers) {
-        // console.log(answer);
       all_answers.push({
         id: found_answers[answer].id,
         user: found_answers[answer].username,
