@@ -8,7 +8,7 @@ exports.add_answer = async function(req, res) {
     res.send({ status: "error", error: "No token provided" });
   } else {
     var jwt = await JWT.validate(req.cookies.jwt);
-    if (!jwt) {
+    if (!jwt.username) {
       res.clearCookie("jwt", { httpOnly: true });
       res.send({ status: "error", error: "Invalid JWT" });
     } else {
