@@ -6,7 +6,28 @@ const ViewQuestionModel = require("../models/viewQuestionModel");
 const uuidv4 = require("uuid/v4");
 
 module.exports = class QuestionRepository {
+
+  /**
+   * Creates a question associated with a username
+   * @param {String} username 
+   * @param {String} title 
+   * @param {String} body 
+   * @param {Array} tags 
+   */
   async create(username, title, body, tags) {
+    // Check the fields
+    if (!username) {
+      return { status: "error", data: "Username is required" };
+    }
+    if (!title) {
+      return { status: "error", data: "Title is required" };
+    }
+    if (!body) {
+      return { status: "error", data: "Body is required" };
+    }
+    if (!tags) {
+      return { status: "error", data: "Tags are required" };
+    }
     const new_id = uuidv4();
     const new_question = new QuestionModel({
       id: new_id,
@@ -19,28 +40,49 @@ module.exports = class QuestionRepository {
     return { status: "OK", data: new_id };
   }
 
+  /**
+   * Get a question associated with an id
+   * @param {String} id 
+   */
   async get_questions_by_id(id) {
     var found_question = await QuestionModel.findOne({ id: id });
-    if (!found_question)
+    if (!found_question) {
       return { status: "error", data: "Question does not exist" };
+    }
     var question = await this.question_to_api_format(found_question);
     return { status: question.status, data: question.data };
   }
 
+  /**
+   * Add a view to a question by IP or username
+   * @param {String} id 
+   * @param {String} info 
+   */
   async add_view_to_question(id, info) {
+    var found_question = await QuestionModel.findOne({ id: id });
+    if (!found_question) {
+      // Don't add a view if question does not exist
+      return;
+    }
     if (info.type == "IP") {
+      // Don't increment if there is a view with this IP
       const find_view = await ViewQuestionModel.findOne({ ip: info.query });
-      if (find_view) return;
+      if (find_view) {
+        return;
+      }
       const new_view = new ViewQuestionModel({
         question_id: id,
         ip: info.query
       });
       new_view.save();
     } else {
+      // Don't increment if there is a view with this username
       const find_view = await ViewQuestionModel.findOne({
         username: info.query
       });
-      if (find_view) return;
+      if (find_view) {
+        return;
+      }
       const new_view = new ViewQuestionModel({
         question_id: id,
         username: info.query
