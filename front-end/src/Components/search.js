@@ -14,10 +14,23 @@ class Search extends Component {
 
   handleRequest = e => {
     e.preventDefault()
-    // console.log(this.state.limit)
-    // console.log(this.state.accepted)
-    // console.log(this.state.timestamp)
-    alert("submitted!")
+    (async () => {
+      const res = await fetch("http://localhost:4000/search", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify({
+          title: this.state.timestamp,
+          body: this.state.limit,
+          tags: this.state.accepted
+        })
+      });
+      let content = await res.json();
+      console.log(content) //display this content by making a separate post component (i'll do later)
+    })();
   };
 
   handleInputChange = (e) => {
