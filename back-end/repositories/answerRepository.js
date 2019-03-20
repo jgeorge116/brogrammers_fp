@@ -1,6 +1,7 @@
 const Mongoose = require("mongoose");
 const AnswerModel = require("../models/answerModel");
 const UserModel = require("../models/userModel");
+const QuestionModel = require("../models/questionModel")
 const uuidv4 = require("uuid/v4");
 
 module.exports = class AnswerRepository {
@@ -19,7 +20,7 @@ module.exports = class AnswerRepository {
     if (!body) {
       return { status: "error", data: "Body is required" };
     }
-    var found_question = await QuestionModel.findOne({ id: id });
+    var found_question = await QuestionModel.findOne({ id: question_id });
     if (!found_question) {
       return { status: "error", data: "Question does not exist" };
     }
@@ -40,7 +41,7 @@ module.exports = class AnswerRepository {
    * @param {String} question_id 
    */
   async get_answers(question_id) {
-    var found_question = await QuestionModel.findOne({ id: id });
+    var found_question = await QuestionModel.findOne({ id: question_id });
     if (!found_question) {
       return { status: "error", data: "Question does not exist" };
     }

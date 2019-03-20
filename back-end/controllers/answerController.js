@@ -27,5 +27,5 @@ exports.add_answer = async function(req, res) {
 
 exports.get_answers = async function(req, res) {
   var result = await AR.get_answers(req.params.id);
-  res.send({ status: result.status, error: result.data });
+  res.send({ status: result.status, answers: result.data });
 };
