@@ -1,6 +1,8 @@
 import React, { Component } from "react"
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
+import Post from './post'
+let data = null
 
 class Search extends Component {
   constructor() {
@@ -8,7 +10,8 @@ class Search extends Component {
     this.state = {
       limit: 25,
       accepted: false,
-      timestamp: false
+      timestamp: false,
+      show: false
     };
   }
 
@@ -29,10 +32,29 @@ class Search extends Component {
         })
       });
       let content = await res.json();
-      console.log(content) //display this content by making a separate post component (i'll do later)
+      console.log(content) 
     })();
-  };
+    data = content.all_questions //array of questions
+    this.setState({show: true})
+  }
+  showResults = (data) => { //display results
+    return(
+      data.map(item =>
+      <Post
+        username={item.username}
+        rep={item.rep} 
+        title={item.title}
+        body={item.body} 
+        views={item.views}
+        time={item.time}
+        tags={item.tags} 
+        />
+      )
+    )
+  }
 
+  clearSearch = () => {this.setState({show: false})} //clear all posts from previous search 
+  
   handleInputChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     const name = e.target.name
@@ -78,10 +100,16 @@ class Search extends Component {
             <Button id="sub" type="submit">
             Submit
           </Button>
-      </form>        
+        </form>  
+        <div>
+          <Button id="clear" onClick={this.clearSearch}>
+                Clear Search Results
+          </Button> 
+          {this.state.show ? this.showResults(data) : null }  
+        </div>
       </div>
-    );
+    )
   }
 }
 
-export default Search;
+export default Search

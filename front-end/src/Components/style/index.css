@@ -86,7 +86,7 @@ p {
     background-color: #AFEEEE;
 }
 
-#sub {
+#sub, #clear {
     font-weight:bold;
     cursor:pointer;
     font-size:14px;
@@ -96,7 +96,7 @@ p {
     width:100%;
 }
 
-#sub:hover, #login:hover, #register:hover, #logout:hover {
+#sub:hover, #clear:hover #login:hover, #register:hover, #logout:hover {
     background-color:#CCF4F4;
 }
 
