@@ -1,34 +1,51 @@
-const express = require("express");
-const app = express();
+const cluster = require("cluster");
 
-const MongoClient = require("mongodb").MongoClient;
-const cors = require("cors");
-const parser = require("body-parser");
-const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer");
-const shortid = require("shortid");
+if (cluster.isMaster) {
+  var numberOfCPU = require("os").cpus().length;
+  for (var i = 0; i < numberOfCPU; i++) {
+    cluster.fork();
+    cluster.on("exit", function(worker, code, signal) {
+      console.log("Worker died. Starting a new one.");
+      cluster.fork();
+    });
+  }
+} else {
+  const express = require("express");
+  const app = express();
+  const cors = require("cors");
+  const parser = require("body-parser");
+  const mongoose = require("mongoose");
+  mongoose.connect("mongodb://localhost:27017/stackOverflowDB", {
+    useNewUrlParser: true
+  });
+  let db = mongoose.connection;
+  db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/stackOverflowDB', {useNewUrlParser: true});
-let db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+  const cookieParser = require("cookie-parser");
+  app.use(cookieParser());
 
-const corsOptions = {
-    origin: 'http://localhost:3000',
+  const corsOptions = {
+    origin: "http://localhost:3000",
     credentials: true
+  };
+
+  app.use(cors(corsOptions));
+  app.use(parser.urlencoded({ extended: true }));
+  app.use(parser.json());
+
+  // App routes
+  const UserRouter = require("./routes/userRouter");
+  const QuestionRouter = require("./routes/questionRouter");
+  const AnswerRouter = require("./routes/answerRouters");
+  app.use("/", [UserRouter, QuestionRouter, AnswerRouter]);
+
+  // morgan to log HTTP responses
+  const morgan = require("morgan");
+  app.use(morgan("dev"));
+
+  // Run app
+  const portNum = process.env.PORT || 4000;
+  app.listen(portNum, () =>
+    console.log(`Process ${process.pid} is listening on port 4000...`)
+  );
 }
-
-app.use(cors(corsOptions));
-app.use(parser.urlencoded({ extended: true }));
-app.use(parser.json());
-
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
-
-const UserRouter = require("./routes/userRouter");
-const QuestionRouter = require("./routes/questionRouter");
-const AnswerRouter = require("./routes/answerRouters");
-app.use("/", [UserRouter, QuestionRouter, AnswerRouter]);
-
-const portNum = process.env.PORT || 4000;
-app.listen(portNum, () => console.log("Web server listening on port 4000..."));
