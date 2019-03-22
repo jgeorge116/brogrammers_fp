@@ -37,17 +37,18 @@ class Search extends Component {
     data = content.all_questions //array of questions
     this.setState({show: true})
   }
+
   showResults = (data) => { //display results
     return(
       data.map(item =>
       <Post
-        username={item.username}
-        rep={item.rep} 
+        username={item.user.username}
+        rep={item.user.reputation} 
         title={item.title}
         body={item.body} 
         views={item.views}
         time={item.time}
-        tags={item.tags} 
+        tags={item.tags.map(tag => tag+" ")} 
         />
       )
     )
