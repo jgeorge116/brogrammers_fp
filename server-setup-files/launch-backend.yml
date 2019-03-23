@@ -1,0 +1,21 @@
+---
+- name: StackOverflow Backend
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: install nginx
+      apt: name=nginx state=latest
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+    - name: install node
+      apt: name=nodejs state=latest
+    - name: install npm
+      apt: name=npm
+    - name: install required backend packages
+      npm:
+        path: ../back-end
+        state: latest
