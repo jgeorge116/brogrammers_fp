@@ -33,8 +33,8 @@ class Search extends Component {
       });
       let content = await res.json();
       console.log(content) 
+      data = content.all_questions //array of questions
     })();
-    data = content.all_questions //array of questions
     this.setState({show: true})
   }
 
