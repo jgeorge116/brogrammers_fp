@@ -15,7 +15,14 @@
       apt: name=nodejs state=latest
     - name: install npm
       apt: name=npm
+    - name: upgrade npm
+      command: npm install -g npm
     - name: install required backend packages
+      command: npm install ../back-end
+    - name: Install PM2
       npm:
-        path: ../back-end
+        name: pm2
         state: latest
+        global: yes
+    - name: Run PM@
+      command: pm2 start ../back-end
