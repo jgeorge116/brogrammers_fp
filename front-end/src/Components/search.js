@@ -15,8 +15,8 @@ class Search extends Component {
     };
   }
 
-  handleRequest = e => {
-    e.preventDefault()
+  handleRequest = (e) => {
+    e.preventDefault();
     (async () => {
       const res = await fetch("http://localhost:4000/search", {
         method: "POST",
@@ -33,15 +33,19 @@ class Search extends Component {
       });
       let content = await res.json();
       console.log(content) 
+      data = content.questions //array of questions
+      console.log(content)
+      this.setState({show: true})
     })();
-    data = content.all_questions //array of questions
-    this.setState({show: true})
+    // this.setState({show: true})
   }
 
   showResults = (data) => { //display results
+    let i = 0 //to eliminate dumb warnings lol
     return(
       data.map(item =>
       <Post
+        key={++i}
         username={item.user.username}
         rep={item.user.reputation} 
         title={item.title}
