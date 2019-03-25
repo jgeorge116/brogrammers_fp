@@ -12,6 +12,9 @@ if (cluster.isMaster) {
 } else {
   const express = require("express");
   const app = express();
+  // morgan to log HTTP responses
+  const morgan = require("morgan");
+  app.use(morgan("dev"));
   const cors = require("cors");
   const parser = require("body-parser");
   const mongoose = require("mongoose");
@@ -39,9 +42,6 @@ if (cluster.isMaster) {
   const AnswerRouter = require("./routes/answerRouters");
   app.use("/", [UserRouter, QuestionRouter, AnswerRouter]);
 
-  // morgan to log HTTP responses
-  const morgan = require("morgan");
-  app.use(morgan("dev"));
 
   // Run app
   const portNum = process.env.PORT || 4000;
