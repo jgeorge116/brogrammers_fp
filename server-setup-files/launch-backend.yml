@@ -25,4 +25,7 @@
         state: latest
         global: yes
     - name: Run PM@
-      command: pm2 start ../back-end
+      command: pm2 start ../back-end/app.js
+    - name: Make PM2 start on startup 
+      command: sudo env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+      

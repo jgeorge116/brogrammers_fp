@@ -1,8 +1,9 @@
 const express = require("express");
-const UserRouter = require("./userRouter");
+const router = express.Router();
 
-export class Routes {
-    constructor() {
-        
-    }
-}
+router.post("/", function (req, res) {
+    res.set('Content-Type', 'text/html');
+res.send(new Buffer('<h1>Hello World</h1>'));
+});
+
+module.exports = router;
