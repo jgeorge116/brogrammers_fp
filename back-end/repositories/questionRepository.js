@@ -129,7 +129,7 @@ module.exports = class QuestionRepository {
     if (!search_timestamp) {
       search_timestamp = new Date().getTime();
     }
-    if (!Number.isInteger(search_timestamp) || search_timestamp < 0) {
+    if (search_timestamp < 0) {
       return {
         status: "error",
         data: "Timestamp has to be a non-negative integer"

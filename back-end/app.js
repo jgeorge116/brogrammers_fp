@@ -12,6 +12,8 @@ if (cluster.isMaster) {
 } else {
   const express = require("express");
   const app = express();
+  // Tell express there is a proxy on the same server as the app
+  app.set('trust proxy', '127.0.0.1');
   // morgan to log HTTP responses
   const morgan = require("morgan");
   app.use(morgan("dev"));
