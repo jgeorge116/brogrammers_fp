@@ -5,6 +5,8 @@ class ViewUserInfo extends Component {
         super(props);
         this.state = {
             username:"",
+            email: "",
+            reputation: -1,
             questions: [],
             answers: [],
             isLoading: true
@@ -12,18 +14,36 @@ class ViewUserInfo extends Component {
       }
 
     async componentDidMount() {
-        this.setState({username: this.props.match.params.id}, this.getUserQuestionsAndAnswers());
+        this.setState({username: this.props.match.params.id}, this.getUserInfo());
         this.setState({isLoading: false});
     }
 
-    getUserQuestionsAndAnswers () { 
+    getUserInfo() {
+        fetch(`http://localhost:4000/user/${this.props.match.params.id}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "error") this.setState({email: "DOES NOT EXIST!!", reputation: "DOES NOT EXIST!!"})
+                else this.setState({email: data.user.email, reputation: data.user.reputation})
+                console.log(data)
+                this.getUserQuestions()
+                })
+            .catch(err => console.log(err))
+    }
+
+    getUserQuestions() { 
         fetch(`http://localhost:4000/user/${this.props.match.params.id}/questions`)
             .then(response => response.json())
             .then(data => {
-                if(data.status === "error") this.setState({questions: ["NOT FOUND!"], isLoading: false})
+                if(data.status === "error") this.setState({questions: ["User didn't post anything yet:("], isLoading: false})
                 else this.setState({questions: data.questions, isLoading: false})
-                console.log(data)})
+                console.log(data)
+                this.getUserAnswers()
+                })
             .catch(err => console.log(err))
+    }
+
+    getUserAnswers() {
+
     }
 
     showQuestions() {
@@ -41,6 +61,8 @@ class ViewUserInfo extends Component {
             return(
                 <div>
                     <h2>UserName: {this.state.username}</h2>
+                    <h2>Email: {this.state.email}</h2>
+                    <h2>Reputation: {this.state.reputation}</h2>
                     <h3>User question Ids: </h3>
                     {this.showQuestions()}
                 </div>

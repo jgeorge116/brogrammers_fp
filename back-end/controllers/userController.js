@@ -35,3 +35,8 @@ exports.resend_verification = async function(req, res) {
   var result = await UR.resend_verification(req.body.username);
   res.send({ status: result.status, error: result.data });
 };
+
+exports.getUserInfo = async (req, res) => {
+  let result = await UR.getUserInfo(req.params.id)
+  res.send({status: result.status, user: result.data})
+}

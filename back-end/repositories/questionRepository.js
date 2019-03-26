@@ -271,7 +271,7 @@ module.exports = class QuestionRepository {
    */
   async get_questions_by_userID(userID) {
     let found_questions = await QuestionModel.find({username: userID})
-    if(found_questions.length == 0) return {status: "error", data: "Invalid username!"}
+    if(found_questions.length == 0) return {status: "error", data: "User has not posted questions yet!"}
     let all_questions = []
     for(let questions in found_questions) {
       let question_info = await this.question_to_api_format(found_questions[questions])
