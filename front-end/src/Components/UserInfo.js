@@ -34,8 +34,8 @@ class ViewUserInfo extends Component {
         fetch(`http://localhost:4000/user/${this.props.match.params.id}/questions`)
             .then(response => response.json())
             .then(data => {
-                if(data.status === "error") this.setState({questions: ["User didn't post anything yet:("], isLoading: false})
-                else this.setState({questions: data.questions, isLoading: false})
+                if(data.status === "error") this.setState({questions: ["User didn't post anything yet:("]})
+                else this.setState({questions: data.questions})
                 console.log(data)
                 this.getUserAnswers()
                 })
@@ -43,7 +43,14 @@ class ViewUserInfo extends Component {
     }
 
     getUserAnswers() {
-
+        fetch(`http://localhost:4000/user/${this.props.match.params.id}/answers`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "error") this.setState({answers: ["User didn't answer anything yet:("], isLoading: false})
+                else this.setState({answers: data.answers, isLoading: false})
+                console.log(data)
+                })
+            .catch(err => console.log(err))
     }
 
     showQuestions() {
@@ -52,7 +59,16 @@ class ViewUserInfo extends Component {
             <div key={item}>
                 <p>{item}</p>
             </div>
-         ))
+        ))
+    }
+
+    showAnswers() {
+        return(
+            this.state.answers.map(ans =>
+            <div key={ans}>
+                <p>{ans}</p>
+            </div>
+        ))
     }
 
     render() { 
@@ -63,11 +79,15 @@ class ViewUserInfo extends Component {
                     <h2>UserName: {this.state.username}</h2>
                     <h2>Email: {this.state.email}</h2>
                     <h2>Reputation: {this.state.reputation}</h2>
-                    <h3>User question Ids: </h3>
+                    <br/>
+                    <h3>User Question Ids: </h3>
                     {this.showQuestions()}
-                </div>
-                 
-        )}
+                    <br/>
+                    <h3>User Answer Ids: </h3>
+                    {this.showAnswers()}
+                </div>       
+            )
+        }
     } 
 }
 

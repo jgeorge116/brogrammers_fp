@@ -5,5 +5,6 @@ var AnswerController = require("../controllers/answerController");
 
 router.post("/questions/:id/answers/add", AnswerController.add_answer);
 router.get("/questions/:id/answers", AnswerController.get_answers);
+router.get("/user/:id/answers", AnswerController.getUserAnswers)
 
 module.exports = router;

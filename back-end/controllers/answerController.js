@@ -29,3 +29,8 @@ exports.get_answers = async function(req, res) {
   var result = await AR.get_answers(req.params.id);
   res.send({ status: result.status, answers: result.data });
 };
+
+exports.getUserAnswers = async (req,res) => {
+  let result = await AR.getUserAnswers(req.params.id)
+  res.send({status: result.status, answers: result.data})
+}
