@@ -94,3 +94,8 @@ exports.delete_question_by_id = async function(req, res) {
     }
   }
 }
+
+exports.get_user_questions = async (req, res) => {
+  let result = await QR.get_questions_by_userID(req.params.id)
+  res.send({status: result.status, questions: result.data})
+}

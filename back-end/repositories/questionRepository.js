@@ -141,14 +141,15 @@ module.exports = class QuestionRepository {
     if (!search_limit) {
       search_limit = 25;
     }
-    if (!Number.isInteger(search_limit) || search_limit < 1) {
+    const parsed_int = parseInt(search_limit, 10) //fix bug in front end
+    if (!Number.isInteger(parsed_int) || search_limit < 1) {
       return {
         status: "error",
         data: "Limit has to be a positive integer"
       };
     }
-    if (search_limit > 100) {
-      search_limit = 100;
+    if (parsed_int > 100) {
+      parsed_int = 100;
     }
     var search_accepted = accepted;
     if (!search_accepted) {
@@ -170,7 +171,7 @@ module.exports = class QuestionRepository {
             $ne: null
           }
         })
-        .limit(search_limit)
+        .limit(parsed_int)
         .sort({
           timestamp: -1
         });
@@ -181,7 +182,7 @@ module.exports = class QuestionRepository {
           },
           accepted_answer_id: null
         })
-        .limit(search_limit)
+        .limit(parsed_int)
         .sort({
           timestamp: -1
         });
@@ -262,5 +263,21 @@ module.exports = class QuestionRepository {
     }
     await QuestionModel.deleteOne({ id: id });
     return { status: 'OK', data: 'Success' };
+  }
+
+  /**
+   * gets all question ids posted by user id (milestone 2)
+   * @param {String} userID 
+   */
+  async get_questions_by_userID(userID) {
+    let found_questions = await QuestionModel.find({username: userID})
+    if(found_questions.length == 0) return {status: "error", data: "Invalid username!"}
+    let all_questions = []
+    for(let questions in found_questions) {
+      let question_info = await this.question_to_api_format(found_questions[questions])
+      if (question_info.status == "error") return {status: "error", data: "Error fetching question data"}
+      else all_questions.push(question_info.data.id)
+    }
+    return {status: "OK", data: all_questions}
   }
 };

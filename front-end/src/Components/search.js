@@ -26,15 +26,14 @@ class Search extends Component {
           "Content-Type": "application/json; charset=utf-8"
         },
         body: JSON.stringify({
-          title: this.state.timestamp,
-          body: this.state.limit,
-          tags: this.state.accepted
+          timestamp: this.state.timestamp,
+          limit: this.state.limit,
+          accepted: this.state.accepted
         })
       });
       let content = await res.json();
       console.log(content) 
       data = content.questions //array of questions
-      console.log(content)
       this.setState({show: true})
     })();
     // this.setState({show: true})

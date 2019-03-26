@@ -157,5 +157,5 @@ module.exports = class UserRepository {
       return { status: result.status, data: result.data };
     }
     return { status: "OK", data: "Verification email resent." };
-  }
+  };
 };
