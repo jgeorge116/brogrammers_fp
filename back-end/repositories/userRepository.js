@@ -159,6 +159,10 @@ module.exports = class UserRepository {
     return { status: "OK", data: "Verification email resent." };
   };
 
+  /**
+   * sends the email and reputation of a user if it exists
+   * @param {String} username
+   */
   async getUserInfo(username) {
     let found_user = await UserModel.findOne({username: username})
     if (found_user === null) return {status: "error", data: "User not found!!" }

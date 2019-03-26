@@ -63,6 +63,10 @@ module.exports = class AnswerRepository {
     return { status: "OK", data: all_answers };
   }
 
+  /**
+   * Gets all the answer ids from a certain user.
+   * @param {String} username 
+   */
   async getUserAnswers(username) {
     let found_answers = await AnswerModel.find({username: username})
     if(found_answers.length == 0) return {status: "error", data: "User has not posted answers yet!"}
