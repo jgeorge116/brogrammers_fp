@@ -46,7 +46,8 @@ module.exports = class QuestionRepository {
       username: username,
       title: title,
       body: body,
-      tags: tags
+      tags: tags,
+      timestamp: Date.now() / 1000
     });
     await new_question.save();
     return {

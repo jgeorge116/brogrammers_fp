@@ -10,7 +10,7 @@ var QuestionModelSchema = new Schema(
     tags:  { type: [String], default: [] },
     media: { type: [String], default: [] },
     accepted_answer_id: { type: String, default: null },
-    timestamp: {type: Number, default: new Date().getTime()}
+    timestamp: Number
   }
 );
 QuestionModelSchema.set("collection", "questions");
