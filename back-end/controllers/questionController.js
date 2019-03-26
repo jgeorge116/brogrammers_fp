@@ -73,3 +73,24 @@ exports.search_questions = async function(req, res) {
     res.send({ status: result.status, questions: result.data });
   }
 };
+
+exports.delete_question_by_id = async function(req, res) {
+  if (!req.cookies.jwt) {
+    // User needs to be logged in
+    res.status(500).send({ status: "error", error: "No token provided" });
+  } else {
+    // Only delete if user is original asker
+    const token = await JWT.validate(req.cookies.jwt);
+    console.log(token);
+    if (!token.username) {
+      res.status(500).send({ status: "error", error: "Invalid JWT" });
+    } else {
+      var result = await QR.delete_question(req.params.id, token.username);
+      if (result.status == 'OK') {
+        res.status(200).send({ status: result.status, data: result.data });
+      } else {
+        res.status(500).send({ status: result.status, data: result.data });
+      }
+    }
+  }
+}

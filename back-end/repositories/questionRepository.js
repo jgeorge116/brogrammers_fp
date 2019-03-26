@@ -246,4 +246,21 @@ module.exports = class QuestionRepository {
       data: question
     };
   }
+
+  /**
+   * Deletes a question by id posted by user with username
+   * @param {String} id 
+   * @param {String} username 
+   */
+  async delete_question(id, username) {
+    const found_question = await QuestionModel.findOne({ id: id });
+    if (!found_question) {
+      return { status: 'error', data: 'Question does not exist!'};
+    }
+    if (found_question.username != username) {
+      return { status: 'error', data: 'User must be the original asker!'};
+    }
+    await QuestionModel.deleteOne({ id: id });
+    return { status: 'OK', data: 'Success' };
+  }
 };
