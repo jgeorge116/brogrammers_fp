@@ -11,12 +11,14 @@ class Search extends Component {
       limit: 25,
       accepted: false,
       timestamp: false,
-      show: false
+      show: false,
+      search_str: ""
     };
   }
 
   handleRequest = (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    console.log(this.state.search_str);
     (async () => {
       const res = await fetch("http://localhost:4000/search", {
         method: "POST",
@@ -28,15 +30,15 @@ class Search extends Component {
         body: JSON.stringify({
           timestamp: this.state.timestamp,
           limit: this.state.limit,
-          accepted: this.state.accepted
+          accepted: this.state.accepted,
+          searchQuery: this.state.search_str //milestone 2
         })
       });
       let content = await res.json();
       console.log(content) 
-      data = content.questions //array of questions
+      data = content.questions 
       this.setState({show: true})
     })();
-    // this.setState({show: true})
   }
 
   showResults = (data) => { //display results
@@ -78,6 +80,16 @@ class Search extends Component {
                 type="text"
                 name="limit"
                 label="Number of Posts to Show"
+                onChange={this.handleInputChange}
+                margin="normal"
+                variant="outlined"
+                fullWidth
+            />
+            <br />
+            <TextField
+                type="text"
+                name="search_str"
+                label="String to search post bodies or titles"
                 onChange={this.handleInputChange}
                 margin="normal"
                 variant="outlined"
