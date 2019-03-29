@@ -20,7 +20,7 @@ class Search extends Component {
     e.preventDefault()
     console.log(this.state.search_str);
     (async () => {
-      const res = await fetch("http://localhost:4000/search", {
+      const res = await fetch("/search", {
         method: "POST",
         credentials: "include",
         headers: {

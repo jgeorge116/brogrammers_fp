@@ -19,7 +19,7 @@ class ViewUserInfo extends Component {
     }
 
     getUserInfo() {
-        fetch(`http://localhost:4000/user/${this.props.match.params.id}`)
+        fetch(`/user/${this.props.match.params.id}`)
             .then(response => response.json())
             .then(data => {
                 if(data.status === "error") this.setState({email: "DOES NOT EXIST!!", reputation: "DOES NOT EXIST!!"})
@@ -31,7 +31,7 @@ class ViewUserInfo extends Component {
     }
 
     getUserQuestions() { 
-        fetch(`http://localhost:4000/user/${this.props.match.params.id}/questions`)
+        fetch(`/user/${this.props.match.params.id}/questions`)
             .then(response => response.json())
             .then(data => {
                 if(data.status === "error") this.setState({questions: ["User didn't post anything yet:("]})
@@ -43,7 +43,7 @@ class ViewUserInfo extends Component {
     }
 
     getUserAnswers() {
-        fetch(`http://localhost:4000/user/${this.props.match.params.id}/answers`)
+        fetch(`/user/${this.props.match.params.id}/answers`)
             .then(response => response.json())
             .then(data => {
                 if(data.status === "error") this.setState({answers: ["User didn't answer anything yet:("], isLoading: false})

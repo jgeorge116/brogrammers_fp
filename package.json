@@ -1,0 +1,24 @@
+{
+  "name": "brogrammers_fp",
+  "version": "1.0.0",
+  "main": "front-end/index.js",
+  "scripts": {
+    "start": "concurrently \"cd back-end && npm start\" \"cd front-end && npm start\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^4.1.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgeorge116/brogrammers_fp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jgeorge116/brogrammers_fp/issues"
+  },
+  "homepage": "https://github.com/jgeorge116/brogrammers_fp#readme",
+  "description": ""
+}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 class home extends Component{ //add logic
     handleLogout = () => {
-        (async () => {const res = await fetch('http://localhost:4000/logout', { 
+        (async () => {const res = await fetch('/logout', { 
             //idk why we need this but we do according to the doc lmao
             method: 'POST',
             headers: {

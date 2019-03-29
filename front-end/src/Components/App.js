@@ -24,7 +24,7 @@ class App extends Component {
       alert("USERNAME AND EMAIL MUST BE UNIQUE");
     else {
       (async () => {
-        const res = await fetch("http://localhost:4000/adduser", {
+        const res = await fetch("/adduser", {
           method: "POST",
           headers: {
             Accept: "application/json",

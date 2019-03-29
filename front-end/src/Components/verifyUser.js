@@ -21,7 +21,7 @@ class verify extends Component {
       // const backdoorKey = "abracadabra"
       // if(this.props.location.state.key === this.state.key || this.state.key === backdoorKey){
       (async () => {
-        const res = await fetch("http://localhost:4000/verify", {
+        const res = await fetch("/verify", {
           method: "POST",
           headers: {
             Accept: "application/json",

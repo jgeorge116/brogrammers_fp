@@ -27,14 +27,14 @@ class viewQuestions extends Component {
   }
 
   getQuestion = _ => {
-    fetch(`http://localhost:4000/questions/${this.props.match.params.id}`)
+    fetch(`/questions/${this.props.match.params.id}`)
         .then(response => response.json())
         .then(data => this.setState({question: [data.question], isLoading:false}))
         .catch(err => console.error(err))
   }
 
   getAnswers = _ => {
-    fetch(`http://localhost:4000/questions/${this.props.match.params.id}/answers`)
+    fetch(`/questions/${this.props.match.params.id}/answers`)
         .then(response => response.json())
         .then(data => this.setState({answers: [data.answers], isLoadingAnswers:false}))
         .catch(err => console.error(err))
@@ -51,7 +51,7 @@ class viewQuestions extends Component {
       alert("BODY IS EMPTY!");
     else {
       (async () => {
-        const res = await fetch(`http://localhost:4000/questions/${this.state.id}/answers/add`, {
+        const res = await fetch(`/questions/${this.state.id}/answers/add`, {
           method: "POST",
           credentials: "include",
           headers: {
