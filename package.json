@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "front-end/index.js",
   "scripts": {
-    "start": "concurrently \"cd back-end && npm start\" \"cd front-end && npm start\""
+    "start": "concurrently \"cd back-end && npm start\" \"cd front-end && serve -s build\""
   },
   "keywords": [],
   "author": "",
