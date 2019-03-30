@@ -17,18 +17,12 @@
       apt: name=npm
     - name: upgrade npm
       command: npm install -g npm
-    - name: go to back-end directory
-      command: cd ../back-end
-    - name: install required backend packages
-      command: npm install
+    - name: go to back-end directory and install required backend packages
+      command: chdir=../back-end npm install
     - name: go to front-end directory
-      command: cd ../front-end
-    - name: install required frontend packages
-      command: npm install
+      command: chdir=../front-end npm install
     - name: go to root directory
-      command: cd ..
-    - name: install required root packages
-      command: npm install
+      command: chdir=.. npm install
     - name: Install PM2
       npm:
         name: pm2
