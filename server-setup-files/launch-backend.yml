@@ -19,9 +19,9 @@
       command: npm install -g npm
     - name: go to back-end directory and install required backend packages
       command: chdir=../back-end npm install
-    - name: go to front-end directory
+    - name: go to front-end directory and install required frontend packages
       command: chdir=../front-end npm install
-    - name: go to root directory
+    - name: go to root directory and install required packages
       command: chdir=.. npm install
     - name: Install PM2
       npm:
