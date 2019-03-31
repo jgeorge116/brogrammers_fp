@@ -41,44 +41,6 @@ class login extends Component {
             pathname: "/home"
             });
         }
-        //   if(content.data === "pwd") alert("USER DOESN'T EXIST OR WRONG PASSWORD")
-        //   else if(content1.data === "not"){ //user exists but isn't verifed.. redirect to verify page
-        //       (async () => {const res = await fetch('http://localhost:4000/send', {
-        //         method: 'POST',
-        //         headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json; charset=utf-8'
-        //         },
-        //         body: JSON.stringify({
-        //           username : this.state.username,
-        //           email : content1.email
-        //         })
-        //       })
-        //         let content = await res.json();
-        //         console.log(content)
-        //         if(content.status === "OK"){
-        //   this.props.history.push({
-        //     pathname: '/verify',
-        //     state: {
-        //       username: this.state.username,
-        //       pwd: content1.pwd,
-        //       email: content1.email,
-        //       key: content.data
-        //     }
-        //           })
-        //         }
-        //     })()
-        //   }
-        //   else if(content1.status === "error") alert("SOMETHING WENT WRONG:(")
-        //   else{
-        // this.props.history.push({
-        //   pathname: '/home',
-        //       state: {
-        //         username: this.state.username,
-        //         pwd: this.state.pwd
-        //       }
-        //     })
-        //   }
       })();
     }
   };
@@ -97,6 +59,7 @@ class login extends Component {
         <h1>Login boi!!</h1>
         <form onSubmit={this.handleRequest}>
           <TextField
+            className="textFields"
             type="text"
             name="username"
             label="Username"
@@ -107,6 +70,7 @@ class login extends Component {
           />
           <br />
           <TextField
+            className="textFields"
             type="password"
             name="pwd"
             label="Password"

@@ -19,8 +19,8 @@ class viewQuestions extends Component {
   async componentDidMount() {
     this.setState({
         id: this.props.match.params.id,
-        isLoading:true,
-        isLoadingAnswers:true
+        isLoading:true, // for checking if question was feteched
+        isLoadingAnswers:true // for checking if answers were fetched
     });
     this.getQuestion();
     this.getAnswers();
@@ -71,7 +71,7 @@ class viewQuestions extends Component {
       })();
     }
   };
-
+  // to display the question data
   renderQuestion = ({id,user,title,body,score,view_count,answer_count,timestamp,media,tags,accepted_answer_id}) => {
       return (
           <div key={id}>
@@ -92,7 +92,7 @@ class viewQuestions extends Component {
           </div>
       )
   }
-
+  // to display answer data
   renderAnswers = ({id,user,body,score,is_accepted,timestamp,media}) => {
       return (
           <div key={id} className="answer">
@@ -127,6 +127,7 @@ class viewQuestions extends Component {
                     <h1>Your Answer</h1>
                     <form onSubmit={this.handleRequest}>
                         <TextField
+                            className="textFields"
                             type="text"
                             name="body"
                             label="Body"
@@ -153,6 +154,7 @@ class viewQuestions extends Component {
                     <h1>Your Answer</h1>
                     <form onSubmit={this.handleRequest}>
                         <TextField
+                            className="textFields"
                             type="text"
                             name="body"
                             label="Body"

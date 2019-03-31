@@ -55,6 +55,7 @@ class questions extends Component {
         <h1>Submit your Question</h1>
         <form onSubmit={this.handleRequest}>
           <TextField
+            className="textFields"
             type="text"
             name="title"
             label="Title"
@@ -65,6 +66,7 @@ class questions extends Component {
           />
           <br />
           <TextField
+            className="textFields"
             type="text"
             name="body"
             label="Body"
@@ -76,6 +78,7 @@ class questions extends Component {
           />
           <br />
           <TextField
+            className="textFields"
             type="text"
             name="tags"
             label="Tags"

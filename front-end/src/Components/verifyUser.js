@@ -18,8 +18,6 @@ class verify extends Component {
     e.preventDefault();
     if (this.key === "") alert("KEY IS EMPTY!");
     else {
-      // const backdoorKey = "abracadabra"
-      // if(this.props.location.state.key === this.state.key || this.state.key === backdoorKey){
       (async () => {
         const res = await fetch("/verify", {
           method: "POST",
@@ -37,17 +35,10 @@ class verify extends Component {
         else {
           this.props.history.push({
             pathname: "/home"
-            // state: {
-            //     username: this.props.location.state.username,
-            //     pwd: this.props.location.state.pwd
-            // }
           });
         }
       })();
     }
-    //  else{
-    //      alert("INCORRECT KEY BOI!! TRY AGAIN")
-    // }
   };
 
   render() {
@@ -56,6 +47,7 @@ class verify extends Component {
         <h1>Verify your Account</h1>
         <form onSubmit={this.handleRequest}>
           <TextField
+            className="textFields"
             type="email"
             name="email"
             label="Email"
@@ -66,6 +58,7 @@ class verify extends Component {
           />
           <br />
           <TextField
+            className="textFields"
             type="text"
             name="key"
             label="Key"

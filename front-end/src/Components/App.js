@@ -75,6 +75,7 @@ class App extends Component {
           <h1> Register For StackOverFlow!!</h1>
           <form onSubmit={this.handleRequest}>
             <TextField
+              className="textFields"
               type="text"
               name="username"
               label="Username"
@@ -85,6 +86,7 @@ class App extends Component {
             />
             <br />
             <TextField
+              className="textFields"
               type="email"
               name="email"
               label="Email"
@@ -95,6 +97,7 @@ class App extends Component {
             />
             <br />
             <TextField
+              className="textFields"
               type="password"
               name="pwd"
               label="Password"
