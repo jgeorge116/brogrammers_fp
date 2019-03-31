@@ -17,20 +17,45 @@ code {
 
 input[type=text], input[type=password], input[type=email] {
     text-decoration: none;
-    background-color: #f2f2f2;
+}
+
+.textFields{
+    background-color:#f2f2f2;
 }
 
 h1 {
     margin-top:0;
 }
 
-.loginContainer, .registerContainer, .verifyContainer, .questionContainer {
+.loginContainer, .registerContainer, .verifyContainer {
     margin: 5% auto;
     background-color:white;
     padding:50px;
     height:auto;
     width: 20%;    
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+.searchButtons {
+    padding-bottom: 1%;
+}
+
+.questionContainer, .searchContainer, .userContainer {
+    margin: 5% auto;
+    background-color:white;
+    padding:50px;
+    height:auto;
+    width: 70%;    
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+.userContainer {
+    overflow: hidden;
+}
+
+.userInfo {
+    float: left;
+    width: 50%;
 }
 
 p {

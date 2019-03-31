@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
+import Checkbox from '@material-ui/core/Checkbox'
 import Post from './post'
 let data = null
 
@@ -71,13 +72,15 @@ class Search extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div className="searchContainer">
         <header className="App-header">
           <link rel="stylesheet" href="style/styles.css" />
         </header>
+        <h1>Search</h1>
         <form onSubmit={this.handleRequest}>
             <TextField
-                type="text"
+                className="textFields"
+                type="number"
                 name="limit"
                 label="Number of Posts to Show"
                 onChange={this.handleInputChange}
@@ -87,9 +90,10 @@ class Search extends Component {
             />
             <br />
             <TextField
+                className="textFields"
                 type="text"
                 name="search_str"
-                label="String to search post bodies or titles"
+                label="Search"
                 onChange={this.handleInputChange}
                 margin="normal"
                 variant="outlined"
@@ -98,7 +102,7 @@ class Search extends Component {
             <br />
             <label>
             By Time Stamp? :
-            <input
+            <Checkbox
                 name="timestamp"
                 type="checkbox"
                 checked={this.state.timestamp}
@@ -107,19 +111,21 @@ class Search extends Component {
             <br />
             <label>
             By Accepted Answer? :
-            <input
+            <Checkbox
                 name="accepted"
                 type="checkbox"
                 value={this.state.accepted}
                 onChange={this.handleInputChange} />
             </label>
-            <Button id="sub" type="submit">
-            Submit
-          </Button>
+            <div className="searchButtons">
+              <Button id="sub" type="submit">
+                Submit
+              </Button>
+            </div>
         </form>  
-        <div>
+        <div className="searchButtons">
           <Button id="clear" onClick={this.clearSearch}>
-                Clear Search Results
+            Clear Search Results
           </Button> 
           {this.state.show ? this.showResults(data) : null }  
         </div>

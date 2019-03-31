@@ -1,4 +1,6 @@
 import React, { Component } from "react"
+import { Link as RouterLink } from 'react-router-dom'
+import Link from '@material-ui/core/Link';
 
 class ViewUserInfo extends Component {
     constructor(props) {
@@ -34,7 +36,7 @@ class ViewUserInfo extends Component {
         fetch(`/user/${this.props.match.params.id}/questions`)
             .then(response => response.json())
             .then(data => {
-                if(data.status === "error") this.setState({questions: ["User didn't post anything yet:("]})
+                if(data.status === "error") this.setState({questions: ["User didn't post anything yet :("]})
                 else this.setState({questions: data.questions})
                 console.log(data)
                 this.getUserAnswers()
@@ -46,7 +48,7 @@ class ViewUserInfo extends Component {
         fetch(`/user/${this.props.match.params.id}/answers`)
             .then(response => response.json())
             .then(data => {
-                if(data.status === "error") this.setState({answers: ["User didn't answer anything yet:("], isLoading: false})
+                if(data.status === "error") this.setState({answers: ["User didn't answer anything yet :("], isLoading: false})
                 else this.setState({answers: data.answers, isLoading: false})
                 console.log(data)
                 })
@@ -57,7 +59,9 @@ class ViewUserInfo extends Component {
         return(
             this.state.questions.map(item =>
             <div key={item}>
-                <p>{item}</p>
+                <Link component={RouterLink} to={`/questions/${item}/answers`}>
+                    {item}
+                </Link>
             </div>
         ))
     }
@@ -75,16 +79,19 @@ class ViewUserInfo extends Component {
         if(this.state.isLoading) return (<p>Loading ...</p>)
         else{
             return(
-                <div>
-                    <h2>UserName: {this.state.username}</h2>
-                    <h2>Email: {this.state.email}</h2>
-                    <h2>Reputation: {this.state.reputation}</h2>
-                    <br/>
-                    <h3>User Question Ids: </h3>
-                    {this.showQuestions()}
-                    <br/>
-                    <h3>User Answer Ids: </h3>
-                    {this.showAnswers()}
+                <div className="userContainer">
+                    <div className="userInfo">
+                        <h2>Username: {this.state.username}</h2>
+                        <h2>Email: {this.state.email}</h2>
+                        <h2>Reputation: {this.state.reputation}</h2>
+                    </div>
+                    <div className="userActivity">
+                        <h3>User Question Ids: </h3>
+                        {this.showQuestions()}
+                        <br/>
+                        <h3>User Answer Ids: </h3>
+                        {this.showAnswers()}
+                    </div>
                 </div>       
             )
         }
