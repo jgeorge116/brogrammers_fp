@@ -124,8 +124,9 @@ module.exports = class QuestionRepository {
    * @param {Integer} timestamp - Optional
    * @param {Integer} limit - Optional
    * @param {boolean} accepted - Optional
+   * @param {String} q - Optional
    */
-  async search_questions(timestamp, limit, accepted) {
+  async search_questions(timestamp, limit, accepted, q) {
     var search_timestamp = timestamp;
     if (!search_timestamp) {
       search_timestamp = new Date().getTime();
@@ -161,31 +162,49 @@ module.exports = class QuestionRepository {
         data: "Accepted has to be a boolean"
       };
     }
+    var search_q = q;
+    if (!search_q) {
+      search_q = "";
+    }
+    if (typeof search_q !== 'string') {
+      return {
+        status: "error",
+        data: "q has to be a string"
+      };
+    }
     var search_results;
     if (search_accepted) {
       search_results = await QuestionModel.find({
-          timestamp: {
-            $lte: search_timestamp
-          },
-          accepted_answer_id: {
-            $ne: null
-          }
-        })
-        .limit(parsed_int)
-        .sort({
-          timestamp: -1
-        });
+        $or: [
+          { title: { $regex: search_q } },
+          { body: { $regex: search_q } }
+        ],
+        timestamp: {
+          $lte: search_timestamp
+        },
+        accepted_answer_id: {
+          $ne: null
+        }
+      })
+      .limit(parsed_int)
+      .sort({
+        timestamp: -1
+      });
     } else {
       search_results = await QuestionModel.find({
-          timestamp: {
-            $lte: search_timestamp
-          },
-          accepted_answer_id: null
-        })
-        .limit(parsed_int)
-        .sort({
-          timestamp: -1
-        });
+        $or: [
+          { title: { $regex: search_q, $options: "i" } },
+          { body: { $regex: search_q, $options: "i" } }
+        ],
+        timestamp: {
+          $lte: search_timestamp
+        },
+        accepted_answer_id: null
+      })
+      .limit(parsed_int)
+      .sort({
+        timestamp: -1
+      });
     }
     var all_questions = [];
     for (var result in search_results) {

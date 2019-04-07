@@ -11,7 +11,7 @@ class Search extends Component {
     this.state = {
       limit: 25,
       accepted: false,
-      timestamp: false,
+      timestamp: 0,
       show: false,
       search_str: ""
     };
@@ -32,7 +32,7 @@ class Search extends Component {
           timestamp: this.state.timestamp,
           limit: this.state.limit,
           accepted: this.state.accepted,
-          searchQuery: this.state.search_str //milestone 2
+          q: this.state.search_str //milestone 2
         })
       });
       let content = await res.json();
@@ -91,6 +91,17 @@ class Search extends Component {
             <br />
             <TextField
                 className="textFields"
+                type="number"
+                name="timestamp"
+                label="Timestamp"
+                onChange={this.handleInputChange}
+                margin="normal"
+                variant="outlined"
+                fullWidth
+            />
+            <br />
+            <TextField
+                className="textFields"
                 type="text"
                 name="search_str"
                 label="Search"
@@ -99,15 +110,6 @@ class Search extends Component {
                 variant="outlined"
                 fullWidth
             />
-            <br />
-            <label>
-            By Time Stamp? :
-            <Checkbox
-                name="timestamp"
-                type="checkbox"
-                checked={this.state.timestamp}
-                onChange={this.handleInputChange} />
-            </label>
             <br />
             <label>
             By Accepted Answer? :

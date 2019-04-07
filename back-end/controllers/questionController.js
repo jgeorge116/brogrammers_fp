@@ -65,7 +65,8 @@ exports.search_questions = async function(req, res) {
   var result = await QR.search_questions(
     req.body.timestamp,
     req.body.limit,
-    req.body.accepted
+    req.body.accepted,
+    req.body.q
   );
   if (result.status == "error") {
     res.send({ status: result.status, error: result.data });
