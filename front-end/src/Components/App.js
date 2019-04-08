@@ -40,13 +40,7 @@ class App extends Component {
         if (content.status === "error") alert("Error: " + content.error);
         else{
           this.props.history.push({
-            pathname: '/verify',
-            // state: {
-            //   username: this.state.username,
-            //   pwd: this.state.pwd,
-            //   email: this.state.email,
-            //   key: content.data
-            // }
+            pathname: '/verify'
           })
         }
       })();

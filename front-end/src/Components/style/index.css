@@ -82,12 +82,6 @@ p {
     clear:both;
 }
 
-.tag {
-    border:1px solid black;
-    padding:5px;
-    margin-left:5px;
-}
-
 #logout, #login {
     position:absolute;
     right:5%;

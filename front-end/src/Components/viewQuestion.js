@@ -1,15 +1,17 @@
 import React, { Component } from "react";
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-class viewQuestions extends Component {
+class viewQuestion extends Component {
   constructor(props) {
     super(props);
     this.state = {
         id:"",
         question: [],
         isLoading: true,
-        isLoadingAnswers: true,
+        isLoadingAnswers: false,
         body: "",
         media: [],
         answers: []
@@ -20,7 +22,7 @@ class viewQuestions extends Component {
     this.setState({
         id: this.props.match.params.id,
         isLoading:true, // for checking if question was feteched
-        isLoadingAnswers:true // for checking if answers were fetched
+        isLoadingAnswers:false // for checking if answers were fetched
     });
     this.getQuestion();
     this.getAnswers();
@@ -35,9 +37,9 @@ class viewQuestions extends Component {
 
   getAnswers = _ => {
     fetch(`/questions/${this.props.match.params.id}/answers`)
-        .then(response => response.json())
-        .then(data => this.setState({answers: [data.answers], isLoadingAnswers:false}))
-        .catch(err => console.error(err))
+      .then(response => response.json())
+      .then(data => {if(data.answers.length) this.setState({answers: [data.answers],isLoadingAnswers:true})})
+      .catch(err => console.error(err))
   }
 
   handleChange = e => {
@@ -86,7 +88,7 @@ class viewQuestions extends Component {
             </div>
             <div className="questionBody">
                 <p>{body}</p>
-                <p>Tags: {tags.map(el=><span key={el} className="tag">{el}</span>)}</p>
+                <p>Tags: {tags.map(el=><Chip key={el} label={el} clickable={true} />)}</p>
                 <p>Accepted Answer ID: {accepted_answer_id}</p>
             </div>
           </div>
@@ -108,71 +110,50 @@ class viewQuestions extends Component {
           </div>
       )
   }
+  
+  showQuestions = () => {
+    return (
+      <div className="answers">
+        <hr />
+        <h1>Answers</h1>
+        {this.state.answers[0].map(this.renderAnswers)}
+      </div>
+    )
+  }
 
   render() {
     if(this.state.isLoading) {
-        return <p>Loading ...</p>;
-    }
-    else if(this.state.answers[0].length !== 0){
-        return (
-            <div className="question">
-                {this.state.question.map(this.renderQuestion)}
-                <div className="answers">
-                    <hr />
-                    <h1>Answers</h1>
-                    {this.state.answers[0].map(this.renderAnswers)}
-                </div>
-                <div className="submitAnswer">
-                    <hr />
-                    <h1>Your Answer</h1>
-                    <form onSubmit={this.handleRequest}>
-                        <TextField
-                            className="textFields"
-                            type="text"
-                            name="body"
-                            label="Body"
-                            onChange={this.handleChange}
-                            margin="normal"
-                            variant="outlined"
-                            fullWidth
-                            multiline
-                        />
-                        <Button id="sub" type="submit">
-                            Submit
-                        </Button>
-                    </form>
-                </div>
-            </div>
-        )
+      return <CircularProgress size="100"/>;
     }
     else {
-        return (
-            <div className="question">
-                {this.state.question.map(this.renderQuestion)}
-                <div className="submitAnswer">
-                    <hr />
-                    <h1>Your Answer</h1>
-                    <form onSubmit={this.handleRequest}>
-                        <TextField
-                            className="textFields"
-                            type="text"
-                            name="body"
-                            label="Body"
-                            onChange={this.handleChange}
-                            margin="normal"
-                            variant="outlined"
-                            fullWidth
-                            multiline
-                        />
-                        <br />
-                        <Button id="sub" type="submit">
-                            Submit
-                        </Button>
-                    </form>
-                </div>
-            </div>
-        )
+      return (
+        <div className="question">
+          {this.state.question.map(this.renderQuestion)}
+          {this.state.isLoadingAnswers ? this.showQuestions() : null }  
+          <div className="submitAnswer">
+              <hr />
+              <h1>Your Answer</h1>
+              <form onSubmit={this.handleRequest}>
+                  <TextField
+                      className="textFields"
+                      type="text"
+                      name="body"
+                      label="Body"
+                      onChange={this.handleChange}
+                      margin="normal"
+                      variant="outlined"
+                      fullWidth
+                      multiline
+                  />
+                  <br />
+                  <Button id="sub" type="submit">
+                      Submit
+                  </Button>
+              </form>
+          </div>
+        </div>
+      )
     }
   }
 }
-export default viewQuestions;
+export default viewQuestion;
