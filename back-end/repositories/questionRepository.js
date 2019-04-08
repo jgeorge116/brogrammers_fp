@@ -173,38 +173,19 @@ module.exports = class QuestionRepository {
       };
     }
     var search_results;
+    let query = { timestamp: { $lte: search_timestamp }};
+    if(search_q)
+      query.$text = { $search: search_q };
     if (search_accepted) {
-      search_results = await QuestionModel.find({
-        $or: [
-          { title: { $regex: search_q } },
-          { body: { $regex: search_q } }
-        ],
-        timestamp: {
-          $lte: search_timestamp
-        },
-        accepted_answer_id: {
-          $ne: null
-        }
-      })
+      query.accepted_answer_id = { $ne: null };
+      search_results = await QuestionModel.find(query,{ score: { $meta: "textScore" } })
       .limit(parsed_int)
-      .sort({
-        timestamp: -1
-      });
+      .sort({ score: { $meta:"textScore"} });
     } else {
-      search_results = await QuestionModel.find({
-        $or: [
-          { title: { $regex: search_q, $options: "i" } },
-          { body: { $regex: search_q, $options: "i" } }
-        ],
-        timestamp: {
-          $lte: search_timestamp
-        },
-        accepted_answer_id: null
-      })
+      query.accepted_answer_id = null;
+      search_results = await QuestionModel.find(query,{ score: { $meta: "textScore" } })
       .limit(parsed_int)
-      .sort({
-        timestamp: -1
-      });
+      .sort({ score: { $meta:"textScore" } });
     }
     var all_questions = [];
     for (var result in search_results) {

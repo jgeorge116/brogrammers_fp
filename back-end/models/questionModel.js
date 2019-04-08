@@ -14,4 +14,5 @@ var QuestionModelSchema = new Schema(
   }
 );
 QuestionModelSchema.set("collection", "questions");
+QuestionModelSchema.index({title:'text',body:'text'});
 module.exports = mongoose.model("QuestionModel", QuestionModelSchema);

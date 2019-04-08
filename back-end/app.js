@@ -21,6 +21,7 @@ if (cluster.isMaster) {
   const parser = require("body-parser");
   const mongoose = require("mongoose");
   mongoose.connect("mongodb://localhost:27017/stackOverflowDB", {
+    useCreateIndex: true,
     useNewUrlParser: true
   });
   let db = mongoose.connection;
