@@ -1,8 +1,10 @@
-import React, { Component } from "react"
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import Checkbox from '@material-ui/core/Checkbox'
-import Post from './post'
+import React, { Component } from "react";
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
+import Post from './post';
+import Chip from '@material-ui/core/Chip';
+
 let data = null
 
 class Search extends Component {
@@ -52,9 +54,9 @@ class Search extends Component {
         rep={item.user.reputation} 
         title={item.title}
         body={item.body} 
-        views={item.views}
+        views={item.view_count}
         time={item.time}
-        tags={item.tags.map(tag => tag+" ")} 
+        tags={item.tags.map(tag => <Chip key={tag} label={tag} clickable={true} className="chips" />)} 
         />
       )
     )

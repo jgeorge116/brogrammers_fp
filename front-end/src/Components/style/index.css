@@ -82,6 +82,10 @@ p {
     clear:both;
 }
 
+.chips {
+    margin-right:3px;
+}
+
 #logout, #login {
     position:absolute;
     right:5%;

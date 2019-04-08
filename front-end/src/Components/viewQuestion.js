@@ -87,9 +87,9 @@ class viewQuestion extends Component {
                 <p>Timestamp: {timestamp}</p>
             </div>
             <div className="questionBody">
-                <p>{body}</p>
-                <p>Tags: {tags.map(el=><Chip key={el} label={el} clickable={true} />)}</p>
-                <p>Accepted Answer ID: {accepted_answer_id}</p>
+                <div>{body}</div>
+                <div>Tags: {tags.map(el=><Chip key={el} label={el} clickable={true} />)}</div>
+                <div>Accepted Answer ID: {accepted_answer_id}</div>
             </div>
           </div>
       )
