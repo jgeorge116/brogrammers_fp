@@ -166,6 +166,7 @@ module.exports = class QuestionRepository {
       };
     }
     var search_q = q;
+    console.log(search_q);
     if (!search_q) {
       search_q = "";
     }
@@ -179,6 +180,7 @@ module.exports = class QuestionRepository {
     let query = { timestamp: { $lte: search_timestamp }};
     if(search_q)
       query.$text = { $search: search_q };
+      console.log(query);
     if (search_accepted) {
       query.accepted_answer_id = { $ne: null };
       search_results = await QuestionModel.find(query,{ score: { $meta: "textScore" } })

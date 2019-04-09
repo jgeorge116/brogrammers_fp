@@ -15,5 +15,4 @@ var QuestionModelSchema = new Schema(
 );
 QuestionModelSchema.set("collection", "questions");
 QuestionModelSchema.index({title:'text',body:'text'});
-await QuestionModelSchema.createIndexes();
 module.exports = mongoose.model("QuestionModel", QuestionModelSchema);
