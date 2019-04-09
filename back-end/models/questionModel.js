@@ -5,8 +5,8 @@ var QuestionModelSchema = new Schema(
   {
     id: String,
     username: String,
-    title: String,
-    body: String,
+    title: {type: String, text: true},
+    body: {type: String, text: true},
     tags:  { type: [String], default: [] },
     media: { type: [String], default: [] },
     accepted_answer_id: { type: String, default: null },

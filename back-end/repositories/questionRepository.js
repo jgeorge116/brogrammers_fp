@@ -142,13 +142,16 @@ module.exports = class QuestionRepository {
     if (!search_limit) {
       search_limit = 25;
     }
-    const parsed_int = parseInt(search_limit, 10) //fix bug in front end
-    if (!Number.isInteger(parsed_int) || search_limit < 1) {
-      return {
-        status: "error",
-        data: "Limit has to be a positive integer"
-      };
-    }
+    // const parsed_int = parseInt(search_limit, 10) //fix bug in front end
+    // if (!Number.isInteger(parsed_int) || search_limit < 1) {
+    //   return {
+    //     status: "error",
+    //     data: "Limit has to be a positive integer"
+    //   };
+    // }
+    var parsed_int = search_limit;
+    if (parsed_int < 1) parsed_int = 25;
+
     if (parsed_int > 100) {
       parsed_int = 100;
     }
