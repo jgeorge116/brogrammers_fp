@@ -110,6 +110,7 @@ exports.upvote_question = async (req, res) => {
       res.send({ status: "error", error: "Invalid JWT" });
     } else {
       const result = await QR.upvote_question(req.params.id, req.body.upvote, token.username);
+      res.send({ status: result.status });
     }
   }
 }

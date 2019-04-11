@@ -286,7 +286,13 @@ module.exports = class QuestionRepository {
     }
     return {status: "OK", data: all_questions}
   }
-
+  
+  /**
+   * Upvotes a question, or removes upvote, and updates reputation of asker
+   * @param {String} questionID 
+   * @param {Boolean} upvote 
+   * @param {String} username 
+   */
   async upvote_question(questionID, upvote, username) {
     const found_question = await QuestionModel.findOne({
       id: questionID
@@ -305,6 +311,10 @@ module.exports = class QuestionRepository {
     if (found_upvote && found_upvote.value === upvote) {
       await UpvoteModel.deleteOne(found_upvote);
       return { status: "OK" };
+    }
+    // Upvoting after downvoting or vice versa, deletes previous upvote
+    if (found_upvote) {
+      await UpvoteModel.deleteOne(found_upvote); // Might not have to await
     }
     // Create and save upvote
     const new_upvote = new UpvoteModel({
