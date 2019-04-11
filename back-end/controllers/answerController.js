@@ -33,4 +33,18 @@ exports.get_answers = async function(req, res) {
 exports.getUserAnswers = async (req,res) => {
   let result = await AR.getUserAnswers(req.params.id)
   res.send({status: result.status, answers: result.data})
-}
+};
+
+exports.upvote_answer = async (req, res) => {
+  if (!req.cookies.jwt) {
+    res.send({ status: "error", error: "No token provided" });
+  } else {
+    const token = await JWT.validate(req.cookies.jwt);
+    if (!token.username) {
+      res.send({ status: "error", error: "Invalid JWT" });
+    } else {
+      const result = await AR.upvote_answer(req.params.id, req.body.upvote, token.username);
+      res.send({ status: result.status });
+    }
+  }
+};

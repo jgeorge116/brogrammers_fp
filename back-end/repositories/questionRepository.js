@@ -3,6 +3,7 @@ const QuestionModel = require("../models/questionModel");
 const AnswerModel = require("../models/answerModel");
 const UserModel = require("../models/userModel");
 const ViewQuestionModel = require("../models/viewQuestionModel");
+const UpvoteModel = require("../models/upvoteModel");
 const uuidv4 = require("uuid/v4");
 
 module.exports = class QuestionRepository {
@@ -284,5 +285,57 @@ module.exports = class QuestionRepository {
       else all_questions.push(question_info.data.id)
     }
     return {status: "OK", data: all_questions}
+  }
+  
+  /**
+   * Upvotes a question, or removes upvote, and updates reputation of asker
+   * @param {String} questionID 
+   * @param {Boolean} upvote 
+   * @param {String} username 
+   */
+  async upvote_question(questionID, upvote, username) {
+    const found_question = await QuestionModel.findOne({
+      id: questionID
+    })
+    if (!found_question) {
+      return { status: "error" };
+    }
+    // Convert the boolean from true/false to 1/-1 (default 1)
+    upvote = typeof upvote === 'undefined' ? 1 : upvote ? 1 : -1;
+    const found_upvote = await UpvoteModel.findOne({
+      type: "question",
+      username: username,
+      question_id: questionID
+    });
+    // Upvoting after already upvoting undoes it
+    if (found_upvote && found_upvote.value === upvote) {
+      await UpvoteModel.deleteOne(found_upvote);
+      return { status: "OK" };
+    }
+    // Upvoting after downvoting or vice versa, deletes previous upvote
+    if (found_upvote) {
+      await UpvoteModel.deleteOne(found_upvote); // Might not have to await
+    }
+    // Create and save upvote
+    const new_upvote = new UpvoteModel({
+      type: "question",
+      username: username,
+      question_id: questionID,
+      value: upvote
+    });
+    await new_upvote.save();
+    // Set reputation of asker only if the result is >= 1
+    const user = await UserModel.findOne({
+      username: found_question.username
+    });
+    const reputation = user.reputation;
+    if (reputation + upvote >= 1) {
+      await UserModel.updateOne({
+        username: found_question.username
+      }, {
+        $set: { reputation: reputation + upvote }
+      });
+    }
+    return { status: "OK" };
   }
 };

@@ -74,4 +74,56 @@ module.exports = class AnswerRepository {
     found_answers.forEach(ans => all_answers.push(ans.id))
     return {status: "OK", data: all_answers}
   }
+
+  /**
+   * Upvotes an answer, or removes upvote, and updates reputation of answerer
+   * @param {String} answerID 
+   * @param {Boolean} upvote 
+   * @param {String} username 
+   */
+  async upvote_answer(answerID, upvote, username) {
+    const found_answer = await AnswerModel.findOne({
+      id: answerID
+    })
+    if (!found_answer) {
+      return { status: "error" };
+    }
+    // Convert the boolean from true/false to 1/-1 (default 1)
+    upvote = typeof upvote === 'undefined' ? 1 : upvote ? 1 : -1;
+    const found_upvote = await UpvoteModel.findOne({
+      type: "answer",
+      username: username,
+      answer_id: answerID
+    });
+    // Upvoting after already upvoting undoes it
+    if (found_upvote && found_upvote.value === upvote) {
+      await UpvoteModel.deleteOne(found_upvote);
+      return { status: "OK" };
+    }
+    // Upvoting after downvoting or vice versa, deletes previous upvote
+    if (found_upvote) {
+      await UpvoteModel.deleteOne(found_upvote); // Might not have to await
+    }
+    // Create and save upvote
+    const new_upvote = new UpvoteModel({
+      type: "answer",
+      username: username,
+      answer_id: answerID,
+      value: upvote
+    });
+    await new_upvote.save();
+    // Set reputation of asker only if the result is >= 1
+    const user = await UserModel.findOne({
+      username: found_answer.username
+    });
+    const reputation = user.reputation;
+    if (reputation + upvote >= 1) {
+      await UserModel.updateOne({
+        username: found_answer.username
+      }, {
+        $set: { reputation: reputation + upvote }
+      });
+    }
+    return { status: "OK" };
+  }
 };

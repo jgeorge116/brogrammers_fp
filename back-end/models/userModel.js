@@ -8,7 +8,7 @@ var UserModelSchema = new Schema({
   password: String,
   verificationKey: String,
   isVerified: { type: Boolean, default: false },
-  reputation: { type: Number, default: 0 }
+  reputation: { type: Number, default: 1 }
 });
 
 UserModelSchema.set("collection", "users");

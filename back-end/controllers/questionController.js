@@ -100,3 +100,17 @@ exports.get_user_questions = async (req, res) => {
   let result = await QR.get_questions_by_userID(req.params.id)
   res.send({status: result.status, questions: result.data})
 }
+
+exports.upvote_question = async (req, res) => {
+  if (!req.cookies.jwt) {
+    res.send({ status: "error", error: "No token provided" });
+  } else {
+    const token = await JWT.validate(req.cookies.jwt);
+    if (!token.username) {
+      res.send({ status: "error", error: "Invalid JWT" });
+    } else {
+      const result = await QR.upvote_question(req.params.id, req.body.upvote, token.username);
+      res.send({ status: result.status });
+    }
+  }
+}
