@@ -1,7 +1,8 @@
 const Mongoose = require("mongoose");
 const AnswerModel = require("../models/answerModel");
 const UserModel = require("../models/userModel");
-const QuestionModel = require("../models/questionModel")
+const QuestionModel = require("../models/questionModel");
+const UpvoteModel = require("../models/upvoteModel");
 const uuidv4 = require("uuid/v4");
 
 module.exports = class AnswerRepository {
@@ -49,15 +50,23 @@ module.exports = class AnswerRepository {
     if (!found_answers)
       return { status: "error", data: "Question does not exist" };
     var all_answers = [];
-    for (var answer in found_answers) {
+    for (const answer of found_answers) {  
+      const upvote_count = await UpvoteModel.countDocuments({
+        answer_id: format_question.id,
+        value: 1
+      });
+      const downvote_count = await UpvoteModel.countDocuments({
+        answer_id: format_question.id,
+        value: -1
+      });
       all_answers.push({
-        id: found_answers[answer].id,
-        user: found_answers[answer].username,
-        body: found_answers[answer].body,
-        score: 0, //TODO IMPLEMENT THIS
+        id: answer.id,
+        user: answer.username,
+        body: answer.body,
+        score: upvote_count - downvote_count,
         is_accepted: false, //TODO IMPLEMENT THIS
-        timestamp: found_answers[answer].timestamp,
-        media: found_answers[answer].media
+        timestamp: answer.timestamp,
+        media: answer.media
       });
     }
     return { status: "OK", data: all_answers };
@@ -97,12 +106,22 @@ module.exports = class AnswerRepository {
     });
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
+      // Undo the reputation too, allowing negatives (just return 1 if its < 1)
+      await UserModel.updateOne(
+        { username: found_answer.username }, 
+        { $inc: { reputation: -upvote } }
+      );
       await UpvoteModel.deleteOne(found_upvote);
       return { status: "OK" };
     }
     // Upvoting after downvoting or vice versa, deletes previous upvote
     if (found_upvote) {
       await UpvoteModel.deleteOne(found_upvote); // Might not have to await
+      // Undo the original upvote value
+      await UserModel.updateOne(
+        { username: found_answer.username }, 
+        { $inc: { reputation: -found_upvote.value } }
+      );
     }
     // Create and save upvote
     const new_upvote = new UpvoteModel({
@@ -112,18 +131,11 @@ module.exports = class AnswerRepository {
       value: upvote
     });
     await new_upvote.save();
-    // Set reputation of asker only if the result is >= 1
-    const user = await UserModel.findOne({
-      username: found_answer.username
-    });
-    const reputation = user.reputation;
-    if (reputation + upvote >= 1) {
-      await UserModel.updateOne({
-        username: found_answer.username
-      }, {
-        $set: { reputation: reputation + upvote }
-      });
-    }
+    // Set reputation of asker
+    await UserModel.updateOne(
+      { username: found_answer.username }, 
+      { $inc: { reputation: upvote } }
+    );
     return { status: "OK" };
   }
 };
