@@ -20,7 +20,29 @@ module.exports = class UserRepository {
     if (!user_info) {
       return { status: "error", data: "User does not exist to send verification email." };
     }
-    let trans = nodemailer.createTransport({
+	const transporter = nodemailer.createTransport({
+    port: 25,
+    host: 'localhost',
+    tls: {
+      rejectUnauthorized: false
+    },
+  });
+
+  var message = {
+    from: 'no-reply@brogrammers.cse356.compas.cs.stonybrook.edu',
+    to: user_info.email,
+    subject: "StackOverflow: Verify Account",
+    text: `${username}, Please enter the following key (without the brackets): <${
+        user_info.verificationKey
+      }>`
+  };
+
+  transporter.sendMail(message, (error, info) => {
+    console.log(error);
+    console.log(info);
+    console.log('Message sent: %s', info.messageId);
+  });
+    /*let trans = nodemailer.createTransport({
       service: "Gmail",
       auth: {
         user: "brogrammers.cse356@gmail.com",
@@ -36,7 +58,7 @@ module.exports = class UserRepository {
         user_info.verificationKey
       }>`
     };
-    trans.sendMail(opt);
+    trans.sendMail(opt);*/
     return { status: "OK", data: "" };
   }
 
