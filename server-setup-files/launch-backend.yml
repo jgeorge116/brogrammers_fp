@@ -28,8 +28,4 @@
         name: pm2
         state: latest
         global: yes
-    - name: Run PM@
-      command: pm2 start npm -- start
-    - name: Make PM2 start on startup 
-      command: env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
       
