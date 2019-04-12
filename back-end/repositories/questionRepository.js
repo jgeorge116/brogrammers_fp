@@ -236,11 +236,11 @@ module.exports = class QuestionRepository {
       user: {
         id: user.id,
         username: user.username,
-        reputation: user.reputation
+        reputation: user.reputation < 1 ? 1 : user.reputation
       },
       title: format_question.title,
       body: format_question.body,
-      score: 0, // TODO: IMPLEMENT THIS
+      score: format_question.score,
       view_count: view_count,
       answer_count: answer_count,
       timestamp: format_question.timestamp,
@@ -309,12 +309,30 @@ module.exports = class QuestionRepository {
     });
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
+      // Undo the reputation too, allowing negatives (just return 1 if its < 1)
+      await UserModel.updateOne(
+        { username: found_question.username }, 
+        { $inc: { reputation: -upvote } }
+      );
+      await QuestionModel.updateOne(
+        { id: found_question.id },
+        { $inc: { score: -upvote } }
+      );
       await UpvoteModel.deleteOne(found_upvote);
       return { status: "OK" };
     }
     // Upvoting after downvoting or vice versa, deletes previous upvote
     if (found_upvote) {
       await UpvoteModel.deleteOne(found_upvote); // Might not have to await
+      // Undo the original upvote value
+      await UserModel.updateOne(
+        { username: found_question.username }, 
+        { $inc: { reputation: -found_upvote.value } }
+      );
+      await QuestionModel.updateOne(
+        { id: found_question.id },
+        { $inc: { score: -found_upvote.value } }
+      );
     }
     // Create and save upvote
     const new_upvote = new UpvoteModel({
@@ -324,18 +342,15 @@ module.exports = class QuestionRepository {
       value: upvote
     });
     await new_upvote.save();
-    // Set reputation of asker only if the result is >= 1
-    const user = await UserModel.findOne({
-      username: found_question.username
-    });
-    const reputation = user.reputation;
-    if (reputation + upvote >= 1) {
-      await UserModel.updateOne({
-        username: found_question.username
-      }, {
-        $set: { reputation: reputation + upvote }
-      });
-    }
+    // Set reputation of asker
+    await UserModel.updateOne(
+      { username: found_question.username }, 
+      { $inc: { reputation: upvote } }
+    );
+    await QuestionModel.updateOne(
+      { id: found_question.id },
+      { $inc: { score: upvote } }
+    )
     return { status: "OK" };
   }
 };

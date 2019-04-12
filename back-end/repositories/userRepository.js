@@ -188,6 +188,6 @@ module.exports = class UserRepository {
   async getUserInfo(username) {
     let found_user = await UserModel.findOne({username: username})
     if (found_user === null) return {status: "error", data: "User not found!!" }
-    else return {status: "OK", data: {email: found_user.email, reputation: found_user.reputation}}
+    else return {status: "OK", data: {email: found_user.email, reputation: found_user.reputation < 1 ? 1 : found_user.reputation }}
   }
 };
