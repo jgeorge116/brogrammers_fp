@@ -1,0 +1,42 @@
+---
+- name: Launch RabbitMQ on local machine
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: WGET the URL 
+      get_url:
+        url: https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+        dest: ~/
+        mode: 0755
+    - name: Install package for erlang
+      apt:
+        deb: dpkg ~/erlang-solutions_1.0_all.deb
+    - name: Apt update
+      cmd: apt-get update
+    - name: Install erlang 
+      apt: name=erlang state=latest
+    - name: Install erlang-nox
+      apt: name=erlang-nox state=latest
+    - name: Get rabbitmq repository
+      cmd: echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+    - name: Get rabbitmq signing key
+      cmd: wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
+    - name: Apt update
+      cmd: apt-get update
+    - name: Install rabbitmq
+      apt: name=rabbitmq-server
+    - name: Enables the rabbitmq_management plugin
+      rabbitmq_plugin:
+        names: rabbitmq_management
+        state: enabled
+    - name: Add admin user for rabbitmq
+      rabbitmq_user:
+        user: brobbit
+        password: password
+        vhost: /
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+        state: present
