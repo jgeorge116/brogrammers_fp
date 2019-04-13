@@ -1,16 +1,17 @@
-const Mongoose = require("mongoose");
 const UserModel = require("../models/userModel");
 const Hash = require("./../utils/hash");
 const hash = new Hash();
+const VerifyEmail = require("./../utils/mailSend");
+const mailSend = new VerifyEmail();
 const shortid = require("shortid");
 const uuidv4 = require("uuid/v4");
 const nodemailer = require("nodemailer");
+// const { performance } = require('perf_hooks');
 
 module.exports = class UserRepository {
-
   /**
    * Sends a verification email for an user
-   * @param {String} username 
+   * @param {String} username
    */
   async send_verification(username) {
     if (!username) {
@@ -18,47 +19,12 @@ module.exports = class UserRepository {
     }
     var user_info = await UserModel.findOne({ username: username });
     if (!user_info) {
-      return { status: "error", data: "User does not exist to send verification email." };
+      return {
+        status: "error",
+        data: "User does not exist to send verification email."
+      };
     }
-	const transporter = nodemailer.createTransport({
-    port: 25,
-    host: 'localhost',
-    tls: {
-      rejectUnauthorized: false
-    },
-  });
-
-  var message = {
-    from: 'no-reply@brogrammers.cse356.compas.cs.stonybrook.edu',
-    to: user_info.email,
-    subject: "StackOverflow: Verify Account",
-    text: `${username}, Please enter the following key (without the brackets): <${
-        user_info.verificationKey
-      }>`
-  };
-
-  transporter.sendMail(message, (error, info) => {
-    console.log(error);
-    console.log(info);
-    console.log('Message sent: %s', info.messageId);
-  });
-    /*let trans = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: "brogrammers.cse356@gmail.com",
-        pass: "ferdman123"
-      }
-    });
-
-    const opt = {
-      from: "The Brogrammers",
-      to: user_info.email,
-      subject: "StackOverflow: Verify Account",
-      text: `${username}, Please enter the following key (without the brackets): <${
-        user_info.verificationKey
-      }>`
-    };
-    trans.sendMail(opt);*/
+    mailSend.sendRequest(username, user_info.email, user_info.verificationKey);
     return { status: "OK", data: "" };
   }
 
@@ -66,7 +32,7 @@ module.exports = class UserRepository {
    * Creates an account with unique username and email and sends a verification email
    * @param {String} username
    * @param {String} password
-   * @param {String} email 
+   * @param {String} email
    */
   async create(username, password, email) {
     // Check if fields exist
@@ -80,17 +46,30 @@ module.exports = class UserRepository {
       return { status: "error", data: "Email cannot be empty!" };
     }
     // Check if username and email are unique
-    var not_unique_username = await UserModel.findOne({ username: username });
-    if (not_unique_username) {
-      return { status: "error", data: "Username exists." };
-    }
-    var not_unique_email = await UserModel.findOne({ email: email });
-    if (not_unique_email) {
-      return { status: "error", data: "Email exists." };
+    // var t0 = performance.now();
+    var not_unique = await UserModel.findOne({
+      $or: [{ username: username }, { email: email }]
+    });
+    // var t1 = performance.now();
+    // console.log("Call to not_unique took " + (t1 - t0) + " milliseconds.")
+    if (not_unique) {
+      if (not_unique.username == username) {
+        return { status: "error", data: "Username exists." };
+      }
+      if (not_unique.email == email) {
+        return { status: "error", data: "Email exists." };
+      }
     }
     // Store new user
+    // t0 = performance.now();
     const hashedPassword = await hash.hashPassword(password);
+    // t1 = performance.now();
+    // console.log("Call to hashing took" + (t1 - t0) + " milliseconds.")
+    // t0 = performance.now();
     const key = shortid.generate();
+    // t1 = performance.now();
+    // console.log("Call to shortid took" + (t1 - t0) + " milliseconds.")
+    // t0 = performance.now();
     const new_user = new UserModel({
       id: uuidv4(),
       username: username,
@@ -100,6 +79,8 @@ module.exports = class UserRepository {
     });
 
     await new_user.save();
+    // t1 = performance.now();
+    // console.log("Creating a user into the db took " + (t1 - t0) + " milliseconds.")
     await this.send_verification(username);
     return { status: "OK", error: "" };
   }
@@ -135,8 +116,8 @@ module.exports = class UserRepository {
 
   /**
    * Logs in an account
-   * @param {String} username 
-   * @param {String} password 
+   * @param {String} username
+   * @param {String} password
    */
   async login(username, password) {
     // Check if fields exist
@@ -175,19 +156,27 @@ module.exports = class UserRepository {
       return { status: "error", data: "Username cannot be empty!" };
     }
     const result = await this.send_verification(username);
-    if (result.status == 'error') {
+    if (result.status == "error") {
       return { status: result.status, data: result.data };
     }
     return { status: "OK", data: "Verification email resent." };
-  };
+  }
 
   /**
    * sends the email and reputation of a user if it exists
    * @param {String} username
    */
   async getUserInfo(username) {
-    let found_user = await UserModel.findOne({username: username})
-    if (found_user === null) return {status: "error", data: "User not found!!" }
-    else return {status: "OK", data: {email: found_user.email, reputation: found_user.reputation < 1 ? 1 : found_user.reputation }}
+    let found_user = await UserModel.findOne({ username: username });
+    if (found_user === null)
+      return { status: "error", data: "User not found!!" };
+    else
+      return {
+        status: "OK",
+        data: {
+          email: found_user.email,
+          reputation: found_user.reputation < 1 ? 1 : found_user.reputation
+        }
+      };
   }
 };
