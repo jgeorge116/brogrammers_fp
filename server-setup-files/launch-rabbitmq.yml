@@ -8,11 +8,10 @@
     - name: WGET the URL 
       get_url:
         url: https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
-        dest: ~/
+        dest: .
         mode: 0755
     - name: Install package for erlang
-      apt:
-        deb: dpkg ~/erlang-solutions_1.0_all.deb
+      command: dpkg -i erlang-solutions_1.0_all.deb
     - name: Apt update
       command: apt-get update
     - name: Install erlang 
