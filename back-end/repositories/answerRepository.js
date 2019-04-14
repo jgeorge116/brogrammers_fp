@@ -104,24 +104,20 @@ module.exports = class AnswerRepository {
       username: username,
       answer_id: answerID
     });
+    const found_user = await UserModel.findOne({
+      username: found_answer.username
+    });
+    if (!found_user) {
+      return { status: "error" };
+    }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      // Undo the reputation too, allowing negatives (just return 1 if its < 1)
-      await UserModel.updateOne(
-        { username: found_answer.username }, 
-        { $inc: { reputation: -upvote } }
-      );
       await UpvoteModel.deleteOne(found_upvote);
       return { status: "OK" };
     }
     // Upvoting after downvoting or vice versa, deletes previous upvote
     if (found_upvote) {
       await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-      // Undo the original upvote value
-      await UserModel.updateOne(
-        { username: found_answer.username }, 
-        { $inc: { reputation: -found_upvote.value } }
-      );
     }
     // Create and save upvote
     const new_upvote = new UpvoteModel({
@@ -131,11 +127,13 @@ module.exports = class AnswerRepository {
       value: upvote
     });
     await new_upvote.save();
-    // Set reputation of asker
-    await UserModel.updateOne(
-      { username: found_answer.username }, 
-      { $inc: { reputation: upvote } }
-    );
+    // Set reputation of answerer unless it goes below 1
+    if (found_user.reputation + upvote >= 1) {
+      await UserModel.updateOne(
+        { username: found_answer.username }, 
+        { $inc: { reputation: upvote } }
+      );
+    }
     return { status: "OK" };
   }
 };

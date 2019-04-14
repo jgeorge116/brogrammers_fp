@@ -307,13 +307,15 @@ module.exports = class QuestionRepository {
       username: username,
       question_id: questionID
     });
+    const found_user = await UserModel.findOne({
+      username: found_question.username
+    });
+    if (!found_user) {
+      return { status: "error" };
+    }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      // Undo the reputation too, allowing negatives (just return 1 if its < 1)
-      await UserModel.updateOne(
-        { username: found_question.username }, 
-        { $inc: { reputation: -upvote } }
-      );
+      // Also changes the score in the question model
       await QuestionModel.updateOne(
         { id: found_question.id },
         { $inc: { score: -upvote } }
@@ -325,10 +327,6 @@ module.exports = class QuestionRepository {
     if (found_upvote) {
       await UpvoteModel.deleteOne(found_upvote); // Might not have to await
       // Undo the original upvote value
-      await UserModel.updateOne(
-        { username: found_question.username }, 
-        { $inc: { reputation: -found_upvote.value } }
-      );
       await QuestionModel.updateOne(
         { id: found_question.id },
         { $inc: { score: -found_upvote.value } }
@@ -342,11 +340,13 @@ module.exports = class QuestionRepository {
       value: upvote
     });
     await new_upvote.save();
-    // Set reputation of asker
-    await UserModel.updateOne(
-      { username: found_question.username }, 
-      { $inc: { reputation: upvote } }
-    );
+    // Set reputation of asker unless it goes below 1
+    if (found_user.reputation + upvote >= 1) {
+      await UserModel.updateOne(
+        { username: found_question.username }, 
+        { $inc: { reputation: upvote } }
+      );
+    }
     await QuestionModel.updateOne(
       { id: found_question.id },
       { $inc: { score: upvote } }
