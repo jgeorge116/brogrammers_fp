@@ -66,7 +66,10 @@ exports.search_questions = async function(req, res) {
     req.body.timestamp,
     req.body.limit,
     req.body.accepted,
-    req.body.q
+    req.body.q,
+    req.body.sort_by,
+    req.body.tags,
+    req.body.has_media
   );
   if (result.status == "error") {
     res.send({ status: result.status, error: result.data });

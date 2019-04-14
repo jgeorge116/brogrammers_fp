@@ -64,7 +64,7 @@ module.exports = class AnswerRepository {
         user: answer.username,
         body: answer.body,
         score: upvote_count - downvote_count,
-        is_accepted: false, //TODO IMPLEMENT THIS
+        is_accepted: answer.is_accepted,
         timestamp: answer.timestamp,
         media: answer.media
       });

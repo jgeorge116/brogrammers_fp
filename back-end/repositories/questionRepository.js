@@ -124,10 +124,13 @@ module.exports = class QuestionRepository {
    * Searches for questions based on timestamp, limit, accepted (only questions with accepted answers)
    * @param {Integer} timestamp - Optional
    * @param {Integer} limit - Optional
-   * @param {boolean} accepted - Optional
+   * @param {Boolean} accepted - Optional
    * @param {String} q - Optional
+   * @param {String} sort_by - Optional
+   * @param {Array[Strings]} tags - Optional
+   * @param {Boolean} has_media - Optional
    */
-  async search_questions(timestamp, limit, accepted, q) {
+  async search_questions(timestamp, limit, accepted, q, sort_by, tags, has_media) {
     var search_timestamp = timestamp;
     if (!search_timestamp) {
       search_timestamp = new Date().getTime();
@@ -143,13 +146,6 @@ module.exports = class QuestionRepository {
     if (!search_limit) {
       search_limit = 25;
     }
-    // const parsed_int = parseInt(search_limit, 10) //fix bug in front end
-    // if (!Number.isInteger(parsed_int) || search_limit < 1) {
-    //   return {
-    //     status: "error",
-    //     data: "Limit has to be a positive integer"
-    //   };
-    // }
     var parsed_int = search_limit;
     if (parsed_int < 1) parsed_int = 25;
 
@@ -177,6 +173,10 @@ module.exports = class QuestionRepository {
         data: "q has to be a string"
       };
     }
+    sort_by = sort_by === "time" ? sort_by : "score";
+    tags = tags ? tags : null;
+    has_media = has_media ? true : false;
+
     var search_results;
     let query = { timestamp: { $lte: search_timestamp }};
     if(search_q)
@@ -184,15 +184,24 @@ module.exports = class QuestionRepository {
       console.log(query);
     if (search_accepted) {
       query.accepted_answer_id = { $ne: null };
-      search_results = await QuestionModel.find(query,{ score: { $meta: "textScore" } })
-      .limit(parsed_int)
-      .sort({ score: { $meta:"textScore"} });
+    }
+    var sort_field = { score: { $meta:"textScore" } };
+    if (sort_by === "time") {
+      sort_field.timestamp = -1;
     } else {
-      query.accepted_answer_id = null;
-      search_results = await QuestionModel.find(query,{ score: { $meta: "textScore" } })
+      sort_field.score = -1; // Score is both used for score in the schema and textScore 
+    }
+    if (tags) {
+      query.tags = tags;
+    }
+    if (has_media) {
+      query.media = { $ne: [] };
+    }
+    console.log('QUERY', query);
+    console.log(sort_field);
+    search_results = await QuestionModel.find(query,{ score: { $meta: "textScore" } })
       .limit(parsed_int)
       .sort({ score: { $meta:"textScore" } });
-    }
     var all_questions = [];
     for (var result in search_results) {
       var question_info = await this.question_to_api_format(
