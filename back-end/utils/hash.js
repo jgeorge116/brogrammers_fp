@@ -4,7 +4,7 @@
 
 const bcrypt = require('bcryptjs');
 
-const rounds = 15;
+const rounds = 10;
 
 module.exports = class Hash {
     /**

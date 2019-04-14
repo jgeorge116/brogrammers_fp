@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jgeorge116/brogrammers_fp#readme",
   "dependencies": {
+    "amqplib": "^0.5.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cluster": "^0.7.7",
@@ -29,6 +30,7 @@
     "mongoose": "^5.4.19",
     "morgan": "^1.9.1",
     "nodemailer": "^5.1.1",
+    "perf_hooks": "0.0.1",
     "shortid": "^2.2.14",
     "uniqueid": "^1.0.0",
     "uuid": "^3.3.2"

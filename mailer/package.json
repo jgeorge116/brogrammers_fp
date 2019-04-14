@@ -1,0 +1,15 @@
+{
+  "name": "mailer",
+  "version": "1.0.0",
+  "description": "Mail server to send verification keys",
+  "main": "mail-app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.5.3",
+    "nodemailer": "^6.1.0"
+  }
+}

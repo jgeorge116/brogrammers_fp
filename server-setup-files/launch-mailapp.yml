@@ -1,28 +1,20 @@
 ---
-- name: StackOverflow Backend
+- name: Mail app to send verification emails
   hosts: 127.0.0.1
   connection: local
   become: yes
   become_method: sudo
   tasks:
     - name: install nginx
-      apt: name=nginx state=latest
-    - name: start nginx
-      service:
-        name: nginx
-        state: started
+      apt: name=postfix state=latest DEBIAN_PRIORITY=low
     - name: install node
       apt: name=nodejs state=latest
     - name: install npm
       apt: name=npm
     - name: upgrade npm
       command: npm install -g npm
-    - name: go to back-end directory and install required backend packages
-      command: chdir=../back-end npm install
-    - name: go to front-end directory and install required frontend packages
-      command: chdir=../front-end npm install
-    - name: go to root directory and install required packages
-      command: chdir=.. npm install
+    - name: Go to mailer and install npm packages
+      command: chdir=../mailer npm install
     - name: Install PM2
       npm:
         name: pm2
@@ -32,5 +24,5 @@
       command: env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
 # Uncomment the following lines if you are on anything but OpenStack
 # OpenStack creates some zombie for some reason
-    #- name: Run PM2
-    #  command: pm2 start npm -- start
+    # - name: Run PM@ 
+    #   command: pm2 start mail-app.js
