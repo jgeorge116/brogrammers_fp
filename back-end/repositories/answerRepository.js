@@ -136,4 +136,37 @@ module.exports = class AnswerRepository {
     }
     return { status: "OK" };
   }
+
+  async accept_answer(answerID, username) {
+    const found_answer = await AnswerModel.findOne({
+      id: answerID
+    });
+    if (!found_answer) {
+      return { status: "error" };
+    }
+    const found_question = await QuestionModel.findOne({
+      id: found_answer.question_id 
+    });
+    if (!found_question) {
+      return { status: "error" };
+    }
+    if (found_question.username !== username) {
+      // User accepting answer has to be original asker
+      return { status: "error" };
+    }
+    // Error if there is an accepted answer already
+    if (found_question.accepted_answer_id) {
+      return { status: "error" };
+    }
+    // Update the answer and question models
+    await AnswerModel.updateOne(
+      { id: answerID},
+      { is_accepted: true}
+    );
+    await QuestionModel.updateOne(
+      { id: found_question.id },
+      { accepted_answer_id: answerID }
+    );
+    return { status: "OK" };
+  }
 };

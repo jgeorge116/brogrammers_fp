@@ -48,3 +48,17 @@ exports.upvote_answer = async (req, res) => {
     }
   }
 };
+
+exports.accept_answer = async (req, res) => {
+  if (!req.cookies.jwt) {
+    res.send({ status: "error", error: "No token provided" }); 
+  } else {
+    const token = await JWT.validate(req.cookies.jwt);
+    if (!token.username) {
+      res.send({ status: "error", error: "Invalid JWT" });
+    } else {
+      const result = await AR.accept_answer(req.params.id, token.username);
+      res.send({ status: result.status });
+    }
+  }
+};
