@@ -20,7 +20,7 @@
     - name: Install erlang-nox
       apt: name=erlang-nox state=latest
     - name: Get rabbitmq repository
-      command: echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+      command: echo "deb https://dl.bintray.com/rabbitmq/debian bionic main" | sudo tee /etc/apt/sources.list.d/bintray.rabbitmq.list
     - name: Get rabbitmq signing key
       apt_key:
         url: https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
