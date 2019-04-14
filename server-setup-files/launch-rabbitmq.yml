@@ -14,17 +14,17 @@
       apt:
         deb: dpkg ~/erlang-solutions_1.0_all.deb
     - name: Apt update
-      cmd: apt-get update
+      command: apt-get update
     - name: Install erlang 
       apt: name=erlang state=latest
     - name: Install erlang-nox
       apt: name=erlang-nox state=latest
     - name: Get rabbitmq repository
-      cmd: echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+      command: echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list
     - name: Get rabbitmq signing key
-      cmd: wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
+      command: wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
     - name: Apt update
-      cmd: apt-get update
+      command: apt-get update
     - name: Install rabbitmq
       apt: name=rabbitmq-server
     - name: Enables the rabbitmq_management plugin
