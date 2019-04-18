@@ -1,3 +1,8 @@
+# Tempory Fix 
+## Indexing for full text search
+
+db.questions.createIndex({ title: "text", body: "text" }, { default_language: "none" })
+
 # Helpful Tutorials
 
 ## Postfix: 
