@@ -41,7 +41,7 @@ module.exports = class AnswerRepository {
    * Gets all the answers associated with a question.
    * @param {String} question_id 
    */
-  async get_answers(question_id) {
+  async get_question_answers(question_id) {
     var found_question = await QuestionModel.findOne({ id: question_id });
     if (!found_question) {
       return { status: "error", data: "Question does not exist" };
@@ -76,7 +76,7 @@ module.exports = class AnswerRepository {
    * Gets all the answer ids from a certain user.
    * @param {String} username 
    */
-  async getUserAnswers(username) {
+  async get_user_answers(username) {
     let found_answers = await AnswerModel.find({username: username})
     if(found_answers.length == 0) return {status: "error", data: "User has not posted answers yet!"}
     let all_answers = []
