@@ -25,14 +25,24 @@ exports.add_answer = async function(req, res) {
   }
 };
 
-exports.get_answers = async function(req, res) {
+exports.get_question_answers = async function(req, res) {
   var result = await AR.get_answers(req.params.id);
-  res.send({ status: result.status, answers: result.data });
+  
+  if (result.status == "error") {
+    res.status(400).send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status, answers: result.data });
+  }
 };
 
-exports.getUserAnswers = async (req,res) => {
-  let result = await AR.getUserAnswers(req.params.id)
-  res.send({status: result.status, answers: result.data})
+exports.get_user_answers = async (req,res) => {
+  let result = await AR.getUserAnswers(req.params.id);
+  
+  if (result.status == "error") {
+    res.status(400).send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status, answers: result.data });
+  }
 };
 
 exports.upvote_answer = async (req, res) => {
