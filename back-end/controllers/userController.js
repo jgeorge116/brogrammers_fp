@@ -9,12 +9,20 @@ exports.add_user = async function(req, res) {
     req.body.password,
     req.body.email
   );
-  res.send({ status: result.status, error: result.data });
+  if (result.status == "error") {
+    res.status(400).send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status });
+  }
 };
 
 exports.verify = async function(req, res) {
   var result = await UR.verify(req.body.email, req.body.key);
-  res.send({ status: result.status, error: result.data });
+  if (result.status == "error") {
+    res.status(400).send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status });
+  }
 };
 
 exports.login = async function(req, res) {
@@ -23,7 +31,11 @@ exports.login = async function(req, res) {
     const token = await JWT.generate(req.body.username);
     res.cookie('jwt', token, { httpOnly: true });
   }
-  res.send({ status: result.status, error: result.data });
+  if (result.status == "error") {
+    res.status(400).send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status });
+  }
 };
 
 exports.logout = async function(req, res) {
@@ -33,10 +45,19 @@ exports.logout = async function(req, res) {
 
 exports.resend_verification = async function(req, res) {
   var result = await UR.resend_verification(req.body.username);
-  res.send({ status: result.status, error: result.data });
+  
+  if (result.status == "error") {
+    res.status(400).send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status });
+  }
 };
 
 exports.getUserInfo = async (req, res) => {
   let result = await UR.getUserInfo(req.params.id)
-  res.send({status: result.status, user: result.data})
+  if (result.status == "error") {
+    res.status(400).send({ status: result.status, error: result.data });
+  } else {
+    res.send({ status: result.status, user: result.data });
+  }
 }
