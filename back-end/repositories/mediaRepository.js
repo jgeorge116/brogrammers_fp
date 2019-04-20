@@ -4,7 +4,7 @@ const shortid = require("shortid");
 const uuidv4 = require("uuid/v4");
 
 
-module.exports = class UserRepository {
+module.exports = class MediaRepository {
 
     /**
      * Creates a media associated with a username

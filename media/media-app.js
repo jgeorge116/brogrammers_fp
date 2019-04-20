@@ -1,6 +1,6 @@
 const amqp = require("amqplib/callback_api");
 const cassandra = require("cassandra-driver");
-const client = new cassandra.Client({contactPoints: ['127.0.0.1']});
+const client = new cassandra.Client({contactPoints: ['127.0.0.1'],localDataCenter:'datacenter1'});
 
 client.connect(function(err,result){
     if(err) console.log(err);
