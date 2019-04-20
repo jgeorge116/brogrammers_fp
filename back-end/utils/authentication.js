@@ -32,13 +32,17 @@ module.exports = class Authentication {
    * Validate a JWT token, an error will be thrown if the token is tampered with if expired.
    * @returns {object} - Object with username, iat, and exp (empty if error)
    */
-  async validate(token) {
+  async validate(authorization_header) {
+    if (!authorization_header) return {};
+    const bearer = authorization_header.split(' ');
+    if (bearer[0] != 'Bearer') return {};
     try {
-      return jwt.verify(token, this.public, {
+      return jwt.verify(bearer[1], this.public, {
         algorithms: ["RS256"]
       });
     } catch(e) {
       return {};
     }
   }
+
 };

@@ -29,7 +29,7 @@ exports.login = async function(req, res) {
   var result = await UR.login(req.body.username, req.body.password);
   if (result.status !== 'error') {
     const token = await JWT.generate(req.body.username);
-    res.cookie('jwt', token, { httpOnly: true });
+    res.cookie('access_token', token, { httpOnly: true });
   }
   if (result.status == "error") {
     res.status(400).send({ status: result.status, error: result.data });

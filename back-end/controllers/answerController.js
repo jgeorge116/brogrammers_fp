@@ -4,10 +4,10 @@ const Authentication = require("../utils/authentication");
 const JWT = new Authentication();
 
 exports.add_answer = async function(req, res) {
-  if (!req.cookies.jwt) {
+  if (!req.headers.authorization) {
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {
-    var jwt = await JWT.validate(req.cookies.jwt);
+    var jwt = await JWT.validate(req.headers.authorization);
     if (!jwt.username) {
       res.clearCookie("jwt", { httpOnly: true });
       res.status(400).send({ status: "error", error: "Invalid JWT" });
@@ -46,7 +46,7 @@ exports.get_user_answers = async (req,res) => {
 };
 
 exports.upvote_answer = async (req, res) => {
-  if (!req.cookies.jwt) {
+  if (!req.headers.authorization) {
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {
     const token = await JWT.validate(req.cookies.jwt);
@@ -60,7 +60,7 @@ exports.upvote_answer = async (req, res) => {
 };
 
 exports.accept_answer = async (req, res) => {
-  if (!req.cookies.jwt) {
+  if (!req.headers.authorization) {
     res.status(400).send({ status: "error", error: "No token provided" }); 
   } else {
     const token = await JWT.validate(req.cookies.jwt);
