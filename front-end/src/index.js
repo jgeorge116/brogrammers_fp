@@ -10,7 +10,7 @@ import logout from "./Components/logout";
 import Search from "./Components/search";
 import questions from "./Components/questions";
 import viewQuestion from "./Components/viewQuestion";
-import UserInfo from "./Components/UserInfo"
+import userInfo from "./Components/userInfo"
 
 ReactDOM.render(
   <BrowserRouter>
@@ -23,7 +23,7 @@ ReactDOM.render(
       <Route path="/search" component={Search}/>
       <Route path="/questions/add" component={questions}/>
       <Route path="/questions/:id" component={viewQuestion}/>
-      <Route path="/user/:id" component={UserInfo}/>
+      <Route path="/user/:id" component={userInfo}/>
       <Redirect from="/" exact to="/adduser"/>
     </Switch>
   </BrowserRouter>,

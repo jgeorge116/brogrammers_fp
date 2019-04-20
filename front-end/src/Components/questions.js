@@ -1,15 +1,16 @@
 import React, { Component } from "react";
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import Cookies from "js-cookie";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
 class questions extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        id: "",
-        title: "",
-        body: "",
-        tags: []
+      id: "",
+      title: "",
+      body: "",
+      tags: []
     };
   }
 
@@ -20,25 +21,31 @@ class questions extends Component {
 
   handleRequest = e => {
     e.preventDefault();
-    if (this.state.title === "" || this.state.body === "" || this.state.tags === "") 
+    if (
+      this.state.title === "" ||
+      this.state.body === "" ||
+      this.state.tags === ""
+    ) {
       alert("ONE OR MORE OF THE FIELDS ARE EMPTY!");
-    else {
+    } else {
       (async () => {
+        alert("Bearer " + Cookies.get("access_token"));
         const res = await fetch("/questions/add", {
           method: "POST",
           credentials: "include",
           headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json; charset=utf-8"
+            "Accept": "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": "Bearer " + Cookies.get("access_token")
           },
           body: JSON.stringify({
             title: this.state.title,
             body: this.state.body,
-            tags: this.state.tags.split(",")
+            tags: this.state.tags
           })
         });
         let content = await res.json();
-        this.setState({id:content.id})
+        this.setState({ id: content.id });
         if (content.status === "error") alert("Error: " + content.error);
         else {
           this.props.history.push({

@@ -54,7 +54,7 @@ class login extends Component {
     return (
       <div className="loginContainer">
         <header>
-          <link rel="stylesheet" href="style/styles.css" />
+          {/* <link rel="stylesheet" href="style/styles.css" /> */}
         </header>
         <h1>Login boi!!</h1>
         <form onSubmit={this.handleRequest}>

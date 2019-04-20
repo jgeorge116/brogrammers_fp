@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
+import Cookies from "js-cookie";
+
 class home extends Component{ //add logic
     handleLogout = () => {
-        (async () => {const res = await fetch('/logout', { 
-            //idk why we need this but we do according to the doc lmao
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=utf-8'
-            }
-        })
-        const content = await res.json();
-        console.log(content);
-        })()
+        // (async () => {const res = await fetch('/logout', { 
+        //     //idk why we need this but we do according to the doc lmao
+        //     method: 'POST',
+        //     headers: {
+        //         'Accept': 'application/json',
+        //         'Content-Type': 'application/json; charset=utf-8'
+        //     }
+        // })
+        // const content = await res.json();
+        // console.log(content);
+        Cookies.remove('access_token');
+        // })()
         this.props.history.push('/logout')
     }
 

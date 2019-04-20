@@ -3,6 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Cookies from "js-cookie";
 
 class viewQuestion extends Component {
   constructor(props) {
@@ -57,8 +58,9 @@ class viewQuestion extends Component {
           method: "POST",
           credentials: "include",
           headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json; charset=utf-8"
+            "Accept": "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": "Bearer " + Cookies.get("access_token")
           },
           body: JSON.stringify({
             body: this.state.body,
