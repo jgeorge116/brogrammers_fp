@@ -39,7 +39,7 @@ exports.login = async function(req, res) {
 };
 
 exports.logout = async function(req, res) {
-  res.clearCookie('jwt', { httpOnly: true });
+  res.clearCookie('access_token', { httpOnly: true });
   res.send({ status: "OK" });
 };
 
