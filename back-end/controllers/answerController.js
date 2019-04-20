@@ -9,7 +9,7 @@ exports.add_answer = async function(req, res) {
   } else {
     var jwt = await JWT.validate(req.headers.authorization);
     if (!jwt.username) {
-      res.clearCookie("jwt", { httpOnly: true });
+      res.clearCookie("access_token", { httpOnly: true });
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       var result = await AR.create(
