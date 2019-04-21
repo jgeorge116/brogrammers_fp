@@ -15,7 +15,7 @@ module.exports = class QuestionRepository {
    * @param {String} body 
    * @param {Array} tags 
    */
-  async create(username, title, body, tags) {
+  async create(username, title, body, tags, media) {
     // Check the fields
     if (!username) {
       return {
@@ -48,6 +48,7 @@ module.exports = class QuestionRepository {
       title: title,
       body: body,
       tags: tags,
+      media: media,
       timestamp: Date.now() / 1000
     });
     await new_question.save();
