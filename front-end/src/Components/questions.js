@@ -30,7 +30,6 @@ class questions extends Component {
       alert("ONE OR MORE OF THE FIELDS ARE EMPTY!");
     } else {
       (async () => {
-        alert("Bearer " + Cookies.get("access_token"));
         const res = await fetch("/questions/add", {
           method: "POST",
           credentials: "include",

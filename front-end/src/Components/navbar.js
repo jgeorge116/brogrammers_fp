@@ -101,9 +101,7 @@ class Navbar extends Component {
   };
 
   render() {
-    const { anchorEl } = this.state;
     const { classes } = this.props;
-    const isMenuOpen = Boolean(anchorEl);
     if (!localStorage.getItem("username")) {
       this.props.history.push("/login");
     }
@@ -138,8 +136,6 @@ class Navbar extends Component {
                 <div />
                 <div className={ClassNames(classes.navlink)}>
                   <IconButton
-                    aria-owns={isMenuOpen ? "material-appbar" : undefined}
-                    aria-haspopup="true"
                     onClick={this.handleAddQuestion}
                     color="inherit"
                   >
@@ -158,7 +154,7 @@ class Navbar extends Component {
                   <Link
                     className={classes.navlink}
                     color="inherit"
-                    variant="h7"
+                    variant="h6"
                     underline="none"
                   >
                     Logout

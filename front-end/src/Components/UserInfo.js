@@ -45,8 +45,7 @@ class ViewUserInfo extends Component {
     fetch(`/user/${this.props.match.params.id}/questions`)
       .then(response => response.json())
       .then(data => {
-        if (data.status === "error")
-          this.setState({ questions: ["User didn't post anything yet :("] });
+        if (data.status === "error") this.setState({ questions: null });
         else this.setState({ questions: data.questions });
         console.log(data);
         this.getUserAnswers();
@@ -70,13 +69,17 @@ class ViewUserInfo extends Component {
   }
 
   showQuestions() {
-    return this.state.questions.map(item => (
-      <div key={item}>
-        <Link component={RouterLink} to={`/questions/${item}/answers`}>
-          {item}
-        </Link>
-      </div>
-    ));
+    if (this.state.questions) {
+      return this.state.questions.map(item => (
+        <div key={item}>
+          <Link component={RouterLink} to={`/questions/${item}/answers`}>
+            {item}
+          </Link>
+        </div>
+      ));
+    } else {
+      return "User didn't post anything yet :(";
+    }
   }
 
   showAnswers() {

@@ -5,7 +5,20 @@ import Chip from "@material-ui/core/Chip";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Cookies from "js-cookie";
 import Navbar from "./navbar";
+import IconButton from "@material-ui/core/IconButton";
+import Delete from "@material-ui/icons/Delete";
+import { withStyles } from "@material-ui/core/styles";
 
+const styles = theme => ({
+  titleArea: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  deleteIcon: {
+    color: "#f44336"
+  }
+});
 class viewQuestion extends Component {
   constructor(props) {
     super(props);
@@ -29,6 +42,28 @@ class viewQuestion extends Component {
     this.getQuestion();
     this.getAnswers();
   }
+
+  handleDeleteQuestion = e => {
+    (async () => {
+      console.log(Cookies.get("access_token"));
+      const res = await fetch(`/questions/${this.state.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: "Bearer " + Cookies.get("access_token")
+        }
+      });
+      let content = await res.json();
+      if (content.status === "error") alert("Error: " + content.error);
+      else {
+        this.props.history.push({
+          pathname: `/home`
+        });
+      }
+    })();
+  };
 
   getQuestion = _ => {
     fetch(`/questions/${this.props.match.params.id}`)
@@ -94,12 +129,15 @@ class viewQuestion extends Component {
     tags,
     accepted_answer_id
   }) => {
+    const { classes } = this.props;
     return (
       <div key={id}>
-        <div className="titleArea">
+        <div className={classes.titleArea}>
           <h1>{title}</h1>
           <div>
-            <Button>Delete Question</Button>
+            <IconButton onClick={this.handleDeleteQuestion} color="inherit">
+              <Delete className={classes.deleteIcon} />
+            </IconButton>
           </div>
         </div>
         <hr />
@@ -197,4 +235,4 @@ class viewQuestion extends Component {
     }
   }
 }
-export default viewQuestion;
+export default withStyles(styles)(viewQuestion);
