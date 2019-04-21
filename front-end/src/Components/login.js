@@ -37,6 +37,7 @@ class login extends Component {
           });
         } else if (content.status === "error") alert("Error: " + content.error);
         else {
+            localStorage.setItem('username', this.state.username)
             this.props.history.push({
             pathname: "/home"
             });

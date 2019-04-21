@@ -1,7 +1,8 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import Cookies from "js-cookie";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import Navbar from "./navbar";
 
 class questions extends Component {
   constructor(props) {
@@ -34,9 +35,9 @@ class questions extends Component {
           method: "POST",
           credentials: "include",
           headers: {
-            "Accept": "application/json",
+            Accept: "application/json",
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": "Bearer " + Cookies.get("access_token")
+            Authorization: "Bearer " + Cookies.get("access_token")
           },
           body: JSON.stringify({
             title: this.state.title,
@@ -58,46 +59,51 @@ class questions extends Component {
 
   render() {
     return (
-      <div className="questionContainer">
-        <h1>Submit your Question</h1>
-        <form onSubmit={this.handleRequest}>
-          <TextField
-            className="textFields"
-            type="text"
-            name="title"
-            label="Title"
-            onChange={this.handleChange}
-            margin="normal"
-            variant="outlined"
-            fullWidth
-          />
-          <br />
-          <TextField
-            className="textFields"
-            type="text"
-            name="body"
-            label="Body"
-            onChange={this.handleChange}
-            margin="normal"
-            variant="outlined"
-            fullWidth
-            multiline
-          />
-          <br />
-          <TextField
-            className="textFields"
-            type="text"
-            name="tags"
-            label="Tags"
-            onChange={this.handleChange}
-            margin="normal"
-            variant="outlined"
-            fullWidth
-          />
-          <Button id="sub" type="submit">
-            Submit
-          </Button>
-        </form>
+      <div>
+        <Fragment>
+          <Navbar />
+        </Fragment>
+        <div className="questionContainer">
+          <h1>Submit your Question</h1>
+          <form onSubmit={this.handleRequest}>
+            <TextField
+              className="textFields"
+              type="text"
+              name="title"
+              label="Title"
+              onChange={this.handleChange}
+              margin="normal"
+              variant="outlined"
+              fullWidth
+            />
+            <br />
+            <TextField
+              className="textFields"
+              type="text"
+              name="body"
+              label="Body"
+              onChange={this.handleChange}
+              margin="normal"
+              variant="outlined"
+              fullWidth
+              multiline
+            />
+            <br />
+            <TextField
+              className="textFields"
+              type="text"
+              name="tags"
+              label="Tags"
+              onChange={this.handleChange}
+              margin="normal"
+              variant="outlined"
+              fullWidth
+            />
+            <Button id="sub" type="submit">
+              Submit
+            </Button>
+          </form>
+        </div>
       </div>
     );
   }

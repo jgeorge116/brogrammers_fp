@@ -1,34 +1,47 @@
-import React, { Component } from 'react';
-import Button from '@material-ui/core/Button';
-import Cookies from "js-cookie";
+import React, { Component, Fragment } from "react";
+import Navbar from "./navbar";
+import { withStyles } from "@material-ui/core/styles";
+import {Grid, Paper} from "@material-ui/core";
 
-class home extends Component{ //add logic
-    handleLogout = () => {
-        // (async () => {const res = await fetch('/logout', { 
-        //     //idk why we need this but we do according to the doc lmao
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json; charset=utf-8'
-        //     }
-        // })
-        // const content = await res.json();
-        // console.log(content);
-        Cookies.remove('access_token');
-        // })()
-        this.props.history.push('/logout')
-    }
+const styles = theme => ({
+  mainContainer: {
+    // height: "1000px",
+    // background: "#fff",
+    marginTop: '10px',
+    ...theme.mixins.toolbar
+  }
+});
 
-    render() {
-        return( //add logic..
-            <div>
-                <header className="App-header">
-                    <link rel="stylesheet" href="style/styles.css"></link>
-                </header>  
-                <h1 id="homeText">HOMEEEE...</h1>
-                <Button id="logout" onClick={this.handleLogout}>Logout</Button> 
-            </div>
-        )
-    }
+class Home extends Component {
+  //add logic
+
+  render() {
+    const { classes } = this.props;
+    return (
+      //add logic..
+      <div>
+        <header className="App-header">
+          <link rel="stylesheet" href="style/styles.css" />
+        </header>
+        <Fragment>
+          <Navbar />
+        </Fragment>
+        <div className={classes.mainContainer}>
+          <Grid container justify="center">
+            <Grid item md={10}>
+              <Paper>
+                <h1 class="toolbar">HOMEEEE...</h1>
+              </Paper>
+            </Grid>
+            <Grid item md={10}>
+              <Paper>
+                <h1 class="toolbar">HOMEEEE...</h1>
+              </Paper>
+            </Grid>
+          </Grid>
+        </div>
+      </div>
+    );
+  }
 }
-export default home
+export default withStyles(styles)(Home);

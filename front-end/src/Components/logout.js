@@ -6,6 +6,7 @@ class logout extends Component {
   constructor() {
       super();
     Cookies.remove('access_token');
+    localStorage.removeItem('username');
   }
   handleLogin = () => {
     this.props.history.push('/login')
