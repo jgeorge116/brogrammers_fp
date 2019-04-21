@@ -1,8 +1,6 @@
 const Media = require("./../utils/media");
 const media = new Media();
-const shortid = require("shortid");
 const uuidv4 = require("uuid/v4");
-
 
 module.exports = class MediaRepository {
 

@@ -22,7 +22,7 @@ exports.add_media = async function(req, res) {
             fs.readFile(files.contents.path, function(err,data){
                 if(err) throw err;
                 contents = data;
-                result = await MR.create(
+                result = MR.create(
                     username,
                     contents
                 );
