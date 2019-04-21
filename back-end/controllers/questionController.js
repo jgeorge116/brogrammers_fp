@@ -41,7 +41,8 @@ exports.get_question_by_id = async function(req, res) {
     var jwt = await JWT.validate(req.headers.authorization);
     if (!jwt.username) {
       // JWT is modified or expired, use IP instead
-      res.clearCookie("access_token", { httpOnly: true });
+    //   res.clearCookie("access_token", { httpOnly: true });
+        res.clearCookie("access_token");
       await QR.add_view_to_question(req.params.id, {
         type: "IP",
         query: ip
