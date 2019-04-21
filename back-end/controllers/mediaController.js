@@ -19,7 +19,7 @@ exports.add_media = async function(req, res) {
         await new formidable.IncomingForm().parse(req, (err,fields,files) => {
             if(err) throw err
             console.log(files);
-            fs.readFile(files.contents.path, function(err,data){
+            fs.readFile(files.content.path, function(err,data){
                 if(err) throw err;
                 contents = data;
                 result = MR.create(

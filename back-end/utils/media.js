@@ -1,4 +1,4 @@
-
+var amqp = require("amqplib/callback_api");
 
 module.exports = class Media {
     sendAddRequest(id,content) {
