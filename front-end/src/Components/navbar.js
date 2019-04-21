@@ -102,10 +102,10 @@ class Navbar extends Component {
 
   handleSearchChange = e => {
     if (e.key === "Enter") {
-      this.setState({ searchQuery: e.target.value });
-      this.props.history.push(`/search?q=${this.state.searchQuery}`);
+      this.props.history.push(`/search?q=${e.target.value}`);
+      window.location.reload();
     }
-    this.setState({ searchQuery: e.target.value });
+    // this.setState({ searchQuery: e.target.value });
   };
 
   render() {
