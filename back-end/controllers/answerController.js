@@ -9,7 +9,8 @@ exports.add_answer = async function(req, res) {
   } else {
     var jwt = await JWT.validate(req.headers.authorization);
     if (!jwt.username) {
-      res.clearCookie("jwt", { httpOnly: true });
+      //   res.clearCookie("access_token", { httpOnly: true });
+      res.clearCookie("access_token");
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       var result = await AR.create(
@@ -26,8 +27,8 @@ exports.add_answer = async function(req, res) {
 };
 
 exports.get_question_answers = async function(req, res) {
-  var result = await AR.get_answers(req.params.id);
-  
+  var result = await AR.get_question_answers(req.params.id);
+
   if (result.status == "error") {
     res.status(400).send({ status: result.status, error: result.data });
   } else {
@@ -35,9 +36,9 @@ exports.get_question_answers = async function(req, res) {
   }
 };
 
-exports.get_user_answers = async (req,res) => {
-  let result = await AR.getUserAnswers(req.params.id);
-  
+exports.get_user_answers = async (req, res) => {
+  let result = await AR.get_user_answers(req.params.id);
+
   if (result.status == "error") {
     res.status(400).send({ status: result.status, error: result.data });
   } else {
@@ -49,11 +50,15 @@ exports.upvote_answer = async (req, res) => {
   if (!req.headers.authorization) {
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {
-    const token = await JWT.validate(req.cookies.jwt);
+    const token = await JWT.validate(req.headers.authorization);
     if (!token.username) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
-      const result = await AR.upvote_answer(req.params.id, req.body.upvote, token.username);
+      const result = await AR.upvote_answer(
+        req.params.id,
+        req.body.upvote,
+        token.username
+      );
       res.send({ status: result.status });
     }
   }
@@ -61,9 +66,9 @@ exports.upvote_answer = async (req, res) => {
 
 exports.accept_answer = async (req, res) => {
   if (!req.headers.authorization) {
-    res.status(400).send({ status: "error", error: "No token provided" }); 
+    res.status(400).send({ status: "error", error: "No token provided" });
   } else {
-    const token = await JWT.validate(req.cookies.jwt);
+    const token = await JWT.validate(req.headers.authorization);
     if (!token.username) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {

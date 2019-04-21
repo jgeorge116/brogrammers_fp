@@ -9,7 +9,7 @@ exports.add_question = async function(req, res) {
   } else {
     var jwt = await JWT.validate(req.headers.authorization);
     if (!jwt.username) {
-      res.clearCookie("access_token", { httpOnly: true });
+      res.clearCookie("access_token");
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       const username = jwt.username;
@@ -84,7 +84,7 @@ exports.delete_question_by_id = async function(req, res) {
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {
     // Only delete if user is original asker
-    const token = await JWT.validate(req.cookies.jwt);
+    const token = await JWT.validate(req.headers.authorization);
     console.log(token);
     if (!token.username) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
@@ -108,7 +108,7 @@ exports.upvote_question = async (req, res) => {
   if (!req.headers.authorization) {
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {
-    const token = await JWT.validate(req.cookies.jwt);
+    const token = await JWT.validate(req.headers.authorization);
     if (!token.username) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {

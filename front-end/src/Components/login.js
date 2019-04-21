@@ -37,6 +37,7 @@ class login extends Component {
           });
         } else if (content.status === "error") alert("Error: " + content.error);
         else {
+            localStorage.setItem('username', this.state.username)
             this.props.history.push({
             pathname: "/home"
             });
@@ -54,7 +55,7 @@ class login extends Component {
     return (
       <div className="loginContainer">
         <header>
-          <link rel="stylesheet" href="style/styles.css" />
+          {/* <link rel="stylesheet" href="style/styles.css" /> */}
         </header>
         <h1>Login boi!!</h1>
         <form onSubmit={this.handleRequest}>

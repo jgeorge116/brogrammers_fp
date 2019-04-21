@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
-class logout extends Component {
+import Cookies from "js-cookie";
 
+class logout extends Component {
+  constructor() {
+      super();
+    Cookies.remove('access_token');
+    localStorage.removeItem('username');
+  }
   handleLogin = () => {
     this.props.history.push('/login')
   }

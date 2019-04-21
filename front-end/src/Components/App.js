@@ -60,7 +60,7 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <link rel="stylesheet" href="style/styles.css" />
+          {/* <link rel="stylesheet" href="style/styles.css" /> */}
         </header>
         <Button id="login" onClick={this.handleLogin}>
           Login
