@@ -49,7 +49,7 @@ function get_media(mediaInfo) {
                     var buffJson = {
                         results: results
                     };
-		    console.log(results);
+		            console.log(results);
                     ch.publish(ex, "get_media_queue", Buffer.from(JSON.stringify(buffJson)));
                     console.log("Send results for get media");
                 });

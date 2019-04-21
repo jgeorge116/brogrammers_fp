@@ -21,8 +21,8 @@ module.exports = class Media {
         });
     }
 
-    async sendGetRequest(id) {
-        await amqp.connect("amqp://localhost", function(err, conn) {
+    sendGetRequest(id) {
+        amqp.connect("amqp://localhost", function(err, conn) {
             conn.createChannel(function(err, ch) {
                 var ex = "get_media";
 
@@ -38,23 +38,28 @@ module.exports = class Media {
                 conn.close();
             }, 500);
         });
-        var content;
-        await amqp.connect("amqp://localhost", function(err, conn) {
-            conn.createChannel(function(err, ch) {
-                var ex = "get_media_results";
-
-                ch.assertExchange(ex, "fanout", { durable: true });
-
-                ch.assertQueue("", { exclusive: true }, function(err, q) {
-                console.log(" [*] Waiting for logs. To exit press CTRL+C");
-                ch.bindQueue(q.queue, ex, "");
-                ch.consume(q.queue, async function(received) {
-                    content = await JSON.parse(received.content.toString());
-                }, { noAck: false });
+        var content = function(callback) {
+            amqp.connect("amqp://localhost", function(err, conn) {
+                conn.createChannel(function(err, ch) {
+                    var ex = "get_media_results";
+    
+                    ch.assertExchange(ex, "fanout", { durable: true });
+    
+                    ch.assertQueue("", { exclusive: true }, function(err, q) {
+                    console.log(" [*] Waiting for logs. To exit press CTRL+C");
+                    ch.bindQueue(q.queue, ex, "");
+                    ch.consume(q.queue, function(received) {
+                        content = JSON.parse(received.content.toString());
+                        callback(null, content.results.rows[0].contents);
+                    }, { noAck: false });
+                    });
                 });
+                if (err) console.log(err);
             });
-            if (err) console.log(err);
-        });
-	return content.results.rows[0].contents;
+        };
+        content(function(err,found) {
+            if(err) console.log(err);
+            else return found;
+        })
     };
 }

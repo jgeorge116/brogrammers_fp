@@ -25,12 +25,11 @@ exports.add_media = async function(req, res) {
                     username,
                     contents
                 );
-		if (result.status == "error") {
+		        if (result.status == "error") {
             	    res.status(400).send({ status: result.status, error: result.data });
-        	} else {
+        	    } else {
             	    res.send({ status: result.status, id: result.data });
-        	}
-                console.log(result);
+        	    }
             });
         });
       }
