@@ -4,6 +4,8 @@ const Authentication = require("../utils/authentication");
 const JWT = new Authentication();
 const formidable = require('formidable');
 const fs = require('fs');
+const cassandra = require("cassandra-driver");
+const client = new cassandra.Client({contactPoints: ['127.0.0.1'],localDataCenter:'datacenter1'});
 
 exports.add_media = async function(req, res) {
     if (!req.headers.authorization) {
@@ -37,10 +39,16 @@ exports.add_media = async function(req, res) {
 };
 
 exports.get_media_by_id = async function(req, res) {
-  var result = await MR.get_media_by_id(req.params.id);
-  if (result.status == "error") {
-    res.status(400).send({ status: result.status, error: result.data });
-  } else {
-    res.send({ status: "OK", media: result.data });
-  }
+  var query = "SELECT contents FROM somedia.media WHERE id = ?;";
+  client.execute(query, mediaInfo.id, function(err,results) {
+      if(err) console.log(err)
+      else {
+        console.log(results);
+        if(!results.rows[0].contents) {
+          res.status(400).send({ status: "error", error: "Media does not exist" });
+        } else {
+        res.send({ status: "OK", media: results.rows[0].contents });
+        }
+      }
+  });
 };

@@ -32,35 +32,34 @@ function add_media(mediaInfo) {
     });
 }
 
-/**
- * Gets the media
- * @param {JSON} mediaInfo 
- */
-function get_media(mediaInfo) {
-    var query = "SELECT contents FROM somedia.media WHERE id = ?;";
-    client.execute(query, mediaInfo.id, function(err,results) {
-        if(err) console.log(err)
-        else {
-            amqp.connect("amqp://localhost", function(err, conn) {
-                conn.createChannel(function(err, ch) {
-                    var ex = "get_media_results";
+// /**
+//  * Gets the media
+//  * @param {JSON} mediaInfo 
+//  */
+// function get_media(mediaInfo) {
+//     var query = "SELECT contents FROM somedia.media WHERE id = ?;";
+//     client.execute(query, mediaInfo.id, function(err,results) {
+//         if(err) console.log(err)
+//         else {
+//             amqp.connect("amqp://localhost", function(err, conn) {
+//                 conn.createChannel(function(err, ch) {
+//                     var ex = "get_media_results";
 
-                    ch.assertExchange(ex, "fanout", { durable: true });
-                    var buffJson = {
-                        results: results
-                    };
-		            console.log(results);
-                    ch.publish(ex, "get_media_queue", Buffer.from(JSON.stringify(buffJson)));
-                    console.log("Send results for get media");
-                });
-                if (err) console.log(err);
-                setTimeout(function() {
-                    conn.close();
-                }, 500);
-            });
-        }
-    });
-}
+//                     ch.assertExchange(ex, "fanout", { durable: true });
+//                     var buffJson = {
+//                         results: results
+//                     };
+//                     ch.publish(ex, "get_media_queue", Buffer.from(JSON.stringify(buffJson)));
+//                     console.log("Send results for get media");
+//                 });
+//                 if (err) console.log(err);
+//                 setTimeout(function() {
+//                     conn.close();
+//                 }, 500);
+//             });
+//         }
+//     });
+// }
 
 amqp.connect("amqp://localhost", function(err, conn) {
   conn.createChannel(function(err, ch) {

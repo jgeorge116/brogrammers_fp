@@ -21,22 +21,22 @@ module.exports = class Media {
         });
     }
 
-    async sendGetRequest(id) {
-        amqp.connect("amqp://localhost", function(err, conn) {
-            conn.createChannel(function(err, ch) {
-                var ex = "get_media";
+    // async sendGetRequest(id) {
+    //     amqp.connect("amqp://localhost", function(err, conn) {
+    //         conn.createChannel(function(err, ch) {
+    //             var ex = "get_media";
 
-                ch.assertExchange(ex, "fanout", { durable: true });
-                var buffJson = {
-                    id: id
-                };
-                ch.publish(ex, "", Buffer.from(JSON.stringify(buffJson)));
-                console.log("Send request for get media");
-            });
-            if (err) console.log(err);
-            setTimeout(function() {
-                conn.close();
-            }, 500);
-        });
-    };
+    //             ch.assertExchange(ex, "fanout", { durable: true });
+    //             var buffJson = {
+    //                 id: id
+    //             };
+    //             ch.publish(ex, "", Buffer.from(JSON.stringify(buffJson)));
+    //             console.log("Send request for get media");
+    //         });
+    //         if (err) console.log(err);
+    //         setTimeout(function() {
+    //             conn.close();
+    //         }, 500);
+    //     });
+    // };
 }
