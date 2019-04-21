@@ -21,7 +21,7 @@ module.exports = class Media {
         });
     }
 
-    sendGetRequest(id) {
+    async sendGetRequest(id) {
         amqp.connect("amqp://localhost", function(err, conn) {
             conn.createChannel(function(err, ch) {
                 var ex = "get_media";
@@ -50,16 +50,19 @@ module.exports = class Media {
                     ch.bindQueue(q.queue, ex, "");
                     ch.consume(q.queue, function(received) {
                         content = JSON.parse(received.content.toString());
-                        callback(null, content.results.rows[0].contents);
+			if(content.results.rows[0].contents)
+                            callback(null, content.results.rows[0].contents);
                     }, { noAck: false });
                     });
                 });
                 if (err) console.log(err);
             });
         };
-        content(function(err,found) {
-            if(err) console.log(err);
+        var result = await content(function(err,found) {
+	    if(err) console.log(err);
             else return found;
-        })
+        });
+	console.log(result);
+	return result;
     };
 }
