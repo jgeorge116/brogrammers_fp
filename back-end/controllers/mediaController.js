@@ -40,10 +40,10 @@ exports.add_media = async function(req, res) {
 
 exports.get_media_by_id = async function(req, res) {
   var query = "SELECT contents FROM somedia.media WHERE id = ?;";
-  client.execute(query, mediaInfo.id, function(err,results) {
+  var params = [req.params.id];
+  client.execute(query, params, {prepare:true},  function(err,results) {
       if(err) console.log(err)
       else {
-        console.log(results);
         if(!results.rows[0].contents) {
           res.status(400).send({ status: "error", error: "Media does not exist" });
         } else {
