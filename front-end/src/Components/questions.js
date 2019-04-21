@@ -34,9 +34,9 @@ class questions extends Component {
           method: "POST",
           credentials: "include",
           headers: {
-            Accept: "application/json",
+            "Accept": "application/json",
             "Content-Type": "application/json; charset=utf-8",
-            Authorization: "Bearer " + Cookies.get("access_token")
+            "Authorization": "Bearer " + Cookies.get("access_token")
           },
           body: JSON.stringify({
             title: this.state.title,
@@ -56,6 +56,7 @@ class questions extends Component {
     }
   };
 
+  
   render() {
     return (
       <div>

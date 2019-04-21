@@ -100,6 +100,14 @@ class Navbar extends Component {
     anchorEl: null
   };
 
+  handleSearchChange = e => {
+    if (e.key === "Enter") {
+      this.setState({ searchQuery: e.target.value });
+      this.props.history.push(`/search?q=${this.state.searchQuery}`);
+    }
+    this.setState({ searchQuery: e.target.value });
+  };
+
   render() {
     const { classes } = this.props;
     if (!localStorage.getItem("username")) {
@@ -111,15 +119,17 @@ class Navbar extends Component {
           <AppBar position="static">
             <Toolbar>
               <div className={classes.mainBar}>
-                <Typography
-                  color="inherit"
-                  noWrap
-                >
-                  <Link className={ClassNames(classes.title, classes.navlink)}
+                <Typography color="inherit" noWrap>
+                  <Link
+                    className={ClassNames(classes.title, classes.navlink)}
                     color="inherit"
                     variant="h6"
                     underline="none"
-                    href="home"> Stack Overflow </Link>
+                    href="/home"
+                  >
+                    {" "}
+                    Stack Overflow{" "}
+                  </Link>
                 </Typography>
                 <div className={classes.search}>
                   <div className={classes.searchIcon}>
@@ -131,22 +141,17 @@ class Navbar extends Component {
                       root: classes.inputRoot,
                       input: classes.inputInput
                     }}
+                    onKeyDown={this.handleSearchChange}
                   />
                 </div>
                 <div />
                 <div className={ClassNames(classes.navlink)}>
-                  <IconButton
-                    onClick={this.handleAddQuestion}
-                    color="inherit"
-                  >
+                  <IconButton onClick={this.handleAddQuestion} color="inherit">
                     <QuestionAnswer />
                   </IconButton>
                 </div>
                 <div className={ClassNames(classes.profile, classes.navlink)}>
-                  <IconButton
-                    onClick={this.handleProfile}
-                    color="inherit"
-                  >
+                  <IconButton onClick={this.handleProfile} color="inherit">
                     <AccountCircle />
                   </IconButton>
                 </div>
