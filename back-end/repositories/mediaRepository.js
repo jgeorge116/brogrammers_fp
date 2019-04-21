@@ -37,7 +37,8 @@ module.exports = class MediaRepository {
      */
     async get_media_by_id(id) {
         var found_media = await media.sendGetRequest({id: id});
-        if (!found_media) {
+        console.log(found_media);
+	if (!found_media) {
             return {
                 status: "error",
                 data: "Media does not exist"

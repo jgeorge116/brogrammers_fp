@@ -21,8 +21,8 @@ module.exports = class Media {
         });
     }
 
-    sendGetRequest(id) {
-        amqp.connect("amqp://localhost", function(err, conn) {
+    async sendGetRequest(id) {
+        await amqp.connect("amqp://localhost", function(err, conn) {
             conn.createChannel(function(err, ch) {
                 var ex = "get_media";
 
@@ -38,7 +38,8 @@ module.exports = class Media {
                 conn.close();
             }, 500);
         });
-        amqp.connect("amqp://localhost", function(err, conn) {
+        var content;
+        await amqp.connect("amqp://localhost", function(err, conn) {
             conn.createChannel(function(err, ch) {
                 var ex = "get_media_results";
 
@@ -47,14 +48,13 @@ module.exports = class Media {
                 ch.assertQueue("", { exclusive: true }, function(err, q) {
                 console.log(" [*] Waiting for logs. To exit press CTRL+C");
                 ch.bindQueue(q.queue, ex, "");
-                ch.consume(q.queue, function(received) {
-                    content = JSON.parse(received.content.toString());
-                    console.log(content);
-                    return content;
+                ch.consume(q.queue, async function(received) {
+                    content = await JSON.parse(received.content.toString());
                 }, { noAck: false });
                 });
             });
             if (err) console.log(err);
         });
+	return content.results.rows[0].contents;
     };
 }
