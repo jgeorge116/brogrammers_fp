@@ -16,23 +16,23 @@ exports.add_media = async function(req, res) {
         } else {
         const username = jwt.username;
         var result;
-        await new formidable.IncomingForm().parse(req, (err,fields,files) => {
+        new formidable.IncomingForm().parse(req, (err,fields,files) => {
             if(err) throw err
-            console.log(files);
-            fs.readFile(files.content.path, function(err,data){
+            fs.readFile(files.content.path, async function(err,data){
                 if(err) throw err;
                 contents = data;
-                result = MR.create(
+                result = await MR.create(
                     username,
                     contents
                 );
+		if (result.status == "error") {
+            	    res.status(400).send({ status: result.status, error: result.data });
+        	} else {
+            	    res.send({ status: result.status, id: result.data });
+        	}
+                console.log(result);
             });
         });
-        if (result.status == "error") {
-          res.status(400).send({ status: result.status, error: result.data });
-        } else {
-          res.send({ status: result.status, id: result.data });
-        }
       }
     }
 };

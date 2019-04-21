@@ -49,7 +49,6 @@ module.exports = class Media {
                 ch.bindQueue(q.queue, ex, "");
                 ch.consume(q.queue, function(received) {
                     content = JSON.parse(received.content.toString());
-                    console.log(content);
                     return content;
                 }, { noAck: false });
                 });

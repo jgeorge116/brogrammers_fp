@@ -14,7 +14,7 @@ client.execute(query, function(err){
 });
 
 var query = "CREATE TABLE IF NOT EXISTS somedia.media (id UUID PRIMARY KEY, contents blob)";
-    client.execute(query, function(err){
+client.execute(query, function(err){
     if(err) console.log(err);
     else console.log('created table media');
 });
@@ -25,7 +25,8 @@ var query = "CREATE TABLE IF NOT EXISTS somedia.media (id UUID PRIMARY KEY, cont
  */
 function add_media(mediaInfo) {
     var query = "INSERT INTO somedia.media (id, contents) VALUES (?,?);";
-    client.execute(query, [mediaInfo.id, mediaInfo.content], function(err) {
+    params = [mediaInfo.id, mediaInfo.content.data]
+    client.execute(query, params, function(err) {
         if(err) console.log(err)
         else console.log('inserted into media');
     });
@@ -37,7 +38,7 @@ function add_media(mediaInfo) {
  */
 function get_media(mediaInfo) {
     var query = "SELECT contents FROM somedia.media WHERE id = ?;";
-    client.execute(query, [mediaInfo.id], function(err,results) {
+    client.execute(query, mediaInfo.id, function(err,results) {
         if(err) console.log(err)
         else {
             amqp.connect("amqp://localhost", function(err, conn) {
@@ -49,7 +50,7 @@ function get_media(mediaInfo) {
                         results: results
                     };
                     ch.publish(ex, "get_media_queue", Buffer.from(JSON.stringify(buffJson)));
-                    console.log("Send request for get media");
+                    console.log("Send results for get media");
                 });
                 if (err) console.log(err);
                 setTimeout(function() {
