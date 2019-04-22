@@ -11,6 +11,8 @@ import Search from "./Components/search";
 import questions from "./Components/questions";
 import viewQuestion from "./Components/viewQuestion";
 import userInfo from "./Components/userInfo";
+import addMedia from "./Components/addMedia";
+import viewMedia from "./Components/viewMedia";
 
 ReactDOM.render(
   <BrowserRouter>
@@ -24,6 +26,8 @@ ReactDOM.render(
       <Route path="/questions/add" component={questions} />
       <Route path="/questions/:id" component={viewQuestion} />
       <Route path="/user/:id" component={userInfo} />
+      <Route path="/addmedia" component={addMedia} />
+      <Route path="/media/:id" component={viewMedia} />
       <Redirect from="/" exact to="/adduser" />
     </Switch>
   </BrowserRouter>,
