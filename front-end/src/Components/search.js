@@ -9,8 +9,6 @@ import { Grid, Paper } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 const queryString = require("query-string");
 
-let data = null;
-
 const styles = theme => ({
   questionPost: {
     // marginLeft: "5%",
@@ -53,8 +51,9 @@ class Search extends Component {
         })
       });
       let content = await res.json();
-      console.log(content);
-      data = content.questions;
+      //   console.log(content);
+      //   data = content.questions;
+      this.setState({ data: content.questions });
       this.forceUpdate();
     })();
   }
@@ -69,14 +68,15 @@ class Search extends Component {
     );
   };
 
-  showResults = data => {
+  showResults = _ => {
     //display results
-    console.log(data);
-    if (!data) return null;
+    let data = this.state.data;
+
+    if (!data || data.length === 0) return <h2> No results found.</h2>;
     // let i = 0;
     const { classes } = this.props;
     return data.map(function(item, i) {
-        console.log(i);
+      console.log(i);
       return (
         <div className={classes.questionPost}>
           <Post
@@ -195,7 +195,7 @@ class Search extends Component {
           <Grid item md={9}>
             <Paper className={classes.resultBox}>
               <h1>Search Results</h1>
-              {this.showResults(data)}
+              {this.showResults()}
             </Paper>
           </Grid>
         </Grid>

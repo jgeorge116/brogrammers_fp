@@ -78,10 +78,6 @@ p {
     overflow:hidden;
 }
 
-.questionInfo, .answerInfo {
-    float:right;
-}
-
 .submitAnswer, .answers {
     clear:both;
 }

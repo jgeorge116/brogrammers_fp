@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import Navbar from "./navbar";
-
+import CircularProgress from "@material-ui/core/CircularProgress";
 class viewMedia extends Component {
     constructor(props) {
         super(props);

@@ -14,7 +14,7 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import QuestionAnswer from "@material-ui/icons/QuestionAnswer";
 import Cookies from "js-cookie";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
-import theme from "./materialUITheme";
+import theme from "./style/materialUITheme";
 import ClassNames from "classnames";
 
 const styles = theme => ({

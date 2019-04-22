@@ -8,7 +8,7 @@ import home from "./Components/home";
 import login from "./Components/login";
 import logout from "./Components/logout";
 import Search from "./Components/search";
-import questions from "./Components/questions";
+import questions from "./Components/addQuestion";
 import viewQuestion from "./Components/viewQuestion";
 import userInfo from "./Components/userInfo";
 import addMedia from "./Components/addMedia";

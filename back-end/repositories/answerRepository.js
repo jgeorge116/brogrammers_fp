@@ -52,11 +52,11 @@ module.exports = class AnswerRepository {
     var all_answers = [];
     for (const answer of found_answers) {  
       const upvote_count = await UpvoteModel.countDocuments({
-        answer_id: format_question.id,
+        answer_id: found_answers.id,
         value: 1
       });
       const downvote_count = await UpvoteModel.countDocuments({
-        answer_id: format_question.id,
+        answer_id: found_answers.id,
         value: -1
       });
       all_answers.push({
@@ -168,5 +168,15 @@ module.exports = class AnswerRepository {
       { accepted_answer_id: answerID }
     );
     return { status: "OK" };
+  }
+
+  async get_answer_upvote_status(answerID, username) {
+    const found_upvote = await UpvoteModel.findOne({
+      type: "answer",
+      username: username,
+      answer_id: answerID
+    });
+    if (!found_upvote) return { status: "error" };
+    return { status: "Ok" , upvote: found_upvote.value};
   }
 };
