@@ -8,7 +8,7 @@ var AnswerModelSchema = new Schema({
   body: String,
   is_accepted: { type: Boolean, default: false},
   timestamp: { type: Number, default: new Date().getTime() },
-  media: [Number]
+  media: [String]
 });
 
 AnswerModelSchema.set("collection", "answers");

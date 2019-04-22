@@ -1,0 +1,15 @@
+{
+  "name": "media",
+  "version": "1.0.0",
+  "description": "Media server to store media",
+  "main": "media-app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.5.3",
+    "cassandra-driver": "^4.0.0"
+  }
+}

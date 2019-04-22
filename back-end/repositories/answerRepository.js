@@ -31,7 +31,7 @@ module.exports = class AnswerRepository {
       question_id: question_id,
       username: username,
       body: body,
-      tags: media
+      media: media
     });
     await new_answer.save();
     return { status: "OK", data: new_id };
