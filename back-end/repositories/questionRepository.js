@@ -382,9 +382,6 @@ module.exports = class QuestionRepository {
       username: username,
       question_id: questionID
     });
-    // console.log(questionID);
-    // console.log(username);
-    // console.log(found_upvote.value);
     if (!found_upvote) return { status: "error" };
     return { status: "Ok" , upvote: found_upvote.value};
   }

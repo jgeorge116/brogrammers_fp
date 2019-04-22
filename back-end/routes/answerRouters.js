@@ -8,5 +8,6 @@ router.get("/questions/:id/answers", AnswerController.get_question_answers);
 router.get("/user/:id/answers", AnswerController.get_user_answers);
 router.post("/answers/:id/upvote", AnswerController.upvote_answer);
 router.post("/answers/:id/accept", AnswerController.accept_answer);
+router.get("/answers/:id/upvotestatus", AnswerController.get_answer_upvote_status);
 
 module.exports = router;

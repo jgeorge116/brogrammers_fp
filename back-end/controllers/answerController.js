@@ -89,3 +89,25 @@ exports.accept_answer = async (req, res) => {
     }
   }
 };
+
+// NOT AN API ENDPOINT, JUST FOR FRONTEND PRETTINESS
+exports.get_answer_upvote_status = async (req, res) => {
+    if (!req.headers.authorization && !req.cookies.access_token) {
+      res.status(400).send({ status: "error", error: "No token provided" });
+    } else {
+      if (!req.headers.authorization) {
+        var token = await JWT.validate(req.cookies.access_token);
+      } else {
+        var token = await JWT.validate(req.headers.authorization);
+      }
+      if (!token.username) {
+        res.status(400).send({ status: "error", error: "Invalid JWT" });
+      } else {
+        const result = await QR.get_answer_upvote_status(
+          req.params.id,
+          token.username
+        );
+        res.send({ status: result.status, upvote: result.upvote });
+      }
+    }
+  };

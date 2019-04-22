@@ -169,4 +169,14 @@ module.exports = class AnswerRepository {
     );
     return { status: "OK" };
   }
+
+  async get_answer_upvote_status(answerID, username) {
+    const found_upvote = await UpvoteModel.findOne({
+      type: "answer",
+      username: username,
+      answer_id: answerID
+    });
+    if (!found_upvote) return { status: "error" };
+    return { status: "Ok" , upvote: found_upvote.value};
+  }
 };

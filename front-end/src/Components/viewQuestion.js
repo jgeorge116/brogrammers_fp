@@ -58,21 +58,24 @@ const styles = theme => ({
     flexDirection: "row",
     justifyContent: "center"
   },
-  questionBody: {
+  questionAnswerBody: {
     display: "flex",
     flexDirection: "row"
   },
   questionDescription: {
     minHeight: "175px"
   },
+  answerDescription: {
+    minHeight: "100px"
+  },
   descriptionContainer: {
     flexGrow: 2
   },
-  questionInfoSection: {
+  infoSection: {
     background: "#e0f2f1",
     padding: ".5em"
   },
-  questionInfo: {
+  info: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between"
@@ -280,18 +283,18 @@ class viewQuestion extends Component {
           </div>
           <hr />
           <div>
-            <div className={classes.questionBody}>
+            <div className={classes.questionAnswerBody}>
               {this.renderVoteArea(score)}
               <div className={classes.descriptionContainer}>
                 <div className={classes.questionDescription}>{body}</div>
-                <div className={classes.questionInfoSection}>
+                <div className={classes.infoSection}>
                   <div>
                     Tags:{" "}
                     {tags.map(el => (
                       <Chip key={el} label={el} clickable={true} />
                     ))}
                   </div>
-                  <div className={classes.questionInfo}>
+                  <div className={classes.info}>
                     <p className={classes.pNoSpace}>
                       Posted By: {user.username} at {timestamp}
                     </p>
@@ -316,17 +319,24 @@ class viewQuestion extends Component {
     timestamp,
     media
   }) => {
+    const { classes } = this.props;
     return (
-      <div key={id} className="answer">
-        <div className="answerInfo">
-          <p>{user}</p>
-          <p>Score: {score}</p>
-          <p>Accepted: {is_accepted}</p>
-          <p>Timestamp: {timestamp}</p>
+      <div key={id} className={classes.answer}>
+        <div className={classes.questionAnswerBody}>
+          {this.renderVoteArea(score)}
+          <div className={classes.descriptionContainer}>
+            <div className={classes.answerDescription}>{body}</div>
+            <div className={classes.infoSection}>
+              <div className={classes.info}>
+                <p className={classes.pNoSpace}>
+                  Answered by: {user} at {timestamp}
+                </p>
+                <p className={classes.pNoSpace}>Accepted: {is_accepted}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="answerBody">
-          <p>{body}</p>
-        </div>
+        <hr />
       </div>
     );
   };
@@ -354,7 +364,6 @@ class viewQuestion extends Component {
             {this.state.question.map(this.renderQuestion)}
             {this.state.isLoadingAnswers ? this.showQuestions() : null}
             <div className="submitAnswer">
-              <hr />
               <h1>Your Answer</h1>
               <form onSubmit={this.handleRequest}>
                 <TextField
