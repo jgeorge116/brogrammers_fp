@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from "react";
 import Navbar from "./navbar";
-import CircularProgress from "@material-ui/core/CircularProgress";
+
 class viewMedia extends Component {
     constructor(props) {
         super(props);
@@ -28,16 +28,20 @@ class viewMedia extends Component {
         })
         .catch(err => console.error(err));
     };
+
     render() {
+        var reader = new FileReader();
+        reader.readAsDataURL(media);
         if (this.state.isLoading) {
           return <CircularProgress size="100" />;
         } else {
             return (
                 <div>
                     <Fragment>
-                    <Navbar />
+                        <Navbar />
                     </Fragment>
-
+                    
+                    <img src={reader.result} />
                 </div>
             );
         }
