@@ -8,10 +8,14 @@ const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({contactPoints: ['127.0.0.1'],localDataCenter:'datacenter1'});
 
 exports.add_media = async function(req, res) {
-    if (!req.headers.authorization) {
+    if (!req.headers.authorization && !req.cookies.access_token) {
         res.status(400).send({ status: "error", error: "No token provided" });
-      } else {
-        var jwt = await JWT.validate(req.headers.authorization);
+    } else {
+        if (!req.headers.authorization) {
+          var jwt = await JWT.validate(req.cookies.access_token);
+        } else {
+          var jwt = await JWT.validate(req.headers.authorization);
+        }
         if (!jwt.username) {
           res.clearCookie("access_token", { httpOnly: true });
           res.status(400).send({ status: "error", error: "Invalid JWT" });
