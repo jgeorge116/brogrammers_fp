@@ -6,8 +6,11 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Cookies from "js-cookie";
 import Navbar from "./navbar";
 import IconButton from "@material-ui/core/IconButton";
+import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
+import ArrowDropDown from "@material-ui/icons/ArrowDropDown";
 import Delete from "@material-ui/icons/Delete";
 import { withStyles } from "@material-ui/core/styles";
+import ClassNames from "classnames";
 
 const styles = theme => ({
   titleArea: {
@@ -15,8 +18,78 @@ const styles = theme => ({
     flexDirection: "row",
     justifyContent: "space-between"
   },
+  titleSecion: {
+    flexGrow: "1"
+  },
+  upIcon: {
+    cursor: "pointer",
+    fontSize: "4em",
+    color: "#000",
+    "& :hover": {
+      color: "#00897b"
+    }
+  },
+  upIconChose: {
+    color: "#00c853",
+    "& :hover": {
+      color: "#757575"
+    }
+  },
+  downIcon: {
+    cursor: "pointer",
+    fontSize: "4em",
+    color: "#000",
+    "& :hover": {
+      color: "#e53935"
+    },
+    marginTop: "-20px"
+  },
+  downIconeChose: {
+    color: "#b71c1c",
+    "& :hover": {
+      color: "#757575"
+    }
+  },
   deleteIcon: {
     color: "#f44336"
+  },
+  headerSection: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center"
+  },
+  questionBody: {
+    display: "flex",
+    flexDirection: "row"
+  },
+  questionDescription: {
+    minHeight: "175px"
+  },
+  descriptionContainer: {
+    flexGrow: 2
+  },
+  questionInfoSection: {
+    background: "#e0f2f1",
+    padding: ".5em"
+  },
+  questionInfo: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  voteArea: {
+    display: "flex",
+    flexDirection: "column",
+    marginLeft: "-15px",
+    marginTop: "-20px"
+  },
+  score: {
+    textAlign: "center",
+    fontSize: "2em",
+    marginTop: "-20px"
+  },
+  pNoSpace: {
+    margin: 0
   }
 });
 class viewQuestion extends Component {
@@ -41,11 +114,11 @@ class viewQuestion extends Component {
     });
     this.getQuestion();
     this.getAnswers();
+    this.getUpvoteStatus();
   }
 
   handleDeleteQuestion = e => {
     (async () => {
-      console.log(Cookies.get("access_token"));
       const res = await fetch(`/questions/${this.state.id}`, {
         method: "DELETE",
         credentials: "include",
@@ -65,6 +138,29 @@ class viewQuestion extends Component {
     })();
   };
 
+  handleVoteQuestion(voteChoice, e) {
+    e.preventDefault();
+    (async () => {
+      //   console.log(Cookies.get("access_token"));
+      const res = await fetch(`/questions/${this.state.id}/upvote`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: "Bearer " + Cookies.get("access_token")
+        },
+        body: JSON.stringify({
+          upvote: voteChoice
+        })
+      });
+      let content = await res.json();
+      if (content.status === "error") alert("Error: " + content.error);
+      else {
+        this.componentDidMount();
+      }
+    })();
+  }
   getQuestion = _ => {
     fetch(`/questions/${this.props.match.params.id}`)
       .then(response => response.json())
@@ -82,6 +178,26 @@ class viewQuestion extends Component {
           this.setState({ answers: [data.answers], isLoadingAnswers: true });
       })
       .catch(err => console.error(err));
+  };
+
+  getUpvoteStatus = _ => {
+    fetch(`/questions/${this.props.match.params.id}/upvotestatus`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json; charset=utf-8",
+        Authorization: "Bearer " + Cookies.get("access_token")
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.upvote) data.upvote = 0;
+        this.setState({
+          questionUpvoteStatus: data.upvote
+        });
+      })
+      .catch(err => console.log(err));
   };
 
   handleChange = e => {
@@ -115,6 +231,26 @@ class viewQuestion extends Component {
       })();
     }
   };
+  renderVoteArea = score => {
+    const { classes } = this.props;
+    let status = this.state.questionUpvoteStatus;
+    let upvoted = status === 1 ? classes.upIconChose : "";
+    let downvoted = status === -1 ? classes.downIconeChose : "";
+    return (
+      <div className={classes.voteArea}>
+        <ArrowDropUp
+          onClick={e => this.handleVoteQuestion(true, e)}
+          className={ClassNames(classes.upIcon, upvoted)}
+        />
+        <div className={classes.score}>{score}</div>
+        <ArrowDropDown
+          onClick={e => this.handleVoteQuestion(false, e)}
+          className={ClassNames(classes.downIcon, downvoted)}
+        />
+      </div>
+    );
+  };
+
   // to display the question data
   renderQuestion = ({
     id,
@@ -131,32 +267,40 @@ class viewQuestion extends Component {
   }) => {
     const { classes } = this.props;
     return (
-      <div key={id}>
-        <div className={classes.titleArea}>
-          <h1>{title}</h1>
-          <div>
-            <IconButton onClick={this.handleDeleteQuestion} color="inherit">
-              <Delete className={classes.deleteIcon} />
-            </IconButton>
+      <div className={classes.headerSection}>
+        <div className={classes.titleSecion} key={id}>
+          <div className={classes.titleArea}>
+            <h1>{title}</h1>
+            <div>
+              <IconButton onClick={this.handleDeleteQuestion} color="inherit">
+                <Delete className={classes.deleteIcon} />
+              </IconButton>
+            </div>
           </div>
-        </div>
-        <hr />
-        <div className="questionInfo">
-          <p>{user.username}</p>
-          <p>Score: {score}</p>
-          <p>View Count: {view_count}</p>
-          <p>Answer Count: {answer_count}</p>
-          <p>Timestamp: {timestamp}</p>
-        </div>
-        <div className="questionBody">
-          <div>{body}</div>
+          <hr />
           <div>
-            Tags:{" "}
-            {tags.map(el => (
-              <Chip key={el} label={el} clickable={true} />
-            ))}
+            <div className={classes.questionBody}>
+              {this.renderVoteArea(score)}
+              <div className={classes.descriptionContainer}>
+                <div className={classes.questionDescription}>{body}</div>
+                <div className={classes.questionInfoSection}>
+                  <div>
+                    Tags:{" "}
+                    {tags.map(el => (
+                      <Chip key={el} label={el} clickable={true} />
+                    ))}
+                  </div>
+                  <div className={classes.questionInfo}>
+                    <p className={classes.pNoSpace}>
+                      Posted By: {user.username} at {timestamp}
+                    </p>
+                    <p className={classes.pNoSpace}>{view_count} Views</p>
+                    <p className={classes.pNoSpace}>{answer_count} Answers</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>Accepted Answer ID: {accepted_answer_id}</div>
         </div>
       </div>
     );
