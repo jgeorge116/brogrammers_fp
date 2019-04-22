@@ -114,7 +114,7 @@ class viewQuestion extends Component {
     });
     this.getQuestion();
     this.getAnswers();
-    this.getUpvoteStatus();
+    // this.getUpvoteStatus();
   }
 
   handleDeleteQuestion = e => {
@@ -157,7 +157,8 @@ class viewQuestion extends Component {
       let content = await res.json();
       if (content.status === "error") alert("Error: " + content.error);
       else {
-        this.componentDidMount();
+        this.getUpvoteStatus();
+        this.getQuestion();
       }
     })();
   }
@@ -226,7 +227,7 @@ class viewQuestion extends Component {
         let content = await res.json();
         if (content.status === "error") alert("Error: " + content.error);
         else {
-          this.componentDidMount();
+          this.getAnswers();
         }
       })();
     }
