@@ -35,11 +35,17 @@ module.exports = class Authentication {
   async validate(authorization_header) {
     if (!authorization_header) return {};
     const bearer = authorization_header.split(' ');
-    if (bearer[0] != 'Bearer') return {};
+    //if (bearer[0] != 'Bearer') return {};
     try {
-      return jwt.verify(bearer[1], this.public, {
-        algorithms: ["RS256"]
-      });
+      if (bearer[1]) {
+        return jwt.verify(bearer[1], this.public, {
+          algorithms: ["RS256"]
+        });
+      } else {
+        return jwt.verify(bearer[0], this.public, {
+          algorithms: ["RS256"]
+        });
+      }
     } catch(e) {
       return {};
     }
