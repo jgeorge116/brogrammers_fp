@@ -52,13 +52,15 @@ module.exports = class AnswerRepository {
     var all_answers = [];
     for (const answer of found_answers) {  
       const upvote_count = await UpvoteModel.countDocuments({
-        answer_id: found_answers.id,
+        answer_id: answer.id,
         value: 1
       });
       const downvote_count = await UpvoteModel.countDocuments({
-        answer_id: found_answers.id,
+        answer_id: answer.id,
         value: -1
       });
+      console.log(upvote_count);
+      console.log(downvote_count);
       all_answers.push({
         id: answer.id,
         user: answer.username,

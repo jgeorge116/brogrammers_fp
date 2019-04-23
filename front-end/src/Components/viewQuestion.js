@@ -137,7 +137,7 @@ class viewQuestion extends Component {
       if (content.status === "error") alert("Error: " + content.error);
       else {
         this.props.history.push({
-          pathname: `/home`
+          pathname: '/home'
         });
       }
     })();
@@ -167,6 +167,30 @@ class viewQuestion extends Component {
       }
     })();
   }
+
+  handleVoteAnswer(answer_id, voteChoice, e) {
+    e.preventDefault();
+    (async () => {
+      const res = await fetch(`/answers/${answer_id}/upvote`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: "Bearer " + Cookies.get("access_token")
+        },
+        body: JSON.stringify({
+          upvote: voteChoice
+        })
+      });
+      let content = await res.json();
+      if (content.status === "error") alert("Error: " + content.error);
+      else {
+        this.getAnswers();
+      }
+    })();
+  }
+
   getQuestion = _ => {
     fetch(`/questions/${this.props.match.params.id}`)
       .then(response => response.json())
@@ -295,22 +319,19 @@ class viewQuestion extends Component {
     );
   };
 
-  renderAnswerVoteArea = (score, status) => {
-    console.log("hi look, down for score and status");
-    console.log(score);
-    console.log(status);
+  renderAnswerVoteArea = (answer_id, score, status) => {
     const { classes } = this.props;
     let upvoted = status === 1 ? classes.upIconChose : "";
     let downvoted = status === -1 ? classes.downIconeChose : "";
     return (
       <div className={classes.voteArea}>
         <ArrowDropUp
-          onClick={e => this.handleVoteQuestion(true, e)}
+          onClick={e => this.handleVoteAnswer(answer_id, true, e)}
           className={ClassNames(classes.upIcon, upvoted)}
         />
         <div className={classes.score}>{score}</div>
         <ArrowDropDown
-          onClick={e => this.handleVoteQuestion(false, e)}
+          onClick={e => this.handleVoteAnswer(answer_id, false, e)}
           className={ClassNames(classes.downIcon, downvoted)}
         />
       </div>
@@ -390,7 +411,7 @@ class viewQuestion extends Component {
     return (
       <div key={id} className={classes.answer}>
         <div className={classes.questionAnswerBody}>
-          {this.renderAnswerVoteArea(score, upvoteStatus)}
+          {this.renderAnswerVoteArea(id, score, upvoteStatus)}
           <div className={classes.descriptionContainer}>
             <div className={classes.answerDescription}>{body}</div>
             <div className={classes.infoSection}>
