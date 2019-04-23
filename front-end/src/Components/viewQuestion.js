@@ -105,7 +105,8 @@ class viewQuestion extends Component {
       isLoadingAnswers: false,
       body: "",
       media: [],
-      answers: []
+      answers: [],
+      allMedia: []
     };
   }
 
@@ -183,6 +184,25 @@ class viewQuestion extends Component {
       })
       .catch(err => console.error(err));
   };
+
+  getMedia = _ => {
+    let allMedia = []
+    for(let i = 0; i < this.state.question.media.length; i++) {
+      fetch(`/media/${media[i]}`)
+        .then(response => response.blob())
+        .then(data => {
+        console.log(data);
+        if (data) {
+          var reader = new FileReader();
+          reader.onload = (e) => {
+            allMedia.push(e.target.result);
+            this.setState({allMedia: allMedia})
+          }
+          reader.readAsDataURL(allMedia[i]);
+        }
+        }).catch(err => console.error(err));
+    }
+  }
 
   getUpvoteStatus = _ => {
     fetch(`/questions/${this.props.match.params.id}/upvotestatus`, {
@@ -270,21 +290,6 @@ class viewQuestion extends Component {
     accepted_answer_id
   }) => {
     const { classes } = this.props;
-    let allMedia = [];
-    for(let i = 0; i < media.length; i++) {
-      fetch(`/media/${media[i]}`)
-        .then(response => response.blob())
-        .then(data => {
-        console.log(data);
-        if (data) {
-          var reader = new FileReader();
-          reader.onload = (e) => {
-            allMedia.push(e.target.result);
-          }
-          reader.readAsDataURL(allMedia[i]);
-        }
-        }).catch(err => console.error(err));
-    }
     return (
       <div className={classes.headerSection}>
         <div className={classes.titleSecion} key={id}>
