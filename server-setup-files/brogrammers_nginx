@@ -2,7 +2,9 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name 140.82.5.254 brogrammers.cse356.compas.cs.stonybrook.edu;
+    server_name 130.245.171.56 brogrammers.cse356.compas.cs.stonybrook.edu;
+    
+    client_max_body_size 100m;
 
     location / {
         proxy_pass http://localhost:3000;

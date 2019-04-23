@@ -33,17 +33,18 @@ module.exports = class ResetRespository {
       else console.log("created keyspace somedia");
     });
 
-    var query2 = "DROP TABLE IF EXISTS somedia.media";
-    await client.execute(query2, function(err) {
-      if (err) console.log(err);
-      else console.log("keyspace somedia");
-    });
 
     var query3 =
       "CREATE TABLE IF NOT EXISTS somedia.media (id UUID PRIMARY KEY, contents blob)";
     await client.execute(query3, function(err) {
       if (err) console.log(err);
       else console.log("created table media");
+    });
+    3
+    var query2 = "TRUNCATE somedia.media";
+    await client.execute(query2, function(err) {
+      if (err) console.log(err);
+      else console.log("erase somedia");
     });
   }
 };
