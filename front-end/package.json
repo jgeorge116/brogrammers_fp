@@ -8,6 +8,7 @@
     "classnames": "^2.2.6",
     "history": "^4.9.0",
     "js-cookie": "^2.2.0",
+    "material-ui-dropzone": "^2.3.5",
     "prop-types": "^15.7.2",
     "query-string": "^6.4.2",
     "react": "^16.8.3",
@@ -16,7 +17,7 @@
     "react-scripts": "^2.1.8"
   },
   "scripts": {
-    "start": "PORT=3000 react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -2,28 +2,33 @@ import React, { Component, Fragment } from "react";
 import Cookies from "js-cookie";
 import Button from "@material-ui/core/Button";
 import Navbar from "./navbar";
+import {DropzoneArea} from 'material-ui-dropzone'
 
 class addMedia extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      content:""
+      content:"",
+      files:[]
     };
   }
 
-  handleChange = e => {
-    this.setState({ content: e.target.files[0] });
-  };
+
+  handleChange(files) {
+      this.setState({
+          files: files,
+      });
+  }
 
   handleRequest = e => {
     e.preventDefault();
     if (
-      this.state.content === ""
+      this.state.files[0] === ""
     ) {
       alert("MEDIA FIELD IS EMPTY!");
     } else {
       let formData = new FormData();
-      formData.append('content', e.target.content.files[0]);
+      formData.append('content', this.state.files[0]);
       console.log(formData.get('content'));
       (async () => {
         const res = await fetch("/addmedia", {
@@ -59,10 +64,14 @@ class addMedia extends Component {
           </header>
           <h1>Submit your Media</h1>
           <form onSubmit={this.handleRequest} encType="multipart/form-data">
-              <Button variant="contained" component="label">
-                Upload File
-                <input type="file" name="content" style={{display:"none"}} onChange={this.handleChange} value={this.state.content.value} />
-              </Button><br/><br />
+              <div>
+                <DropzoneArea
+                    onChange={this.handleChange.bind(this)}
+                    acceptedFiles={['image/*', 'video/*']}
+                    maxFileSize={50000000}
+                    filesLimit={1}
+                />
+              </div><br />
               <Button variant="contained" type="submit">yeah boy!</Button>
            </form>
         </div>
