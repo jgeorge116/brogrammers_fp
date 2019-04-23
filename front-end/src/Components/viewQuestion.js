@@ -105,7 +105,9 @@ class viewQuestion extends Component {
       isLoadingAnswers: false,
       body: "",
       media: [],
-      answers: []
+      answers: [],
+      allMedia: [],
+      isLoadingMedia: true
     };
   }
 
@@ -183,6 +185,29 @@ class viewQuestion extends Component {
       })
       .catch(err => console.error(err));
   };
+
+  getMedia = _ => {
+    let allMedia = [];
+    console.log(this.state.question);
+    for(let i = 0; i < this.state.question[0].media.length; i++) {
+      fetch(`/media/${this.state.question[0].media[i]}`)
+        .then(response => response.blob())
+        .then(data => {
+        console.log(data);
+        if (data) {
+          var reader = new FileReader();
+          reader.onload = (e) => {
+            allMedia.push(e.target.result);
+            this.setState({allMedia: allMedia})
+          }
+          reader.readAsDataURL(data);
+          console.log("inside the loop");
+        }
+        }).catch(err => console.error(err));
+    }
+    this.setState({isLoadingMedia: false});
+    console.log("outside the loop");
+  }
 
   getUpvoteStatus = _ => {
     fetch(`/questions/${this.props.match.params.id}/upvotestatus`, {
@@ -287,6 +312,9 @@ class viewQuestion extends Component {
               {this.renderVoteArea(score)}
               <div className={classes.descriptionContainer}>
                 <div className={classes.questionDescription}>{body}</div>
+                <div className={classes.questionMedia}>
+                  {this.state.allMedia.map(el => (<img key={el} src={el} />))}
+                </div>
                 <div className={classes.infoSection}>
                   <div>
                     Tags:{" "}
@@ -353,6 +381,9 @@ class viewQuestion extends Component {
 
   render() {
     if (this.state.isLoading) {
+      return <CircularProgress size="100" />;
+    } else if (this.state.isLoadingMedia) {
+      this.getMedia();
       return <CircularProgress size="100" />;
     } else {
       return (

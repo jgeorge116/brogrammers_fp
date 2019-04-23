@@ -25,16 +25,16 @@ class viewMedia extends Component {
             .then(response => response.blob())
             .then(data => {
             console.log(data);
-		if (data) {
-                	this.setState({ media: data, isLoading: false });
-			var reader = new FileReader();
-        		reader.onload = (e) => {
-				this.setState({url: e.target.result});
-			}
-			reader.readAsDataURL(this.state.media);
-		}
-        })
-        .catch(err => console.error(err));
+            if (data) {
+                this.setState({ media: data, isLoading: false });
+                var reader = new FileReader();
+                reader.onload = (e) => {
+                    this.setState({url: e.target.result});
+                }
+                reader.readAsDataURL(this.state.media);
+            }
+            })
+            .catch(err => console.error(err));
     };
 
     render() {

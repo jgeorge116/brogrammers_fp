@@ -11,7 +11,8 @@ class questions extends Component {
       id: "",
       title: "",
       body: "",
-      tags: []
+      tags: [],
+      media: []
     };
   }
 
@@ -41,7 +42,8 @@ class questions extends Component {
           body: JSON.stringify({
             title: this.state.title,
             body: this.state.body,
-            tags: this.state.tags
+            tags: this.state.tags,
+            media: this.state.media
           })
         });
         let content = await res.json();
@@ -94,6 +96,16 @@ class questions extends Component {
               type="text"
               name="tags"
               label="Tags"
+              onChange={this.handleChange}
+              margin="normal"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              className="textFields"
+              type="text"
+              name="media"
+              label="Media"
               onChange={this.handleChange}
               margin="normal"
               variant="outlined"
