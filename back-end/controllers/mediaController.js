@@ -28,9 +28,21 @@ exports.add_media = async function(req, res) {
     } else {
       const username = jwt.username;
       new formidable.IncomingForm().parse(req, (err, fields, files) => {
-        if (err) throw err;
+        if (err) {
+          res
+          .status(400)
+          .send({ status: "error", error: "Error parsing file" });
+          console.log(err);
+          return;
+        };
         fs.readFile(files.content.path, async function(err, data) {
-          if (err) throw err;
+          if (err) {
+            res
+            .status(400)
+            .send({ status: "error", error: "Error reading file" });
+            console.log(err);
+            return;
+          }
           contents = data;
           var query = "INSERT INTO somedia.media (id, contents) VALUES (?,?);";
           const id = uuidv4();
@@ -69,28 +81,28 @@ exports.get_media_by_id = async function(req, res) {
   var params = [req.params.id];
   client.execute(query, params, { prepare: true }, function(err, results) {
     if (err) {
-	console.log(err);
-	res
-          .status(400)
-          .send({ status: "error", error: "Media does not exist" })
-	  .end();
+	    console.log(err);
+      res
+      .status(400)
+      .send({ status: "error", error: "Media does not exist" })
+      .end();
     }
     else {
-	if(!results.rows[0]) {
-	   res
-            .status(400)
-            .send({ status: "error", error: "Media does not exist" })
-            .end();
-	} else {
-	    console.log(results);
-            res.writeHeader(200, {
-              "Content-Type": fileType(results.rows[0].contents).mime,
-	      "Content-Length": results.rows[0].contents.length
-            });
-            res.write(results.rows[0].contents);
-            res.end();
-	}
+      if(!results.rows[0]) {
+        res
+        .status(400)
+        .send({ status: "error", error: "Media does not exist" })
+        .end();
+      } else {
+        console.log(results);
+        res.writeHeader(200, {
+          "Content-Type": fileType(results.rows[0].contents).mime,
+          "Content-Length": results.rows[0].contents.length
+        });
+        res.write(results.rows[0].contents);
+        res.end();
       }
-    });
+    }
+  });
 };
 
