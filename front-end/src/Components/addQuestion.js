@@ -51,7 +51,7 @@ class questions extends Component {
         if (content.status === "error") alert("Error: " + content.error);
         else {
           this.props.history.push({
-            pathname: `/questions/${this.state.id}`
+            pathname: `/fquestions/${this.state.id}`
           });
         }
       })();

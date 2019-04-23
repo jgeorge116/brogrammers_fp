@@ -72,7 +72,7 @@ class ViewUserInfo extends Component {
     if (this.state.questions) {
       return this.state.questions.map(item => (
         <div key={item}>
-          <Link component={RouterLink} to={`/questions/${item}/answers`}>
+          <Link component={RouterLink} to={`/fquestions/${item}`}>
             {item}
           </Link>
         </div>

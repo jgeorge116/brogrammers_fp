@@ -39,7 +39,7 @@ class addMedia extends Component {
         if (content.status === "error") alert("Error: " + content.error);
         else {
           this.props.history.push({
-            pathname: `/media/${this.state.id}`
+            pathname: `/fmedia/${this.state.id}`
           });
         }
       })();

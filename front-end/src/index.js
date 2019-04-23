@@ -24,10 +24,10 @@ ReactDOM.render(
       <Route path="/logout" component={logout} />
       <Route path="/search" component={Search} />
       <Route path="/questions/add" component={questions} />
-      <Route path="/questions/:id" component={viewQuestion} />
-      <Route path="/user/:id" component={userInfo} />
+      <Route path="/fquestions/:id" component={viewQuestion} />
+      <Route path="/fuser/:id" component={userInfo} />
       <Route path="/addmedia" component={addMedia} />
-      <Route path="/media/:id" component={viewMedia} />
+      <Route path="/fmedia/:id" component={viewMedia} />
       <Redirect from="/" exact to="/adduser" />
     </Switch>
   </BrowserRouter>,

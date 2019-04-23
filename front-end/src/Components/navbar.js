@@ -11,6 +11,7 @@ import { fade } from "@material-ui/core/styles/colorManipulator";
 import { withStyles } from "@material-ui/core/styles";
 import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import AddPhotoAlternate from "@material-ui/icons/AddPhotoAlternate";
 import QuestionAnswer from "@material-ui/icons/QuestionAnswer";
 import Cookies from "js-cookie";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
@@ -85,6 +86,10 @@ class Navbar extends Component {
     this.props.history.push("/questions/add");
   };
 
+  handleAddMedia = () => {
+    this.props.history.push("/addmedia");
+  };
+
   handleLogout = () => {
     Cookies.remove("access_token");
     localStorage.removeItem("username");
@@ -93,7 +98,7 @@ class Navbar extends Component {
 
   handleProfile = () => {
     this.props.history.push({
-      pathname: `/user/${localStorage.getItem("username")}`
+      pathname: `/fuser/${localStorage.getItem("username")}`
     });
   };
   state = {
@@ -145,6 +150,11 @@ class Navbar extends Component {
                   />
                 </div>
                 <div />
+                <div className={ClassNames(classes.navlink)}>
+                  <IconButton onClick={this.handleAddMedia} color="inherit">
+                    <AddPhotoAlternate />
+                  </IconButton>
+                </div>
                 <div className={ClassNames(classes.navlink)}>
                   <IconButton onClick={this.handleAddQuestion} color="inherit">
                     <QuestionAnswer />
