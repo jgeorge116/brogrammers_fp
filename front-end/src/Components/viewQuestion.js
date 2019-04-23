@@ -270,6 +270,21 @@ class viewQuestion extends Component {
     accepted_answer_id
   }) => {
     const { classes } = this.props;
+    let allMedia = [];
+    for(let i = 0; i < media.length; i++) {
+      fetch(`/media/${media[i]}`)
+        .then(response => response.blob())
+        .then(data => {
+        console.log(data);
+        if (data) {
+          var reader = new FileReader();
+          reader.onload = (e) => {
+            allMedia.push(e.target.result);
+          }
+          reader.readAsDataURL(allMedia[i]);
+        }
+        }).catch(err => console.error(err));
+    }
     return (
       <div className={classes.headerSection}>
         <div className={classes.titleSecion} key={id}>
@@ -287,6 +302,9 @@ class viewQuestion extends Component {
               {this.renderVoteArea(score)}
               <div className={classes.descriptionContainer}>
                 <div className={classes.questionDescription}>{body}</div>
+                <div className={classes.questionMedia}>
+                  {allMedia.map(el => (<img key={el} src={el} />))}
+                </div>
                 <div className={classes.infoSection}>
                   <div>
                     Tags:{" "}
