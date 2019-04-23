@@ -44,7 +44,8 @@ if (cluster.isMaster) {
   const QuestionRouter = require("./routes/questionRouter");
   const AnswerRouter = require("./routes/answerRouters");
   const MediaRouter = require("./routes/mediaRouter");
-  app.use("/", [UserRouter, QuestionRouter, AnswerRouter, MediaRouter]);
+  const IndexRouter = require("./routes/index")
+  app.use("/", [UserRouter, QuestionRouter, AnswerRouter, MediaRouter, IndexRouter]);
 
 
   // Run app
