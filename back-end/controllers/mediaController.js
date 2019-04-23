@@ -68,22 +68,29 @@ exports.get_media_by_id = async function(req, res) {
   var query = "SELECT contents FROM somedia.media WHERE id = ?;";
   var params = [req.params.id];
   client.execute(query, params, { prepare: true }, function(err, results) {
-    if (err) console.log(err);
-    else {
-      if (!results.rows[0].contents) {
-        res
+    if (err) {
+	console.log(err);
+	res
           .status(400)
-          .send({ status: "error", error: "Media does not exist" });
-      } else {
-	console.log(results);
-        res.writeHeader(200, {
-          "Content-Type": fileType(results.rows[0].contents).mime,
-	  "Content-Length": results.rows[0].contents.length
-        });
-        res.write(results.rows[0].contents);
-        res.end();
-      }
+          .send({ status: "error", error: "Media does not exist" })
+	  .end();
     }
-  });
+    else {
+	if(!results.rows[0]) {
+	   res
+            .status(400)
+            .send({ status: "error", error: "Media does not exist" })
+            .end();
+	} else {
+	    console.log(results);
+            res.writeHeader(200, {
+              "Content-Type": fileType(results.rows[0].contents).mime,
+	      "Content-Length": results.rows[0].contents.length
+            });
+            res.write(results.rows[0].contents);
+            res.end();
+	}
+      }
+    });
 };
 
