@@ -189,6 +189,7 @@ class viewQuestion extends Component {
   getMedia = _ => {
     let allMedia = [];
     console.log(this.state.question);
+    if(this.state.question[0].media[0]) {
     for(let i = 0; i < this.state.question[0].media.length; i++) {
       fetch(`/media/${this.state.question[0].media[i]}`)
         .then(response => response.blob())
@@ -204,7 +205,7 @@ class viewQuestion extends Component {
           console.log("inside the loop");
         }
         }).catch(err => console.error(err));
-    }
+    }}
     this.setState({isLoadingMedia: false});
     console.log("outside the loop");
   }
