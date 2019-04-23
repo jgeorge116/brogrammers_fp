@@ -180,8 +180,20 @@ class viewQuestion extends Component {
     fetch(`/questions/${this.props.match.params.id}/answers`)
       .then(response => response.json())
       .then(data => {
-        if (data.answers.length)
+        this.setState({ answers: [data.answers], isLoadingAnswers: true });
+        if (data.answers.length) {
           this.setState({ answers: [data.answers], isLoadingAnswers: true });
+          for (let i = 0; i < data.answers.length; i++) {
+            fetch(`/answers/${data.answers[i].id}/upvotestatus`)
+              .then(response => response.json())
+              .then(upvote => {
+                //   console.log(prev_answers);
+                let prev_answers = this.state.answers;
+                prev_answers[0][i].upvoteStatus = upvote.upvote;
+                this.setState({ answers: prev_answers });
+              });
+          }
+        }
       })
       .catch(err => console.error(err));
   };
@@ -189,26 +201,28 @@ class viewQuestion extends Component {
   getMedia = _ => {
     let allMedia = [];
     console.log(this.state.question);
-    if(this.state.question[0].media[0]) {
-    for(let i = 0; i < this.state.question[0].media.length; i++) {
-      fetch(`/media/${this.state.question[0].media[i]}`)
-        .then(response => response.blob())
-        .then(data => {
-        console.log(data);
-        if (data) {
-          var reader = new FileReader();
-          reader.onload = (e) => {
-            allMedia.push(e.target.result);
-            this.setState({allMedia: allMedia})
-          }
-          reader.readAsDataURL(data);
-          console.log("inside the loop");
-        }
-        }).catch(err => console.error(err));
-    }}
-    this.setState({isLoadingMedia: false});
+    if (this.state.question[0].media[0]) {
+      for (let i = 0; i < this.state.question[0].media.length; i++) {
+        fetch(`/media/${this.state.question[0].media[i]}`)
+          .then(response => response.blob())
+          .then(data => {
+            console.log(data);
+            if (data) {
+              var reader = new FileReader();
+              reader.onload = e => {
+                allMedia.push(e.target.result);
+                this.setState({ allMedia: allMedia });
+              };
+              reader.readAsDataURL(data);
+              console.log("inside the loop");
+            }
+          })
+          .catch(err => console.error(err));
+      }
+    }
+    this.setState({ isLoadingMedia: false });
     console.log("outside the loop");
-  }
+  };
 
   getUpvoteStatus = _ => {
     fetch(`/questions/${this.props.match.params.id}/upvotestatus`, {
@@ -281,6 +295,27 @@ class viewQuestion extends Component {
     );
   };
 
+  renderAnswerVoteArea = (score, status) => {
+    console.log("hi look, down for score and status");
+    console.log(score);
+    console.log(status);
+    const { classes } = this.props;
+    let upvoted = status === 1 ? classes.upIconChose : "";
+    let downvoted = status === -1 ? classes.downIconeChose : "";
+    return (
+      <div className={classes.voteArea}>
+        <ArrowDropUp
+          onClick={e => this.handleVoteQuestion(true, e)}
+          className={ClassNames(classes.upIcon, upvoted)}
+        />
+        <div className={classes.score}>{score}</div>
+        <ArrowDropDown
+          onClick={e => this.handleVoteQuestion(false, e)}
+          className={ClassNames(classes.downIcon, downvoted)}
+        />
+      </div>
+    );
+  };
   // to display the question data
   renderQuestion = ({
     id,
@@ -314,7 +349,9 @@ class viewQuestion extends Component {
               <div className={classes.descriptionContainer}>
                 <div className={classes.questionDescription}>{body}</div>
                 <div className={classes.questionMedia}>
-                  {this.state.allMedia.map(el => (<img key={el} src={el} />))}
+                  {this.state.allMedia.map(el => (
+                    <img key={el} src={el} />
+                  ))}
                 </div>
                 <div className={classes.infoSection}>
                   <div>
@@ -346,13 +383,14 @@ class viewQuestion extends Component {
     score,
     is_accepted,
     timestamp,
-    media
+    media,
+    upvoteStatus
   }) => {
     const { classes } = this.props;
     return (
       <div key={id} className={classes.answer}>
         <div className={classes.questionAnswerBody}>
-          {this.renderVoteArea(score)}
+          {this.renderAnswerVoteArea(score, upvoteStatus)}
           <div className={classes.descriptionContainer}>
             <div className={classes.answerDescription}>{body}</div>
             <div className={classes.infoSection}>
