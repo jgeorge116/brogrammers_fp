@@ -27,7 +27,6 @@ exports.add_media = async function(req, res) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       const username = jwt.username;
-      var result;
       new formidable.IncomingForm().parse(req, (err, fields, files) => {
         if (err) throw err;
         fs.readFile(files.content.path, async function(err, data) {
@@ -36,27 +35,29 @@ exports.add_media = async function(req, res) {
           var query = "INSERT INTO somedia.media (id, contents) VALUES (?,?);";
           const id = uuidv4();
           var params = [id, contents];
-          client.execute(query, params, function(err) {
+          await client.execute(query, params, function(err) {
             if (err) console.log(err);
-            else console.log("inserted into media");
+            else {
+              console.log("inserted into media");
+              var data = {
+                status: "",
+                id: ""
+              };
+              if (!username || !contents) {
+                res
+                  .status(400)
+                  .send({ status: "error", error: "Missing something" });
+              } else {
+                data["status"] = "OK";
+                data["id"] = id;
+                res.json(data);
+              }
+            }
           });
           //result = await MR.create(
           //    username,
           //    contents
           //);
-          var data = {
-            status: "",
-            id: ""
-          };
-          if (!username || !contents) {
-            res
-              .status(400)
-              .send({ status: "error", error: "Missing something" });
-          } else {
-            data["status"] = "OK";
-            data["id"] = id;
-            res.json(data);
-          }
         });
       });
     }
@@ -74,8 +75,10 @@ exports.get_media_by_id = async function(req, res) {
           .status(400)
           .send({ status: "error", error: "Media does not exist" });
       } else {
+	console.log(results);
         res.writeHeader(200, {
-          "Content-Type": fileType(results.rows[0].contents).mime
+          "Content-Type": fileType(results.rows[0].contents).mime,
+	  "Content-Length": results.rows[0].contents.length
         });
         res.write(results.rows[0].contents);
         res.end();
@@ -83,3 +86,4 @@ exports.get_media_by_id = async function(req, res) {
     }
   });
 };
+
