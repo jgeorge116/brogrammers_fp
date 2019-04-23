@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
 import Navbar from "./navbar";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 class viewMedia extends Component {
     constructor(props) {
@@ -21,17 +22,22 @@ class viewMedia extends Component {
     
     getMedia = _ => {
         fetch(`/media/${this.props.match.params.id}`)
-            .then(response => response.json())
+            .then(response => response.blob())
             .then(data => {
-            if (data.media)
-                this.setState({ media: [data.media], isLoading: false });
+            console.log(data);
+		if (data) {
+                	this.setState({ media: data, isLoading: false });
+			var reader = new FileReader();
+        		reader.onload = (e) => {
+				this.setState({url: e.target.result});
+			}
+			reader.readAsDataURL(this.state.media);
+		}
         })
         .catch(err => console.error(err));
     };
 
     render() {
-        var reader = new FileReader();
-        reader.readAsDataURL(media);
         if (this.state.isLoading) {
           return <CircularProgress size="100" />;
         } else {
@@ -41,9 +47,10 @@ class viewMedia extends Component {
                         <Navbar />
                     </Fragment>
                     
-                    <img src={reader.result} />
+                    <img src={this.state.url} />
                 </div>
             );
+
         }
     }
 }

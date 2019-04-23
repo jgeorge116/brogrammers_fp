@@ -6,6 +6,7 @@ const formidable = require('formidable');
 const fs = require('fs');
 const cassandra = require("cassandra-driver");
 const fileType = require('file-type');
+const uuidv4 = require("uuid/v4");
 const client = new cassandra.Client({contactPoints: ['127.0.0.1'],localDataCenter:'datacenter1'});
 
 exports.add_media = async function(req, res) {
@@ -28,14 +29,27 @@ exports.add_media = async function(req, res) {
             fs.readFile(files.content.path, async function(err,data){
                 if(err) throw err;
                 contents = data;
-                result = await MR.create(
-                    username,
-                    contents
-                );
-		        if (result.status == "error") {
-            	    res.status(400).send({ status: result.status, error: result.data });
+		var query = "INSERT INTO somedia.media (id, contents) VALUES (?,?);"
+        	const id = uuidv4();
+		var params = [id,contents];
+		client.execute(query, params, function(err) {
+			if(err) console.log(err);
+			else console.log("inserted into media");
+		});
+                //result = await MR.create(
+                //    username,
+                //    contents
+                //);
+		var data = {
+			"status":"",
+			"id":""
+		};
+		        if (!username || !contents) {
+            	    res.status(400).send({ status: "error", error: "Missing something" });
         	    } else {
-            	    res.send({ status: result.status, id: result.data });
+		    data["status"] = "OK";
+		    data["id"] = id;
+		    res.json(data);
         	    }
             });
         });

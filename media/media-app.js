@@ -25,10 +25,14 @@ client.execute(query, function(err){
  */
 function add_media(mediaInfo) {
     var query = "INSERT INTO somedia.media (id, contents) VALUES (?,?);";
-    params = [mediaInfo.id, mediaInfo.content.data]
+    console.log("INSERTING", mediaInfo.content.data);
+    params = [mediaInfo.id, mediaInfo.content.data];
     client.execute(query, params, function(err) {
         if(err) console.log(err)
         else console.log('inserted into media');
+	client.execute("SELECT contents FROM somedia.media WHERE id=?", [mediaInfo.id], function(err, data) {
+		console.log(data);
+	});
     });
 }
 
