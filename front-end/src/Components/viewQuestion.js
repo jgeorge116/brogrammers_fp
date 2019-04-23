@@ -8,6 +8,8 @@ import Navbar from "./navbar";
 import IconButton from "@material-ui/core/IconButton";
 import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
 import ArrowDropDown from "@material-ui/icons/ArrowDropDown";
+import CheckCircle from "@material-ui/icons/CheckCircle";
+import CheckCircleOutline from "@material-ui/icons/CheckCircleOutline";
 import Delete from "@material-ui/icons/Delete";
 import { withStyles } from "@material-ui/core/styles";
 import ClassNames from "classnames";
@@ -66,7 +68,8 @@ const styles = theme => ({
     minHeight: "175px"
   },
   answerDescription: {
-    minHeight: "100px"
+    minHeight: "100px",
+    flexGrow: 1
   },
   descriptionContainer: {
     flexGrow: 2
@@ -93,6 +96,21 @@ const styles = theme => ({
   },
   pNoSpace: {
     margin: 0
+  },
+  answerDescriptionAccepted: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  CheckCircle: {
+    color: "#00c853",
+  },
+  CheckCircleOutline: {
+    cursor: "pointer",
+    color: "#000",
+    "& :hover": {
+      color: "#00897b"
+    }
   }
 });
 class viewQuestion extends Component {
@@ -137,7 +155,7 @@ class viewQuestion extends Component {
       if (content.status === "error") alert("Error: " + content.error);
       else {
         this.props.history.push({
-          pathname: '/home'
+          pathname: "/home"
         });
       }
     })();
@@ -191,6 +209,26 @@ class viewQuestion extends Component {
     })();
   }
 
+  handleAcceptAnswer(answer_id, e) {
+    e.preventDefault();
+    (async () => {
+      const res = await fetch(`/answers/${answer_id}/accept`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: "Bearer " + Cookies.get("access_token")
+        }
+      });
+      let content = await res.json();
+      if (content.status === "error") alert("Error: " + content.error);
+      else {
+          this.getAnswers();
+        this.getQuestion();
+      }
+    })();
+  }
   getQuestion = _ => {
     fetch(`/questions/${this.props.match.params.id}`)
       .then(response => response.json())
@@ -204,7 +242,7 @@ class viewQuestion extends Component {
     fetch(`/questions/${this.props.match.params.id}/answers`)
       .then(response => response.json())
       .then(data => {
-        this.setState({ answers: [data.answers], isLoadingAnswers: true });
+        // this.setState({ answers: [data.answers], isLoadingAnswers: true });
         if (data.answers.length) {
           this.setState({ answers: [data.answers], isLoadingAnswers: true });
           for (let i = 0; i < data.answers.length; i++) {
@@ -337,6 +375,23 @@ class viewQuestion extends Component {
       </div>
     );
   };
+
+  renderAcceptance = (answer_id, is_accepted) => {
+    const { classes } = this.props;
+    if (this.state.question[0].accepted_answer_id) {
+        console.log(is_accepted);
+      if (is_accepted) {
+        return <CheckCircle className={classes.CheckCircle} />;
+      }
+    } else {
+      return (
+        <CheckCircleOutline
+          className={classes.CheckCircleOutline}
+          onClick={e => this.handleAcceptAnswer(answer_id, e)}
+        />
+      );
+    }
+  };
   // to display the question data
   renderQuestion = ({
     id,
@@ -353,8 +408,8 @@ class viewQuestion extends Component {
   }) => {
     const { classes } = this.props;
     return (
-      <div className={classes.headerSection}>
-        <div className={classes.titleSecion} key={id}>
+      <div className={classes.headerSection} key={id}>
+        <div className={classes.titleSecion}>
           <div className={classes.titleArea}>
             <h1>{title}</h1>
             <div>
@@ -413,7 +468,12 @@ class viewQuestion extends Component {
         <div className={classes.questionAnswerBody}>
           {this.renderAnswerVoteArea(id, score, upvoteStatus)}
           <div className={classes.descriptionContainer}>
-            <div className={classes.answerDescription}>{body}</div>
+            <div className={classes.answerDescriptionAccepted}>
+              <div className={classes.answerDescription}>
+                <div>{body}</div>
+              </div>
+              {this.renderAcceptance(id, is_accepted)}
+            </div>
             <div className={classes.infoSection}>
               <div className={classes.info}>
                 <p className={classes.pNoSpace}>

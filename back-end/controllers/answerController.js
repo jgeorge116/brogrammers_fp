@@ -77,9 +77,9 @@ exports.accept_answer = async (req, res) => {
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {
     if (!req.headers.authorization) {
-      var jwt = await JWT.validate(req.cookies.access_token);
+      var token = await JWT.validate(req.cookies.access_token);
     } else {
-      var jwt = await JWT.validate(req.headers.authorization);
+      var token = await JWT.validate(req.headers.authorization);
     }
     if (!token.username) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
