@@ -24,7 +24,6 @@ exports.add_question = async function(req, res) {
         req.body.tags,
         req.body.media
       );
-	console.log(result);
       if (result.status == "error") {
         res.status(400).send({ status: result.status, error: result.data });
       } else {

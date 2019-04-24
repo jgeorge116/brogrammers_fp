@@ -13,7 +13,6 @@ module.exports = class SendVerifyEmail {
           key: key
         };
         ch.publish(ex, "", Buffer.from(JSON.stringify(buffJson)));
-        console.log("Send verify email for %s", username);
       });
       if (err) console.log(err);
       setTimeout(function() {
