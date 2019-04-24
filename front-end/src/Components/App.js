@@ -40,7 +40,7 @@ class App extends Component {
         if (content.status === "error") alert("Error: " + content.error);
         else{
           this.props.history.push({
-            pathname: '/verify'
+            pathname: '/fverify'
           })
         }
       })();
@@ -53,7 +53,7 @@ class App extends Component {
   };
 
   handleLogin = () => {
-    this.props.history.push("/login");
+    this.props.history.push("/flogin");
   };
 
   render() {
