@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+process.env.UV_THREADPOOL_SIZE = 128;
+
 const cluster = require("cluster");
 
 if (cluster.isMaster) {
