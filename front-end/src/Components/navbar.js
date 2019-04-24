@@ -83,17 +83,17 @@ const styles = theme => ({
 });
 class Navbar extends Component {
   handleAddQuestion = () => {
-    this.props.history.push("/questions/add");
+    this.props.history.push("/fquestions/add");
   };
 
   handleAddMedia = () => {
-    this.props.history.push("/addmedia");
+    this.props.history.push("/faddmedia");
   };
 
   handleLogout = () => {
     Cookies.remove("access_token");
     localStorage.removeItem("username");
-    this.props.history.push("/logout");
+    this.props.history.push("/flogout");
   };
 
   handleProfile = () => {
@@ -107,7 +107,7 @@ class Navbar extends Component {
 
   handleSearchChange = e => {
     if (e.key === "Enter") {
-      this.props.history.push(`/search?q=${e.target.value}`);
+      this.props.history.push(`/fsearch?q=${e.target.value}`);
       window.location.reload();
     }
     // this.setState({ searchQuery: e.target.value });
@@ -116,7 +116,7 @@ class Navbar extends Component {
   render() {
     const { classes } = this.props;
     if (!localStorage.getItem("username")) {
-      this.props.history.push("/login");
+      this.props.history.push("/flogin");
     }
     return (
       <MuiThemeProvider theme={theme}>
