@@ -46,7 +46,7 @@ exports.add_media = async function(req, res) {
           }
           contents = data;
           var query = "INSERT INTO somedia.media (id, contents) VALUES (?,?);";
-          const id = uuidv4().toString().replace(/-/,"");
+          const id = uuidv4().toString().replace(/\-/g,"");
           console.log(id);
           var params = [id, contents];
           await client.execute(query, params, function(err) {
