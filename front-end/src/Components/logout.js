@@ -9,11 +9,11 @@ class logout extends Component {
     localStorage.removeItem('username');
   }
   handleLogin = () => {
-    this.props.history.push('/login')
+    this.props.history.push('/flogin')
   }
 
   handleRegister = () => {
-    this.props.history.push('/adduser')
+    this.props.history.push('/fadduser')
   }
 
   render() {    

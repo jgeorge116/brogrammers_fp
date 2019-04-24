@@ -34,7 +34,7 @@ class verify extends Component {
         if (content.status === "error") alert("Error: " + content.error);
         else {
           this.props.history.push({
-            pathname: "/home"
+            pathname: "/fhome"
           });
         }
       })();

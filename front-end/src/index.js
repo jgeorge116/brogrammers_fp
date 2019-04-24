@@ -17,16 +17,16 @@ import viewMedia from "./Components/viewMedia";
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
-      <Route path="/adduser" component={App} />
-      <Route path="/verify" component={verify} />
-      <Route path="/home" component={home} />
-      <Route path="/login" component={login} />
-      <Route path="/logout" component={logout} />
-      <Route path="/search" component={Search} />
-      <Route path="/questions/add" component={questions} />
+      <Route path="/fadduser" component={App} />
+      <Route path="/fverify" component={verify} />
+      <Route path="/fhome" component={home} />
+      <Route path="/flogin" component={login} />
+      <Route path="/flogout" component={logout} />
+      <Route path="/fsearch" component={Search} />
+      <Route path="/fquestions/add" component={questions} />
       <Route path="/fquestions/:id" component={viewQuestion} />
       <Route path="/fuser/:id" component={userInfo} />
-      <Route path="/addmedia" component={addMedia} />
+      <Route path="/faddmedia" component={addMedia} />
       <Route path="/fmedia/:id" component={viewMedia} />
       <Redirect from="/" exact to="/adduser" />
     </Switch>

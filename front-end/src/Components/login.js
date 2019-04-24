@@ -33,13 +33,13 @@ class login extends Component {
         let content = await res.json();
         if (content.error === "Not verified") {
           this.props.history.push({
-            pathname: "/verify"
+            pathname: "/fverify"
           });
         } else if (content.status === "error") alert("Error: " + content.error);
         else {
             localStorage.setItem('username', this.state.username)
             this.props.history.push({
-            pathname: "/home"
+            pathname: "/fhome"
             });
         }
       })();
