@@ -11,6 +11,9 @@ if (cluster.isMaster) {
   }
 } else {
   const express = require("express");
+  var http = require('http');
+  var agent = new http.Agent({ maxSockets: Number.MAX_VALUE });
+
   const app = express();
   // Tell express there is a proxy on the same server as the app
   app.set('trust proxy', '127.0.0.1');
