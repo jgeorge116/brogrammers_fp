@@ -24,7 +24,6 @@ class viewMedia extends Component {
         fetch(`/media/${this.props.match.params.id}`)
             .then(response => response.blob())
             .then(data => {
-            console.log(data);
             if (data) {
                 this.setState({ media: data, isLoading: false });
                 var reader = new FileReader();
@@ -47,7 +46,7 @@ class viewMedia extends Component {
                         <Navbar />
                     </Fragment>
                     
-                    <img src={this.state.url} />
+                    <img src={this.state.url} alt="" />
                 </div>
             );
 

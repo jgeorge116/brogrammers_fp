@@ -4,8 +4,6 @@ const Authentication = require("../utils/authentication");
 const JWT = new Authentication();
 
 exports.add_question = async function(req, res) {
-console.log(req.cookies);
-console.log(req.headers.authorization);
   if (!req.headers.authorization && !req.cookies.access_token) {
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {

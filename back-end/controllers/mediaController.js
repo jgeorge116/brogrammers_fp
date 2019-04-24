@@ -14,11 +14,11 @@ const client = new cassandra.Client({
 
 exports.add_media = async function(req, res) {
   if (!req.headers.authorization && !req.cookies.access_token) {
+    console.log("No token provided");
     res.status(400).send({ status: "error", error: "No token provided" });
   } else {
     if (!req.headers.authorization) {
       var jwt = await JWT.validate(req.cookies.access_token);
-      console.log('there is no header');
     } else {
       var jwt = await JWT.validate(req.headers.authorization);
     }
@@ -29,18 +29,18 @@ exports.add_media = async function(req, res) {
       const username = jwt.username;
       new formidable.IncomingForm().parse(req, (err, fields, files) => {
         if (err) {
+          console.log(err);
           res
           .status(400)
           .send({ status: "error", error: "Error parsing file" });
-          console.log(err);
           return;
         };
         fs.readFile(files.content.path, async function(err, data) {
           if (err) {
+            console.log(err);
             res
             .status(400)
             .send({ status: "error", error: "Error reading file" });
-            console.log(err);
             return;
           }
           contents = data;
@@ -56,13 +56,14 @@ exports.add_media = async function(req, res) {
                 id: ""
               };
               if (!username || !contents) {
+                console.log("Missing something");
                 res
-                  .status(400)
-                  .send({ status: "error", error: "Missing something" });
+                .status(400)
+                .send({ status: "error", error: "Missing something" });
               } else {
                 data["status"] = "OK";
                 data["id"] = id;
-                res.json(data);
+                res.status(200).send(data);
               }
             }
           });
@@ -94,13 +95,13 @@ exports.get_media_by_id = async function(req, res) {
         .send({ status: "error", error: "Media does not exist" })
         .end();
       } else {
-        console.log(results);
-        res.writeHeader(200, {
-          "Content-Type": fileType(results.rows[0].contents).mime,
-          "Content-Length": results.rows[0].contents.length
-        });
-        res.write(results.rows[0].contents);
-        res.end();
+	res.setHeader("Content-Type", fileType(results.rows[0].contents).mime);
+	res.setHeader("Content-Length",results.rows[0].contents.length);
+        //res.writeHeader(200, {
+        //  "Content-Type": fileType(results.rows[0].contents).mime,
+        //  "Content-Length": results.rows[0].contents.length
+        //});
+        res.status(200).send(results.rows[0].contents);
       }
     }
   });

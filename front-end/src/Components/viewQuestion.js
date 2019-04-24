@@ -426,7 +426,7 @@ class viewQuestion extends Component {
                 <div className={classes.questionDescription}>{body}</div>
                 <div className={classes.questionMedia}>
                   {this.state.allMedia.map(el => (
-                    <img key={el} src={el} />
+                    <img key={el} src={el} alt="" />
                   ))}
                 </div>
                 <div className={classes.infoSection}>
