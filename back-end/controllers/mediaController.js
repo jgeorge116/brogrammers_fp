@@ -8,7 +8,7 @@ const cassandra = require("cassandra-driver");
 const fileType = require("file-type");
 const uuidv4 = require("uuid/v4");
 const client = new cassandra.Client({
-  contactPoints: ["127.0.0.1"],
+  contactPoints: ["192.168.122.41"],
   localDataCenter: "datacenter1"
 });
 
@@ -16,6 +16,7 @@ exports.add_media = async function(req, res) {
   if (!req.headers.authorization && !req.cookies.access_token) {
     console.log("No token provided");
     res.status(400).send({ status: "error", error: "No token provided" });
+    return;
   } else {
     if (!req.headers.authorization) {
       var jwt = await JWT.validate(req.cookies.access_token);
@@ -63,6 +64,7 @@ exports.add_media = async function(req, res) {
               } else {
                 data["status"] = "OK";
                 data["id"] = id;
+		console.log(data);
                 res.status(200).send(data);
               }
             }
@@ -77,7 +79,7 @@ exports.add_media = async function(req, res) {
   }
 };
 
-exports.get_media_by_id = async function(req, res) {
+exports.get_media_by_id = function(req, res) {
   var query = "SELECT contents FROM somedia.media WHERE id = ?;";
   var params = [req.params.id];
   client.execute(query, params, { prepare: true }, function(err, results) {

@@ -6,7 +6,7 @@ const UpvoteModel = require("../models/upvoteModel");
 
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
-  contactPoints: ["127.0.0.1"],
+  contactPoints: ["192.168.122.41"],
   localDataCenter: "datacenter1"
 });
 

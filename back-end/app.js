@@ -20,7 +20,7 @@ if (cluster.isMaster) {
   const cors = require("cors");
   const parser = require("body-parser");
   const mongoose = require("mongoose");
-  mongoose.connect("mongodb://localhost:27017/stackOverflowDB", {
+  mongoose.connect("mongodb://192.168.122.44:27017/stackOverflowDB", {
     useCreateIndex: true,
     useNewUrlParser: true
   });
@@ -36,8 +36,8 @@ if (cluster.isMaster) {
   };
 
   app.use(cors(corsOptions));
-  app.use(parser.urlencoded({ extended: true }));
-  app.use(parser.json());
+  app.use(parser.urlencoded({ limit:'100mb',  extended: true }));
+  app.use(parser.json({ limit:'100mb' }));
 
   // App routes
   const UserRouter = require("./routes/userRouter");
