@@ -50,6 +50,15 @@ module.exports = class AnswerRepository {
             data: "Media does not exist"
           };
         }
+        var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
+        var params2 = [media[i]];
+        var results2 = await client.execute(query2, params2, { prepare: true });
+        if(results2.rows[0].username != username) {
+          return {
+            status:"error",
+            data: "Username does not match"
+         };
+        }
       }
     }
     const new_id = uuidv4();

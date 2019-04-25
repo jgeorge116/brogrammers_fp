@@ -28,6 +28,12 @@ exports.add_media = async function(req, res) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       const username = jwt.username;
+      if(!username) {
+          console.log("Missing username");
+          res
+          .status(400)
+          .send({ status: "error", error: "Missing something" });
+      }
       new formidable.IncomingForm().parse(req, (err, fields, files) => {
         if (err) {
           console.log(err);
@@ -45,10 +51,10 @@ exports.add_media = async function(req, res) {
             return;
           }
           contents = data;
-          var query = "INSERT INTO somedia.media (id, contents) VALUES (?,?);";
+          var query = "INSERT INTO somedia.media (id, contents, username) VALUES (?,?,?);";
           const id = uuidv4().toString().replace(/\-/g,"");
           console.log(id);
-          var params = [id, contents];
+          var params = [id, contents, username];
           await client.execute(query, params, function(err) {
             if (err) console.log(err);
             else {
@@ -57,11 +63,11 @@ exports.add_media = async function(req, res) {
                 status: "",
                 id: ""
               };
-              if (!username || !contents) {
-                console.log("Missing something");
+              if (!contents) {
+                console.log("Missing buffer value");
                 res
                 .status(400)
-                .send({ status: "error", error: "Missing something" });
+                .send({ status: "error", error: "Missing buffer value" });
               } else {
                 data["status"] = "OK";
                 data["id"] = id;

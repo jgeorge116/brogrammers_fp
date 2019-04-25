@@ -58,12 +58,20 @@ module.exports = class QuestionRepository {
       for(let i = 0; i < media.length; i++) {
         var params = [media[i]];
         var results = await client.execute(query, params, { prepare: true });
-        console.log(results.rowLength);
         if(results.rowLength == 0) {
           return {
             status:"error",
             data: "Media does not exist"
           };
+        }
+        var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
+        var params2 = [media[i]];
+        var results2 = await client.execute(query2, params2, { prepare: true });
+        if(results2.rows[0].username != username) {
+          return {
+            status:"error",
+            data: "Username does not match"
+         };
         }
       }
     }
