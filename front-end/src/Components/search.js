@@ -36,7 +36,7 @@ class Search extends Component {
 
   getResults(search_string, timestamp, limit, accepted) {
     (async () => {
-      const res = await fetch("/search", {
+      const res = await fetch("http://localhost:4000/search", {
         method: "POST",
         credentials: "include",
         headers: {

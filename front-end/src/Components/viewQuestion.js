@@ -142,7 +142,7 @@ class viewQuestion extends Component {
 
   handleDeleteQuestion = e => {
     (async () => {
-      const res = await fetch(`/questions/${this.state.id}`, {
+      const res = await fetch(`http://localhost:4000/questions/${this.state.id}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
@@ -165,7 +165,7 @@ class viewQuestion extends Component {
     e.preventDefault();
     (async () => {
       //   console.log(Cookies.get("access_token"));
-      const res = await fetch(`/questions/${this.state.id}/upvote`, {
+      const res = await fetch(`http://localhost:4000/questions/${this.state.id}/upvote`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -189,7 +189,7 @@ class viewQuestion extends Component {
   handleVoteAnswer(answer_id, voteChoice, e) {
     e.preventDefault();
     (async () => {
-      const res = await fetch(`/answers/${answer_id}/upvote`, {
+      const res = await fetch(`http://localhost:4000/answers/${answer_id}/upvote`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -212,7 +212,7 @@ class viewQuestion extends Component {
   handleAcceptAnswer(answer_id, e) {
     e.preventDefault();
     (async () => {
-      const res = await fetch(`/answers/${answer_id}/accept`, {
+      const res = await fetch(`http://localhost:4000/answers/${answer_id}/accept`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -230,7 +230,7 @@ class viewQuestion extends Component {
     })();
   }
   getQuestion = _ => {
-    fetch(`/questions/${this.props.match.params.id}`)
+    fetch(`http://localhost:4000/questions/${this.props.match.params.id}`)
       .then(response => response.json())
       .then(data =>
         this.setState({ question: [data.question], isLoading: false })
@@ -239,14 +239,14 @@ class viewQuestion extends Component {
   };
 
   getAnswers = _ => {
-    fetch(`/questions/${this.props.match.params.id}/answers`)
+    fetch(`http://localhost:4000/questions/${this.props.match.params.id}/answers`)
       .then(response => response.json())
       .then(data => {
         // this.setState({ answers: [data.answers], isLoadingAnswers: true });
         if (data.answers.length) {
           this.setState({ answers: [data.answers], isLoadingAnswers: true });
           for (let i = 0; i < data.answers.length; i++) {
-            fetch(`/answers/${data.answers[i].id}/upvotestatus`)
+            fetch(`http://localhost:4000/answers/${data.answers[i].id}/upvotestatus`)
               .then(response => response.json())
               .then(upvote => {
                 //   console.log(prev_answers);
@@ -265,7 +265,7 @@ class viewQuestion extends Component {
     console.log(this.state.question);
     if (this.state.question[0].media[0]) {
       for (let i = 0; i < this.state.question[0].media.length; i++) {
-        fetch(`/media/${this.state.question[0].media[i]}`)
+        (`/media/${this.state.question[0].media[i]}`)
           .then(response => response.blob())
           .then(data => {
             console.log(data);
@@ -287,7 +287,7 @@ class viewQuestion extends Component {
   };
 
   getUpvoteStatus = _ => {
-    fetch(`/questions/${this.props.match.params.id}/upvotestatus`, {
+    (`/questions/${this.props.match.params.id}/upvotestatus`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -316,7 +316,7 @@ class viewQuestion extends Component {
     if (this.state.body === "") alert("BODY IS EMPTY!");
     else {
       (async () => {
-        const res = await fetch(`/questions/${this.state.id}/answers/add`, {
+        const res = await fetch(`http://localhost:4000/questions/${this.state.id}/answers/add`, {
           method: "POST",
           credentials: "include",
           headers: {
