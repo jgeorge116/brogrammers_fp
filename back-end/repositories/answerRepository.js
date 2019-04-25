@@ -30,34 +30,36 @@ module.exports = class AnswerRepository {
     if (!found_question) {
       return { status: "error", data: "Question does not exist" };
     }
-    var search_question_media = await QuestionModel.find({media: {$in: media}});
-    var search_answer_media = await AnswerModel.find({media: {$in: media}});
-    if(search_question_media.length > 0 || search_answer_media.length > 0) {
-        return {
-            status: "error",
-            data: "Duplicate media"
-        }
+    var search_question_media = await QuestionModel.find({
+      media: { $in: media }
+    });
+    var search_answer_media = await AnswerModel.find({ media: { $in: media } });
+    if (search_question_media.length > 0 || search_answer_media.length > 0) {
+      return {
+        status: "error",
+        data: "Duplicate media"
+      };
     }
-    if(media) {
+    if (media) {
       var query = "SELECT id FROM somedia.media WHERE id = ?;";
-      for(let i = 0; i < media.length; i++) {
+      for (let i = 0; i < media.length; i++) {
         var params = [media[i]];
         var results = await client.execute(query, params, { prepare: true });
         console.log(results.rowLength);
-        if(results.rowLength == 0) {
+        if (results.rowLength == 0) {
           return {
-            status:"error",
+            status: "error",
             data: "Media does not exist"
           };
         }
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
-        if(results2.rows[0].username != username) {
+        if (results2.rows[0].username != username) {
           return {
-            status:"error",
+            status: "error",
             data: "Username does not match"
-         };
+          };
         }
       }
     }
@@ -72,10 +74,10 @@ module.exports = class AnswerRepository {
     await new_answer.save();
     return { status: "OK", data: new_id };
   }
-  
+
   /**
    * Gets all the answers associated with a question.
-   * @param {String} question_id 
+   * @param {String} question_id
    */
   async get_question_answers(question_id) {
     var found_question = await QuestionModel.findOne({ id: question_id });
@@ -86,7 +88,7 @@ module.exports = class AnswerRepository {
     if (!found_answers)
       return { status: "error", data: "Question does not exist" };
     var all_answers = [];
-    for (const answer of found_answers) {  
+    for (const answer of found_answers) {
       const upvote_count = await UpvoteModel.countDocuments({
         answer_id: answer.id,
         value: 1
@@ -95,8 +97,8 @@ module.exports = class AnswerRepository {
         answer_id: answer.id,
         value: -1
       });
-      console.log(upvote_count);
-      console.log(downvote_count);
+      //   console.log(upvote_count);
+      //   console.log(downvote_count);
       all_answers.push({
         id: answer.id,
         user: answer.username,
@@ -112,31 +114,32 @@ module.exports = class AnswerRepository {
 
   /**
    * Gets all the answer ids from a certain user.
-   * @param {String} username 
+   * @param {String} username
    */
   async get_user_answers(username) {
-    let found_answers = await AnswerModel.find({username: username})
-    if(found_answers.length == 0) return {status: "error", data: "User has not posted answers yet!"}
-    let all_answers = []
-    found_answers.forEach(ans => all_answers.push(ans.id))
-    return {status: "OK", data: all_answers}
+    let found_answers = await AnswerModel.find({ username: username });
+    if (found_answers.length == 0)
+      return { status: "error", data: "User has not posted answers yet!" };
+    let all_answers = [];
+    found_answers.forEach(ans => all_answers.push(ans.id));
+    return { status: "OK", data: all_answers };
   }
 
   /**
    * Upvotes an answer, or removes upvote, and updates reputation of answerer
-   * @param {String} answerID 
-   * @param {Boolean} upvote 
-   * @param {String} username 
+   * @param {String} answerID
+   * @param {Boolean} upvote
+   * @param {String} username
    */
   async upvote_answer(answerID, upvote, username) {
     const found_answer = await AnswerModel.findOne({
       id: answerID
-    })
+    });
     if (!found_answer) {
       return { status: "error" };
     }
     // Convert the boolean from true/false to 1/-1 (default 1)
-    upvote = typeof upvote === 'undefined' ? 1 : upvote ? 1 : -1;
+    upvote = typeof upvote === "undefined" ? 1 : upvote ? 1 : -1;
     const found_upvote = await UpvoteModel.findOne({
       type: "answer",
       username: username,
@@ -150,27 +153,56 @@ module.exports = class AnswerRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.deleteOne(found_upvote);
-      return { status: "OK" };
+      await UpvoteModel.updateOne(
+        {
+          answer_id: found_upvote.answer_id,
+          username: username,
+          type: "answer"
+        },
+        { value: 0 }
+      );
+      if (found_user.reputation + -upvote >= 1) {
+        await UserModel.updateOne(
+          { username: found_answer.username },
+          { $inc: { reputation: upvote } }
+        );
+      }
     }
     // Upvoting after downvoting or vice versa, deletes previous upvote
-    if (found_upvote) {
-      await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-    }
-    // Create and save upvote
-    const new_upvote = new UpvoteModel({
-      type: "answer",
-      username: username,
-      answer_id: answerID,
-      value: upvote
-    });
-    await new_upvote.save();
-    // Set reputation of answerer unless it goes below 1
-    if (found_user.reputation + upvote >= 1) {
-      await UserModel.updateOne(
-        { username: found_answer.username }, 
-        { $inc: { reputation: upvote } }
+    else if (found_upvote) {
+      //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
+
+      await UpvoteModel.updateOne(
+        {
+          answer_id: found_upvote.answer_id,
+          username: username,
+          type: "answer"
+        },
+        { value: upvote }
       );
+
+      if (found_user.reputation + upvote >= 1) {
+        await UserModel.updateOne(
+          { username: found_answer.username },
+          { $inc: { reputation: upvote } }
+        );
+      }
+    } else {
+      // Create and save upvote
+      const new_upvote = new UpvoteModel({
+        type: "answer",
+        username: username,
+        answer_id: answerID,
+        value: upvote
+      });
+      await new_upvote.save();
+      // Set reputation of answerer unless it goes below 1
+      if (found_user.reputation + upvote >= 1) {
+        await UserModel.updateOne(
+          { username: found_answer.username },
+          { $inc: { reputation: upvote } }
+        );
+      }
     }
     return { status: "OK" };
   }
@@ -183,7 +215,7 @@ module.exports = class AnswerRepository {
       return { status: "error" };
     }
     const found_question = await QuestionModel.findOne({
-      id: found_answer.question_id 
+      id: found_answer.question_id
     });
     if (!found_question) {
       return { status: "error" };
@@ -197,10 +229,7 @@ module.exports = class AnswerRepository {
       return { status: "error" };
     }
     // Update the answer and question models
-    await AnswerModel.updateOne(
-      { id: answerID},
-      { is_accepted: true}
-    );
+    await AnswerModel.updateOne({ id: answerID }, { is_accepted: true });
     await QuestionModel.updateOne(
       { id: found_question.id },
       { accepted_answer_id: answerID }
@@ -215,6 +244,6 @@ module.exports = class AnswerRepository {
       answer_id: answerID
     });
     if (!found_upvote) return { status: "error" };
-    return { status: "Ok" , upvote: found_upvote.value};
+    return { status: "Ok", upvote: found_upvote.value };
   }
 };

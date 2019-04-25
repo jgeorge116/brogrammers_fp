@@ -45,33 +45,35 @@ module.exports = class QuestionRepository {
         data: "Tags are required"
       };
     }
-    var search_question_media = await QuestionModel.find({media: {$in: media}});
-    var search_answer_media = await AnswerModel.find({media: {$in: media}});
-    if(search_question_media.length > 0 || search_answer_media.length > 0) {
-    	return {
-            status: "error",
-            data: "Duplicate media"
-        }
+    var search_question_media = await QuestionModel.find({
+      media: { $in: media }
+    });
+    var search_answer_media = await AnswerModel.find({ media: { $in: media } });
+    if (search_question_media.length > 0 || search_answer_media.length > 0) {
+      return {
+        status: "error",
+        data: "Duplicate media"
+      };
     }
-    if(media) {
+    if (media) {
       var query = "SELECT id FROM somedia.media WHERE id = ?;";
-      for(let i = 0; i < media.length; i++) {
+      for (let i = 0; i < media.length; i++) {
         var params = [media[i]];
         var results = await client.execute(query, params, { prepare: true });
-        if(results.rowLength == 0) {
+        if (results.rowLength == 0) {
           return {
-            status:"error",
+            status: "error",
             data: "Media does not exist"
           };
         }
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
-        if(results2.rows[0].username != username) {
+        if (results2.rows[0].username != username) {
           return {
-            status:"error",
+            status: "error",
             data: "Username does not match"
-         };
+          };
         }
       }
     }
@@ -284,6 +286,21 @@ module.exports = class QuestionRepository {
     const answer_count = await AnswerModel.countDocuments({
       question_id: format_question.id
     });
+
+    const upvote_count = await UpvoteModel.countDocuments({
+      question_id: format_question.id,
+      type: "question",
+      value: 1
+    });
+
+    const downvote_count = await UpvoteModel.countDocuments({
+      question_id: format_question.id,
+      type: "question",
+      value: -1
+    });
+
+    const score = upvote_count - downvote_count;
+
     var question = {
       id: format_question.id,
       user: {
@@ -293,7 +310,7 @@ module.exports = class QuestionRepository {
       },
       title: format_question.title,
       body: format_question.body,
-      score: format_question.score,
+      score: score,
       view_count: view_count,
       answer_count: answer_count,
       timestamp: format_question.timestamp,
@@ -372,42 +389,55 @@ module.exports = class QuestionRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      // Also changes the score in the question model
-      await QuestionModel.updateOne(
-        { id: found_question.id },
-        { $inc: { score: -upvote } }
+      await UpvoteModel.updateOne(
+        {
+          question_id: found_upvote.question_id,
+          username: username,
+          type: "question"
+        },
+        { value: 0 }
       );
-      await UpvoteModel.deleteOne(found_upvote);
-      return { status: "OK" };
-    }
-    // Upvoting after downvoting or vice versa, deletes previous upvote
-    if (found_upvote) {
-      await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-      // Undo the original upvote value
-      await QuestionModel.updateOne(
-        { id: found_question.id },
-        { $inc: { score: -found_upvote.value } }
+      if (found_user.reputation + -upvote >= 1) {
+        await UserModel.updateOne(
+          { username: found_question.username },
+          { $inc: { reputation: upvote } }
+        );
+      }
+    } else if (found_upvote) {
+    //   console.log("votes changed");
+      //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
+      await UpvoteModel.updateOne(
+        {
+          question_id: found_upvote.question_id,
+          username: username,
+          type: "question"
+        },
+        { value: upvote }
       );
+
+      if (found_user.reputation + upvote >= 1) {
+        await UserModel.updateOne(
+          { username: found_question.username },
+          { $inc: { reputation: upvote } }
+        );
+      }
+    } else {
+      // Create and save upvote
+      const new_upvote = new UpvoteModel({
+        type: "question",
+        username: username,
+        question_id: questionID,
+        value: upvote
+      });
+      await new_upvote.save();
+
+      if (found_user.reputation + upvote >= 1) {
+        await UserModel.updateOne(
+          { username: found_question.username },
+          { $inc: { reputation: upvote } }
+        );
+      }
     }
-    // Create and save upvote
-    const new_upvote = new UpvoteModel({
-      type: "question",
-      username: username,
-      question_id: questionID,
-      value: upvote
-    });
-    await new_upvote.save();
-    // Set reputation of asker unless it goes below 1
-    if (found_user.reputation + upvote >= 1) {
-      await UserModel.updateOne(
-        { username: found_question.username },
-        { $inc: { reputation: upvote } }
-      );
-    }
-    await QuestionModel.updateOne(
-      { id: found_question.id },
-      { $inc: { score: upvote } }
-    );
     return { status: "OK" };
   }
 
@@ -418,6 +448,6 @@ module.exports = class QuestionRepository {
       question_id: questionID
     });
     if (!found_upvote) return { status: "error" };
-    return { status: "Ok" , upvote: found_upvote.value};
+    return { status: "Ok", upvote: found_upvote.value };
   }
 };
