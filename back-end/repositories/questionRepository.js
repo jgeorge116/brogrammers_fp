@@ -400,7 +400,7 @@ module.exports = class QuestionRepository {
       if (found_user.reputation + -upvote >= 1) {
         await UserModel.updateOne(
           { username: found_question.username },
-          { $inc: { reputation: upvote } }
+          { $inc: { reputation: -upvote } }
         );
       }
     } else if (found_upvote) {
