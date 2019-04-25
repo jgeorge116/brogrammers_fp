@@ -55,7 +55,10 @@ module.exports = class QuestionRepository {
         data: "Duplicate media"
       };
     }
+    console.log("~~~~~~~~~~~~~~~~~~");
+    console.log("author: " + username);
     if (media) {
+      console.log("length of media: " + media.length);
       var query = "SELECT id FROM somedia.media WHERE id = ?;";
       for (let i = 0; i < media.length; i++) {
         var params = [media[i]];
@@ -66,6 +69,7 @@ module.exports = class QuestionRepository {
             data: "Media does not exist"
           };
         }
+        console.log("media [" + i + "]" + media[i]);
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
@@ -75,6 +79,7 @@ module.exports = class QuestionRepository {
             data: "Username does not match"
           };
         }
+        console.log("owner of the media above: " + results2.rows[0].username);
       }
     }
     const new_id = uuidv4();
@@ -404,7 +409,7 @@ module.exports = class QuestionRepository {
         );
       }
     } else if (found_upvote) {
-    //   console.log("votes changed");
+      //   console.log("votes changed");
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
       await UpvoteModel.updateOne(
         {
