@@ -4,6 +4,11 @@ const UserModel = require("../models/userModel");
 const QuestionModel = require("../models/questionModel");
 const UpvoteModel = require("../models/upvoteModel");
 const uuidv4 = require("uuid/v4");
+const cassandra = require("cassandra-driver");
+const client = new cassandra.Client({
+  contactPoints: ["192.168.122.41"],
+  localDataCenter: "datacenter1"
+});
 
 module.exports = class AnswerRepository {
   /**
@@ -32,6 +37,18 @@ module.exports = class AnswerRepository {
             status: "error",
             data: "Duplicate media"
         }
+    }
+    var query = "SELECT id FROM somedia.media WHERE id = ?;";
+    for(let i = 0; i < media.length; i++) {
+      var params = [media[i]];
+      var results = await client.execute(query, params, { prepare: true });
+      console.log(results.rowLength);
+      if(results.rowLength == 0) {
+          return {
+                status:"error",
+                data: "Media does not exist"
+          };
+      }
     }
     const new_id = uuidv4();
     const new_answer = new AnswerModel({
