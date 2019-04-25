@@ -31,7 +31,7 @@ class addMedia extends Component {
       formData.append('content', this.state.files[0]);
       console.log(formData.get('content'));
       (async () => {
-        const res = await fetch("http://localhost:4000/addmedia", {
+        const res = await fetch("/addmedia", {
           method: "POST",
           credentials: "include",
           headers: {

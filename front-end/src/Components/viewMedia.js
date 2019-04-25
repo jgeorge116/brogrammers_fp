@@ -21,7 +21,7 @@ class viewMedia extends Component {
     }
     
     getMedia = _ => {
-        fetch(`http://localhost:4000/media/${this.props.match.params.id}`)
+        fetch(`/media/${this.props.match.params.id}`)
             .then(response => response.blob())
             .then(data => {
             if (data) {

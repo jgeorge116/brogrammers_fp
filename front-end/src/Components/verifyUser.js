@@ -19,7 +19,7 @@ class verify extends Component {
     if (this.key === "") alert("KEY IS EMPTY!");
     else {
       (async () => {
-        const res = await fetch("http://localhost:4000/verify", {
+        const res = await fetch("/verify", {
           method: "POST",
           headers: {
             Accept: "application/json",
