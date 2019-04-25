@@ -346,6 +346,18 @@ module.exports = class QuestionRepository {
         await client.execute(query, params);
       }
     }
+    const found_answers = await AnswerModel.find({question_id:id});
+    if(found_answers) {
+      for(let answer in found_answers) {
+        if(answer.media) {
+          for(let i = 0; i < answer.media.length; i++) {
+            var query = "DELETE FROM somedia.media WHERE id = ? IF EXISTS;";
+            var params = [answer.media[i]];
+            await client.execute(query, params);
+          }
+        }
+      }
+    }
     await AnswerModel.deleteMany({question_id: id});
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };
