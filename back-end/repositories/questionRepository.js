@@ -40,6 +40,14 @@ module.exports = class QuestionRepository {
         data: "Tags are required"
       };
     }
+    var search_question_media = await QuestionModel.find({media: {$in: media}});
+    var search_answer_media = await AnswerModel.find({media: {$in: media}});
+    if(search_question_media.length > 0 || search_answer_media.length > 0) {
+    	return {
+            status: "error",
+            data: "Duplicate media"
+        }
+    }
     const new_id = uuidv4();
     const new_question = new QuestionModel({
       id: new_id,
