@@ -223,7 +223,7 @@ module.exports = class QuestionRepository {
         data: "q has to be a string"
       };
     }
-    sort_by = sort_by === "time" ? sort_by : "score";
+    sort_by = sort_by === "timestamp" ? sort_by : "score";
     tags = tags ? tags : null;
     has_media = has_media ? true : false;
 
@@ -234,25 +234,27 @@ module.exports = class QuestionRepository {
     if (search_accepted) {
       query.accepted_answer_id = { $ne: null };
     }
-    var sort_field = { score: { $meta: "textScore" } };
-    if (sort_by === "time") {
-      sort_field.timestamp = -1;
-    } else {
-      sort_field.score = -1; // Score is both used for score in the schema and textScore
-    }
     if (tags) {
       query.tags = tags;
     }
     if (has_media) {
       query.media = { $ne: [] };
     }
+    if (sort_by === "timestamp") {
+      search_results = await QuestionModel.find(query, {
+         score: { $meta: "textScore" }
+      })
+      .limit(parsed_int)
+      .sort({"score":{"$meta":"textScore"},"timestamp":-1});
+    } else {
     // console.log('QUERY', query);
     // console.log(sort_field);
     search_results = await QuestionModel.find(query, {
       score: { $meta: "textScore" }
     })
       .limit(parsed_int)
-      .sort({ score: { $meta: "textScore" } });
+      .sort({"score":{"$meta":"textScore"}});
+    }
     var all_questions = [];
     for (var result in search_results) {
       var question_info = await this.question_to_api_format(
@@ -342,6 +344,26 @@ module.exports = class QuestionRepository {
     if (found_question.username != username) {
       return { status: "error", data: "User must be the original asker!" };
     }
+    if(found_question.media) {
+      for(let i = 0; i < found_question.media.length; i++) {
+        var query = "DELETE FROM somedia.media WHERE id = ? IF EXISTS;";
+        var params = [found_question.media[i]];
+        await client.execute(query, params);
+      }
+    }
+    const found_answers = await AnswerModel.find({question_id:id});
+    if(found_answers) {
+      for(let answer in found_answers) {
+        if(answer.media) {
+          for(let i = 0; i < answer.media.length; i++) {
+            var query = "DELETE FROM somedia.media WHERE id = ? IF EXISTS;";
+            var params = [answer.media[i]];
+            await client.execute(query, params);
+          }
+        }
+      }
+    }
+    await AnswerModel.deleteMany({question_id: id});
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };
   }

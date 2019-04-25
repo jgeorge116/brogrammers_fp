@@ -29,7 +29,7 @@ ReactDOM.render(
       <Route path="/fuser/:id" component={userInfo} />
       <Route path="/faddmedia" component={addMedia} />
       <Route path="/fmedia/:id" component={viewMedia} />
-      <Redirect from="/" exact to="/adduser" />
+      <Redirect from="/" exact to="/fadduser" />
     </Switch>
   </BrowserRouter>,
   document.getElementById("root")

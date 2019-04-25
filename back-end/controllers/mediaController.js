@@ -90,7 +90,6 @@ exports.get_media_by_id = function(req, res) {
   var query = "SELECT contents FROM somedia.media WHERE id = ?;";
   var params = [req.params.id];
   client.execute(query, params, { prepare: true }, function(err, results) {
-    console.log("GOT THE SHIT");
     if (err) {
 	    console.log(err);
       res
