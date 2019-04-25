@@ -38,16 +38,18 @@ module.exports = class AnswerRepository {
             data: "Duplicate media"
         }
     }
-    var query = "SELECT id FROM somedia.media WHERE id = ?;";
-    for(let i = 0; i < media.length; i++) {
-      var params = [media[i]];
-      var results = await client.execute(query, params, { prepare: true });
-      console.log(results.rowLength);
-      if(results.rowLength == 0) {
+    if(media) {
+      var query = "SELECT id FROM somedia.media WHERE id = ?;";
+      for(let i = 0; i < media.length; i++) {
+        var params = [media[i]];
+        var results = await client.execute(query, params, { prepare: true });
+        console.log(results.rowLength);
+        if(results.rowLength == 0) {
           return {
-                status:"error",
-                data: "Media does not exist"
+            status:"error",
+            data: "Media does not exist"
           };
+        }
       }
     }
     const new_id = uuidv4();
