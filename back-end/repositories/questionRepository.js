@@ -339,6 +339,13 @@ module.exports = class QuestionRepository {
     if (found_question.username != username) {
       return { status: "error", data: "User must be the original asker!" };
     }
+    if(found_question.media) {
+      for(let i = 0; i < found_question.media.length; i++) {
+        var query = "DELETE FROM somedia.media WHERE id = ? IF EXISTS;";
+        var params = [found_question.media[i]];
+        await client.execute(query, params);
+      }
+    }
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };
   }
