@@ -35,7 +35,7 @@ module.exports = class ResetRespository {
 
 
     var query3 =
-     "CREATE IF NOT EXISTS TABLE somedia.media (id text PRIMARY KEY, contents blob, username text); "
+     "CREATE TABLE IF NOT EXISTS somedia.media (id text PRIMARY KEY, contents blob, username text); "
     await client.execute(query3, function(err) {
       if (err) console.log(err);
       else console.log("created table media");
