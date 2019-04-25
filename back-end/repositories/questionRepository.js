@@ -346,6 +346,7 @@ module.exports = class QuestionRepository {
         await client.execute(query, params);
       }
     }
+    await AnswerModel.deleteMany({question_id: id});
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };
   }
