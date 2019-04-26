@@ -356,9 +356,12 @@ module.exports = class QuestionRepository {
   async delete_question(id, username) {
     const found_question = await QuestionModel.findOne({ id: id });
     if (!found_question) {
+      console.log("Question does not exist");
       return { status: "error", data: "Question does not exist!" };
     }
     if (found_question.username != username) {
+      console.log("Author of question: "  + found_question.username + "\n"
+      + "Current user: " + username);
       return { status: "error", data: "User must be the original asker!" };
     }
     if (found_question.media) {
