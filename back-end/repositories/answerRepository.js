@@ -40,18 +40,24 @@ module.exports = class AnswerRepository {
         data: "Duplicate media"
       };
     }
+    console.log("`````````````````````````````");
+    console.log(`author: ${username}`);
     if (media) {
+      console.log(`length of media: ${media.length}`);
+      console.log(`all the media: ${media}`);
       var query = "SELECT id FROM somedia.media WHERE id = ?;";
       for (let i = 0; i < media.length; i++) {
         var params = [media[i]];
+        console.log(`media[${i}] = ${media[i]} `);
         var results = await client.execute(query, params, { prepare: true });
-        console.log(results.rowLength);
+        // console.log(results.rowLength);
         if (results.rowLength == 0) {
           return {
             status: "error",
             data: "Media does not exist"
           };
         }
+        console.log(`media is ok`);
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
@@ -63,6 +69,7 @@ module.exports = class AnswerRepository {
         }
       }
     }
+    console.log(`~~~~~ add answers finished with no errors `);
     const new_id = uuidv4();
     const new_answer = new AnswerModel({
       id: new_id,

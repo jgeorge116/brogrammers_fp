@@ -59,9 +59,11 @@ module.exports = class QuestionRepository {
     console.log("author: " + username);
     if (media) {
       console.log("length of media: " + media.length);
+      console.log(`all the media: ${media}`);
       var query = "SELECT id FROM somedia.media WHERE id = ?;";
       for (let i = 0; i < media.length; i++) {
         var params = [media[i]];
+        console.log("media [" + i + "]" + media[i]);
         var results = await client.execute(query, params, { prepare: true });
         if (results.rowLength == 0) {
           return {
@@ -69,7 +71,7 @@ module.exports = class QuestionRepository {
             data: "Media does not exist"
           };
         }
-        console.log("media [" + i + "]" + media[i]);
+        console.log(`media is ok`);
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
@@ -82,6 +84,7 @@ module.exports = class QuestionRepository {
         console.log("owner of the media above: " + results2.rows[0].username);
       }
     }
+    console.log(`~~~~~ add question finished with no errors `);
     const new_id = uuidv4();
     const new_question = new QuestionModel({
       id: new_id,
