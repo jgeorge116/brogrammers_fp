@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./Components/style/index.css";
 import App from "./Components/App";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter, Route, Switch} from "react-router-dom";
 import verify from "./Components/verifyUser";
 import home from "./Components/home";
 import login from "./Components/login";
@@ -14,13 +14,12 @@ import userInfo from "./Components/userInfo";
 import addMedia from "./Components/addMedia";
 import viewMedia from "./Components/viewMedia";
 
-
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
+      <Route exact path="/" component={home} />
       <Route path="/fadduser" component={App} />
       <Route path="/fverify" component={verify} />
-      <Route path="/" component={home} />
       <Route path="/flogin" component={login} />
       <Route path="/flogout" component={logout} />
       <Route path="/fsearch" component={Search} />
