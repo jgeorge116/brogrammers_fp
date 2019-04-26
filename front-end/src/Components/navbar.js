@@ -115,9 +115,9 @@ class Navbar extends Component {
 
   render() {
     const { classes } = this.props;
-    if (!localStorage.getItem("username")) {
-      this.props.history.push("/flogin");
-    }
+    // if (!localStorage.getItem("username")) {
+    //   this.props.history.push("/flogin");
+    // }
     return (
       <MuiThemeProvider theme={theme}>
         <div className={classes.root}>
