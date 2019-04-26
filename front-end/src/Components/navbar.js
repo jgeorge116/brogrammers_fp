@@ -93,7 +93,7 @@ class Navbar extends Component {
   handleLogout = () => {
     Cookies.remove("access_token");
     localStorage.removeItem("username");
-    this.props.history.push("/flogout");
+    this.props.history.push("/flogin");
   };
 
   handleProfile = () => {

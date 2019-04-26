@@ -21,7 +21,7 @@ ReactDOM.render(
       <Route path="/fadduser" component={App} />
       <Route path="/fverify" component={verify} />
       <Route path="/flogin" component={login} />
-      <Route path="/flogout" component={logout} />
+      {/* <Route path="/flogout" component={logout} /> */}
       <Route path="/fsearch" component={Search} />
       <Route path="/fquestions/add" component={questions} />
       <Route path="/fquestions/:id" component={viewQuestion} />
