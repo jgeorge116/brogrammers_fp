@@ -30,8 +30,7 @@ class Home extends Component {
           <Grid container justify="center">
             <Grid item md={10}>
               <Paper>
-                <h1 class="toolbar">HOMEEEE...</h1>
-                <img src="https://i.imgur.com/aeOaQSZ.jpg" alt="Suprised Pikachu" />
+                <img src="https://i.imgur.com/aeOaQSZ.jpg" alt="Suprised Pikachu" style={{display:"block", margin:"0 auto"}}/>
               </Paper>
             </Grid>
           </Grid>
