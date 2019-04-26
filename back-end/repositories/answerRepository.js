@@ -35,39 +35,46 @@ module.exports = class AnswerRepository {
     });
     var search_answer_media = await AnswerModel.find({ media: { $in: media } });
     if (search_question_media.length > 0 || search_answer_media.length > 0) {
-    // if (search_answer_media.length > 0) {
+      // if (search_answer_media.length > 0) {
       return {
         status: "error",
         data: "Duplicate media"
       };
     }
-    console.log("`````````````````````````````");
-    console.log(`author: ${username}`);
+
     if (media) {
-      console.log(`length of media: ${media.length}`);
-      console.log(`all the media: ${media}`);
-      var query = "SELECT id FROM somedia.media WHERE id = ?;";
+        console.log(
+            '"*******************************"' +
+              "author: " +
+              username +
+              "\n" +
+              "length of media: " +
+              media.length +
+              "\n" +
+              `all the media: ${media}` +
+              "\n" +
+              " "
+          );
       for (let i = 0; i < media.length; i++) {
-        var params = [media[i]];
-        console.log(`media[${i}] = ${media[i]} `);
-        var results = await client.execute(query, params, { prepare: true });
-        // console.log(results.rowLength);
-        if (results.rowLength == 0) {
-          return {
-            status: "error",
-            data: "Media does not exist"
-          };
-        }
-        console.log(`media is ok`);
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
         if (results2.rows[0].username != username) {
           return {
             status: "error",
-            data: "Username does not match"
+            data: "Username does not match or is not theres"
           };
         }
+        console.log(
+          "media [" +
+            i +
+            "]" +
+            media[i] +
+            "is ok" +
+            "\n" +
+            "owner of the media above: " +
+            results2.rows[0].username
+        );
       }
     }
     console.log(`~~~~~ add answers finished with no errors `);

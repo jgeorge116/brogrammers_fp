@@ -55,33 +55,42 @@ module.exports = class QuestionRepository {
         data: "Duplicate media"
       };
     }
-    console.log("~~~~~~~~~~~~~~~~~~");
+    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     console.log("author: " + username);
     if (media) {
-      console.log("length of media: " + media.length);
-      console.log(`all the media: ${media}`);
-      var query = "SELECT id FROM somedia.media WHERE id = ?;";
+      console.log(
+        '"~~~~~~~~~~~~~~~~~~"' +
+          "author: " +
+          username +
+          "\n" +
+          "length of media: " +
+          media.length +
+          "\n" +
+          `all the media: ${media}` +
+          "\n" +
+          " "
+      );
+
       for (let i = 0; i < media.length; i++) {
-        var params = [media[i]];
-        console.log("media [" + i + "]" + media[i]);
-        var results = await client.execute(query, params, { prepare: true });
-        if (results.rowLength == 0) {
-          return {
-            status: "error",
-            data: "Media does not exist"
-          };
-        }
-        console.log(`media is ok`);
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
         if (results2.rows[0].username != username) {
           return {
             status: "error",
-            data: "Username does not match"
+            data: "Username does not match or is not theres"
           };
         }
-        console.log("owner of the media above: " + results2.rows[0].username);
+        console.log(
+          "media [" +
+            i +
+            "]" +
+            media[i] +
+            "is ok" +
+            "\n" +
+            "owner of the media above: " +
+            results2.rows[0].username
+        );
       }
     }
     console.log(`~~~~~ add question finished with no errors `);
@@ -245,18 +254,18 @@ module.exports = class QuestionRepository {
     }
     if (sort_by === "timestamp") {
       search_results = await QuestionModel.find(query, {
-         score: { $meta: "textScore" }
+        score: { $meta: "textScore" }
       })
-      .limit(parsed_int)
-      .sort({"score":{"$meta":"textScore"},"timestamp":-1});
+        .limit(parsed_int)
+        .sort({ score: { $meta: "textScore" }, timestamp: -1 });
     } else {
-    // console.log('QUERY', query);
-    // console.log(sort_field);
-    search_results = await QuestionModel.find(query, {
-      score: { $meta: "textScore" }
-    })
-      .limit(parsed_int)
-      .sort({"score":{"$meta":"textScore"}});
+      // console.log('QUERY', query);
+      // console.log(sort_field);
+      search_results = await QuestionModel.find(query, {
+        score: { $meta: "textScore" }
+      })
+        .limit(parsed_int)
+        .sort({ score: { $meta: "textScore" } });
     }
     var all_questions = [];
     for (var result in search_results) {
@@ -347,18 +356,18 @@ module.exports = class QuestionRepository {
     if (found_question.username != username) {
       return { status: "error", data: "User must be the original asker!" };
     }
-    if(found_question.media) {
-      for(let i = 0; i < found_question.media.length; i++) {
+    if (found_question.media) {
+      for (let i = 0; i < found_question.media.length; i++) {
         var query = "DELETE FROM somedia.media WHERE id = ? IF EXISTS;";
         var params = [found_question.media[i]];
         await client.execute(query, params);
       }
     }
-    const found_answers = await AnswerModel.find({question_id:id});
-    if(found_answers) {
-      for(let answer in found_answers) {
-        if(answer.media) {
-          for(let i = 0; i < answer.media.length; i++) {
+    const found_answers = await AnswerModel.find({ question_id: id });
+    if (found_answers) {
+      for (let answer in found_answers) {
+        if (answer.media) {
+          for (let i = 0; i < answer.media.length; i++) {
             var query = "DELETE FROM somedia.media WHERE id = ? IF EXISTS;";
             var params = [answer.media[i]];
             await client.execute(query, params);
@@ -366,7 +375,7 @@ module.exports = class QuestionRepository {
         }
       }
     }
-    await AnswerModel.deleteMany({question_id: id});
+    await AnswerModel.deleteMany({ question_id: id });
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };
   }
