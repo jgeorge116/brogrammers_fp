@@ -130,7 +130,7 @@ class Navbar extends Component {
                     color="inherit"
                     variant="h6"
                     underline="none"
-                    href="/home"
+                    href="/"
                   >
                     {" "}
                     Stack Overflow{" "}

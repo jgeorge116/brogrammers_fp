@@ -31,11 +31,7 @@ class Home extends Component {
             <Grid item md={10}>
               <Paper>
                 <h1 class="toolbar">HOMEEEE...</h1>
-              </Paper>
-            </Grid>
-            <Grid item md={10}>
-              <Paper>
-                <h1 class="toolbar">HOMEEEE...</h1>
+                <img src="https://i.imgur.com/aeOaQSZ.jpg" alt="Suprised Pikachu" />
               </Paper>
             </Grid>
           </Grid>

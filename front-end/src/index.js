@@ -20,7 +20,7 @@ ReactDOM.render(
     <Switch>
       <Route path="/fadduser" component={App} />
       <Route path="/fverify" component={verify} />
-      <Route path="/fhome" component={home} />
+      <Route path="/" component={home} />
       <Route path="/flogin" component={login} />
       <Route path="/flogout" component={logout} />
       <Route path="/fsearch" component={Search} />
@@ -29,7 +29,6 @@ ReactDOM.render(
       <Route path="/fuser/:id" component={userInfo} />
       <Route path="/faddmedia" component={addMedia} />
       <Route path="/fmedia/:id" component={viewMedia} />
-      <Redirect from="/" exact to="/fadduser" />
     </Switch>
   </BrowserRouter>,
   document.getElementById("root")
