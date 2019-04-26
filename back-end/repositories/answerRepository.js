@@ -41,7 +41,7 @@ module.exports = class AnswerRepository {
         data: "Duplicate media"
       };
     }
-
+    const new_id = uuidv4();
     if (media) {
         console.log(
             '"*******************************"' +
@@ -53,7 +53,8 @@ module.exports = class AnswerRepository {
               "\n" +
               `all the media: ${media}` +
               "\n" +
-              " "
+              "id: " +  new_id + 
+              "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
           );
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
@@ -77,8 +78,7 @@ module.exports = class AnswerRepository {
         );
       }
     }
-    console.log(`~~~~~ add answers finished with no errors `);
-    const new_id = uuidv4();
+    console.log(`~~~~~ add answers finished with no errors for ${new_id}`);
     const new_answer = new AnswerModel({
       id: new_id,
       question_id: question_id,

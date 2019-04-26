@@ -57,9 +57,10 @@ module.exports = class QuestionRepository {
     }
     console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     console.log("author: " + username);
+    const new_id = uuidv4();
     if (media) {
       console.log(
-        '"~~~~~~~~~~~~~~~~~~"' +
+        '"~~~~~~~~~~~~~~~~~~~~~~~~"' +
           "author: " +
           username +
           "\n" +
@@ -68,7 +69,9 @@ module.exports = class QuestionRepository {
           "\n" +
           `all the media: ${media}` +
           "\n" +
-          " "
+          "id : " +
+          new_id +
+          "\n _________________________"
       );
 
       for (let i = 0; i < media.length; i++) {
@@ -93,8 +96,10 @@ module.exports = class QuestionRepository {
         );
       }
     }
-    console.log(`~~~~~ add question finished with no errors `);
-    const new_id = uuidv4();
+    console.log(
+      `~~~~~ add question finished with no errors \n with ID of ${new_id}`
+    );
+
     const new_question = new QuestionModel({
       id: new_id,
       username: username,
