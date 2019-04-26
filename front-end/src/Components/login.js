@@ -39,7 +39,7 @@ class login extends Component {
         else {
             localStorage.setItem('username', this.state.username)
             this.props.history.push({
-            pathname: "/fhome"
+            pathname: "/"
             });
         }
       })();
