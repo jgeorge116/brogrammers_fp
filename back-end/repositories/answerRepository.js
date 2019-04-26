@@ -30,9 +30,9 @@ module.exports = class AnswerRepository {
     if (!found_question) {
       return { status: "error", data: "Question does not exist" };
     }
-    var search_question_media = await QuestionModel.find({
-      media: { $in: media }
-    });
+    // var search_question_media = await QuestionModel.find({
+    //   media: { $in: media }
+    // });
     var search_answer_media = await AnswerModel.find({ media: { $in: media } });
     if (search_question_media.length > 0 || search_answer_media.length > 0) {
       return {
