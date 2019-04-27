@@ -44,20 +44,20 @@ module.exports = class AnswerRepository {
     }
     const new_id = uuidv4();
     if (media) {
-      console.log(
-        '"*******************************"' +
-          "author: " +
-          username +
-          "\n" +
-          "length of media: " +
-          media.length +
-          "\n" +
-          `all the media: ${media}` +
-          "\n" +
-          "id: " +
-          new_id +
-          "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-      );
+    //   console.log(
+    //     '"*******************************"' +
+    //       "author: " +
+    //       username +
+    //       "\n" +
+    //       "length of media: " +
+    //       media.length +
+    //       "\n" +
+    //       `all the media: ${media}` +
+    //       "\n" +
+    //       "id: " +
+    //       new_id +
+    //       "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+    //   );
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
@@ -68,19 +68,19 @@ module.exports = class AnswerRepository {
             data: "Username does not match or is not theres"
           };
         }
-        console.log(
-          "media [" +
-            i +
-            "]" +
-            media[i] +
-            "is ok" +
-            "\n" +
-            "owner of the media above: " +
-            results2.rows[0].username
-        );
+        // console.log(
+        //   "media [" +
+        //     i +
+        //     "]" +
+        //     media[i] +
+        //     "is ok" +
+        //     "\n" +
+        //     "owner of the media above: " +
+        //     results2.rows[0].username
+        // );
       }
     }
-    console.log(`~~~~~ add answers finished with no errors for ${new_id}`);
+    // console.log(`~~~~~ add answers finished with no errors for ${new_id}`);
     const new_answer = new AnswerModel({
       id: new_id,
       question_id: question_id,

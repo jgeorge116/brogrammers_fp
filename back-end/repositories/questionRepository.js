@@ -56,24 +56,24 @@ module.exports = class QuestionRepository {
         data: "Duplicate media"
       };
     }
-    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    console.log("author: " + username);
+    // console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    // console.log("author: " + username);
     const new_id = uuidv4();
     if (media) {
-      console.log(
-        '"~~~~~~~~~~~~~~~~~~~~~~~~"' +
-          "author: " +
-          username +
-          "\n" +
-          "length of media: " +
-          media.length +
-          "\n" +
-          `all the media: ${media}` +
-          "\n" +
-          "id : " +
-          new_id +
-          "\n _________________________"
-      );
+    //   console.log(
+    //     '"~~~~~~~~~~~~~~~~~~~~~~~~"' +
+    //       "author: " +
+    //       username +
+    //       "\n" +
+    //       "length of media: " +
+    //       media.length +
+    //       "\n" +
+    //       `all the media: ${media}` +
+    //       "\n" +
+    //       "id : " +
+    //       new_id +
+    //       "\n _________________________"
+    //   );
 
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
@@ -85,21 +85,21 @@ module.exports = class QuestionRepository {
             data: "Username does not match or is not theres"
           };
         }
-        console.log(
-          "media [" +
-            i +
-            "]" +
-            media[i] +
-            "is ok" +
-            "\n" +
-            "owner of the media above: " +
-            results2.rows[0].username
-        );
+        // console.log(
+        //   "media [" +
+        //     i +
+        //     "]" +
+        //     media[i] +
+        //     "is ok" +
+        //     "\n" +
+        //     "owner of the media above: " +
+        //     results2.rows[0].username
+        // );
       }
     }
-    console.log(
-      `~~~~~ add question finished with no errors \n with ID of ${new_id}`
-    );
+    // console.log(
+    //   `~~~~~ add question finished with no errors \n with ID of ${new_id}`
+    // );
 
     const new_question = new QuestionModel({
       id: new_id,
