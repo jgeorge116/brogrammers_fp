@@ -8,6 +8,7 @@ const uuidv4 = require("uuid/v4");
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
   contactPoints: ["192.168.122.41"],
+  //   contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1"
 });
 
@@ -368,18 +369,26 @@ module.exports = class QuestionRepository {
         await client.execute(query, params);
       }
     }
-    const found_answers = await AnswerModel.find({ question_id: id });
-    if (found_answers) {
-      for (let answer in found_answers) {
-        if (answer.media) {
-          for (let i = 0; i < answer.media.length; i++) {
+    AnswerModel.find({ question_id: id })
+      .stream()
+      .on("data", async function(doc) {
+        if (doc.media) {
+          for (let i = 0; doc.media.length; i++) {
             var query = "DELETE FROM somedia.media WHERE id = ? IF EXISTS;";
-            var params = [answer.media[i]];
+            var params = [doc.media[i]];
             await client.execute(query, params);
           }
         }
-      }
-    }
+      })
+      .on("error", function(err) {
+        // handle error
+        console.log("ERRROR HANDLING MEDIA");
+        return { status: "error", data: err };
+      })
+      .on("end", function() {
+        // final callback
+        console.log("finished deleting media");
+      });
     await AnswerModel.deleteMany({ question_id: id });
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };

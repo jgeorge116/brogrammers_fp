@@ -7,6 +7,7 @@ const uuidv4 = require("uuid/v4");
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
   contactPoints: ["192.168.122.41"],
+  //   contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1"
 });
 
@@ -43,19 +44,20 @@ module.exports = class AnswerRepository {
     }
     const new_id = uuidv4();
     if (media) {
-        console.log(
-            '"*******************************"' +
-              "author: " +
-              username +
-              "\n" +
-              "length of media: " +
-              media.length +
-              "\n" +
-              `all the media: ${media}` +
-              "\n" +
-              "id: " +  new_id + 
-              "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-          );
+      console.log(
+        '"*******************************"' +
+          "author: " +
+          username +
+          "\n" +
+          "length of media: " +
+          media.length +
+          "\n" +
+          `all the media: ${media}` +
+          "\n" +
+          "id: " +
+          new_id +
+          "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+      );
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];

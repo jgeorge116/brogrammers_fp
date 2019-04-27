@@ -7,6 +7,7 @@ const UpvoteModel = require("../models/upvoteModel");
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
   contactPoints: ["192.168.122.41"],
+  // contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1"
 });
 
@@ -33,14 +34,13 @@ module.exports = class ResetRespository {
       else console.log("created keyspace somedia");
     });
 
-
     var query3 =
-     "CREATE TABLE IF NOT EXISTS somedia.media (id text PRIMARY KEY, contents blob, username text); "
+      "CREATE TABLE IF NOT EXISTS somedia.media (id text PRIMARY KEY, contents blob, username text); ";
     await client.execute(query3, function(err) {
       if (err) console.log(err);
       else console.log("created table media");
     });
-    3
+    3;
     var query2 = "TRUNCATE somedia.media";
     await client.execute(query2, function(err) {
       if (err) console.log(err);

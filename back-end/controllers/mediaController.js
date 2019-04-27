@@ -9,6 +9,7 @@ const fileType = require("file-type");
 const uuidv4 = require("uuid/v4");
 const client = new cassandra.Client({
   contactPoints: ["192.168.122.41"],
+  // contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1"
 });
 
@@ -28,31 +29,32 @@ exports.add_media = async function(req, res) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       const username = jwt.username;
-      if(!username) {
-          console.log("Missing username");
-          res
-          .status(400)
-          .send({ status: "error", error: "Missing something" });
+      if (!username) {
+        console.log("Missing username");
+        res.status(400).send({ status: "error", error: "Missing something" });
       }
       new formidable.IncomingForm().parse(req, (err, fields, files) => {
         if (err) {
           console.log(err);
           res
-          .status(400)
-          .send({ status: "error", error: "Error parsing file" });
+            .status(400)
+            .send({ status: "error", error: "Error parsing file" });
           return;
-        };
+        }
         fs.readFile(files.content.path, async function(err, data) {
           if (err) {
             console.log(err);
             res
-            .status(400)
-            .send({ status: "error", error: "Error reading file" });
+              .status(400)
+              .send({ status: "error", error: "Error reading file" });
             return;
           }
           contents = data;
-          var query = "INSERT INTO somedia.media (id, contents, username) VALUES (?,?,?);";
-          const id = uuidv4().toString().replace(/\-/g,"");
+          var query =
+            "INSERT INTO somedia.media (id, contents, username) VALUES (?,?,?);";
+          const id = uuidv4()
+            .toString()
+            .replace(/\-/g, "");
           console.log(id);
           var params = [id, contents, username];
           await client.execute(query, params, function(err) {
@@ -66,12 +68,12 @@ exports.add_media = async function(req, res) {
               if (!contents) {
                 console.log("Missing buffer value");
                 res
-                .status(400)
-                .send({ status: "error", error: "Missing buffer value" });
+                  .status(400)
+                  .send({ status: "error", error: "Missing buffer value" });
               } else {
                 data["status"] = "OK";
                 data["id"] = id;
-		console.log(data);
+                console.log(data);
                 res.status(200).send(data);
               }
             }
@@ -91,21 +93,20 @@ exports.get_media_by_id = function(req, res) {
   var params = [req.params.id];
   client.execute(query, params, { prepare: true }, function(err, results) {
     if (err) {
-	    console.log(err);
+      console.log(err);
       res
-      .status(400)
-      .send({ status: "error", error: "Media does not exist" })
-      .end();
-    }
-    else {
-      if(!results.rows[0]) {
-        res
         .status(400)
         .send({ status: "error", error: "Media does not exist" })
         .end();
+    } else {
+      if (!results.rows[0]) {
+        res
+          .status(400)
+          .send({ status: "error", error: "Media does not exist" })
+          .end();
       } else {
-	res.setHeader("Content-Type", fileType(results.rows[0].contents).mime);
-	res.setHeader("Content-Length",results.rows[0].contents.length);
+        res.setHeader("Content-Type", fileType(results.rows[0].contents).mime);
+        res.setHeader("Content-Length", results.rows[0].contents.length);
         //res.writeHeader(200, {
         //  "Content-Type": fileType(results.rows[0].contents).mime,
         //  "Content-Length": results.rows[0].contents.length
@@ -115,4 +116,3 @@ exports.get_media_by_id = function(req, res) {
     }
   });
 };
-
