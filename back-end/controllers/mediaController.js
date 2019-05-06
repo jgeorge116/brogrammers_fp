@@ -8,7 +8,7 @@ const cassandra = require("cassandra-driver");
 const fileType = require("file-type");
 const uuidv4 = require("uuid/v4");
 const client = new cassandra.Client({
-  contactPoints: ["192.168.122.50"],
+  contactPoints: ["192.168.122.50", "192.168.122.49"],
   // contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1"
 });
