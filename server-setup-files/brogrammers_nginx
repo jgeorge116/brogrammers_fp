@@ -1,19 +1,45 @@
+upstream backend {
+        server 192.168.122.39:4000;
+        server 192.168.122.33:4000;
+}
+
+upstream frontend {
+        server 192.168.122.39:3000;
+        server 192.168.122.33:3000;
+}
+
 server {
-    listen 80;
-    listen [::]:80;
+        listen 80;
+        client_max_body_size 100m;
+        proxy_max_temp_file_size 0;
+	proxy_buffering off;
 
-    server_name 130.245.171.56 brogrammers.cse356.compas.cs.stonybrook.edu;
-    
-    client_max_body_size 100m;
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+	location ~ "^/(adduser|login|logout|logout|verify|questions|search|user|questions|answers|addmedia|media|reset)" {
+		proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_http_version 1.1;
+                proxy_pass http://backend;
+                proxy_next_upstream error timeout invalid_header http_500 http_502  http_404;
+                proxy_connect_timeout 999999s;
+                proxy_send_timeout 999999s;
+                proxy_read_timeout 999999s;
+		proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+	}
+
+         location / {
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_http_version 1.1;
+                proxy_pass http://frontend;
+                proxy_next_upstream error timeout invalid_header http_500 http_502  http_404;
+                proxy_connect_timeout 999999s;
+                proxy_send_timeout 999999s;
+                proxy_read_timeout 999999s;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection 'upgrade';
+        }
 }
