@@ -6,6 +6,7 @@ const JWT = new Authentication();
 exports.add_question = async function(req, res) {
   if (!req.headers.authorization && !req.cookies.access_token) {
     res.status(400).send({ status: "error", error: "No token provided" });
+    console.log('Add question failed because of no jwt');
   } else {
     if (!req.headers.authorization) {
       var jwt = await JWT.validate(req.cookies.access_token);
@@ -15,6 +16,7 @@ exports.add_question = async function(req, res) {
     if (!jwt.username) {
       res.clearCookie("access_token");
       res.status(400).send({ status: "error", error: "Invalid JWT" });
+      console.log('Add question failed because of Invalid jwt');
     } else {
       const username = jwt.username;
       var result = await QR.create(
@@ -25,6 +27,7 @@ exports.add_question = async function(req, res) {
         req.body.media
       );
       if (result.status == "error") {
+        console.log(`question failed because of something else: ${result.data}`);
         res.status(400).send({ status: result.status, error: result.data });
       } else {
         res.send({ status: result.status, id: result.data });
