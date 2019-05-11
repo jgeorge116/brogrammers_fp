@@ -79,6 +79,10 @@ module.exports = class QuestionRepository {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
+        console.log(results2);
+        if (!results2.rows[0]) {
+          console.log('results do not exist');
+        }
         if (results2.rows[0].username != username) {
           return {
             status: "error",
