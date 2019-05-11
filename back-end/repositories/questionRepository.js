@@ -60,20 +60,7 @@ module.exports = class QuestionRepository {
     // console.log("author: " + username);
     const new_id = uuidv4();
     if (media) {
-    //   console.log(
-    //     '"~~~~~~~~~~~~~~~~~~~~~~~~"' +
-    //       "author: " +
-    //       username +
-    //       "\n" +
-    //       "length of media: " +
-    //       media.length +
-    //       "\n" +
-    //       `all the media: ${media}` +
-    //       "\n" +
-    //       "id : " +
-    //       new_id +
-    //       "\n _________________________"
-    //   );
+   
 
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
@@ -81,6 +68,21 @@ module.exports = class QuestionRepository {
         var results2 = await client.execute(query2, params2, { prepare: true });
         //console.log(results2);
         if (results2.rowLength == 0) {
+          console.log(
+        '"FAILURE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
+          "author: " +
+          username +
+          "\n" +
+          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n"
+          "length of media: " +
+          media.length +
+          "\n" +
+          `all the media: ${media}` +
+          "\n" +
+          "id : " +
+          new_id +
+          "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
+      );
           return {
             status: "error",
             data: "Media does not exist"
