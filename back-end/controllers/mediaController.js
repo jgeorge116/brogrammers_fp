@@ -45,6 +45,10 @@ exports.add_media = async function(req, res) {
             .send({ status: "error", error: "Error parsing file" });
           return;
         }
+        if (!files.content) {
+          res.status(400).send({ status: "error", error: "No file provided" });
+          return;
+        }
         fs.readFile(files.content.path, async function(err, data) {
           if (err) {
             console.log(err);
