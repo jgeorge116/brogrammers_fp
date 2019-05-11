@@ -32,7 +32,7 @@ exports.add_media = async function(req, res) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       const username = jwt.username;
-      console.log(req.headers);
+      //console.log(req.headers);
       if (!username) {
         console.log("Missing username");
         res.status(400).send({ status: "error", error: "Missing something" });
@@ -64,20 +64,20 @@ exports.add_media = async function(req, res) {
           await client.execute(query, params, function(err) {
             if (err) console.log(err);
             else {
-              console.log("inserted into media");
+              //console.log("inserted into media");
               var data = {
                 status: "",
                 id: ""
               };
               if (!contents) {
-                console.log("Missing buffer value");
+                //console.log("Missing buffer value");
                 res
                   .status(400)
                   .send({ status: "error", error: "Missing buffer value" });
               } else {
                 data["status"] = "OK";
                 data["id"] = id;
-                console.log(data);
+                //console.log(data);
                 res.status(200).send(data);
               }
             }
@@ -111,7 +111,7 @@ exports.get_media_by_id = function(req, res) {
       } else {
         var mime = magic.detect(Buffer.from(results.rows[0].contents) , function(err, result) {
           if (err) console.log(err);
-          console.log(result);
+          //console.log(result);
           res.setHeader("Content-Type", result);
           res.setHeader("Content-Length", results.rows[0].contents.length);
           res.status(200).send(results.rows[0].contents);
