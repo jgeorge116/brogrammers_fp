@@ -80,8 +80,11 @@ module.exports = class QuestionRepository {
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
         console.log(results2);
-        if (!results2.rows[0]) {
-          console.log('results do not exist');
+        if (results2.rowLength == 0) {
+          return {
+            status: "error",
+            data: "Media does not exist"
+          }
         }
         if (results2.rows[0].username != username) {
           return {
