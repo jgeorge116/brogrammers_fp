@@ -110,11 +110,11 @@ exports.get_media_by_id = function(req, res) {
           .end();
       } else {
         magic.detect(Buffer.from(results.rows[0].contents), function(err, result) {
-      if (err) throw err;
-      console.log(result);
-      // output: Python script, ASCII text executable
-  });
-        console.log(fileType(results.rows[0].contents));
+          if (err) console.log(err);
+          console.log(result);
+          res.setHeader("Content-Type", result);
+        });
+        //console.log(fileType(results.rows[0].contents));
         //res.setHeader("Content-Type", fileType(results.rows[0].contents).mime);
         res.setHeader("Content-Length", results.rows[0].contents.length);
         //res.writeHeader(200, {
