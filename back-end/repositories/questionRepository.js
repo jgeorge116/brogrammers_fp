@@ -73,7 +73,7 @@ module.exports = class QuestionRepository {
           "author: " +
           username +
           "\n" +
-          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n"
+          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n" +
           "length of media: " +
           media.length +
           "\n" +
