@@ -10,7 +10,7 @@ const client = new cassandra.Client({
   contactPoints: ["192.168.122.50", "192.168.122.49"],
   //   contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1",
-  socketOptions.readTimeout: 0
+  readTimeout: 0
 });
 
 module.exports = class QuestionRepository {
