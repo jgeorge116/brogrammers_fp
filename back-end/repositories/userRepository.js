@@ -105,7 +105,7 @@ module.exports = class UserRepository {
         verificationKey == user_info.verificationKey)
     ) {
       user_info.isVerified = true;
-      user_info.save();
+      await user_info.save();
       return { status: "OK", data: "User verified." };
     }
     return {
@@ -133,7 +133,7 @@ module.exports = class UserRepository {
     }
     var verified_user = found_user.isVerified;
     if (!verified_user) {
-      await this.send_verification(username);
+      //await this.send_verification(username);
       return { status: "error", data: "Not verified" };
     }
     const check_password = await hash.verifyPassword(
