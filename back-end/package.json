@@ -30,6 +30,7 @@
     "formidable": "^1.2.1",
     "helmet": "^3.15.1",
     "jsonwebtoken": "^8.5.0",
+    "mmmagic": "^0.5.3",
     "mongoose": "^5.4.19",
     "morgan": "^1.9.1",
     "nodemailer": "^5.1.1",

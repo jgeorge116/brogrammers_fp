@@ -7,6 +7,9 @@ const fs = require("fs");
 const cassandra = require("cassandra-driver");
 const fileType = require("file-type");
 const uuidv4 = require("uuid/v4");
+const mmm = require('mmmagic');
+const Magic = mmm.Magic;
+const magic = new Magic(mmm.MAGIC_MIME_TYPE);
 const client = new cassandra.Client({
   contactPoints: ["192.168.122.50", "192.168.122.49"],
   // contactPoints: ["127.0.0.1"],
@@ -29,6 +32,7 @@ exports.add_media = async function(req, res) {
       res.status(400).send({ status: "error", error: "Invalid JWT" });
     } else {
       const username = jwt.username;
+      console.log(req.headers);
       if (!username) {
         console.log("Missing username");
         res.status(400).send({ status: "error", error: "Missing something" });
@@ -105,7 +109,13 @@ exports.get_media_by_id = function(req, res) {
           .send({ status: "error", error: "Media does not exist" })
           .end();
       } else {
-        res.setHeader("Content-Type", fileType(results.rows[0].contents).mime);
+        magic.detect(Buffer.from(results.rows[0].contents), function(err, result) {
+      if (err) throw err;
+      console.log(result);
+      // output: Python script, ASCII text executable
+  });
+        console.log(fileType(results.rows[0].contents));
+        //res.setHeader("Content-Type", fileType(results.rows[0].contents).mime);
         res.setHeader("Content-Length", results.rows[0].contents.length);
         //res.writeHeader(200, {
         //  "Content-Type": fileType(results.rows[0].contents).mime,
