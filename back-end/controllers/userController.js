@@ -60,6 +60,7 @@ exports.resend_verification = async function(req, res) {
 exports.getUserInfo = async (req, res) => {
   let result = await UR.getUserInfo(req.params.id);
   if (result.status == "error") {
+    console.log(`Getting user failed because of ${result.data}`);
     res.status(400).send({ status: result.status, error: result.data });
   } else {
     res.send({ status: result.status, user: result.data });
