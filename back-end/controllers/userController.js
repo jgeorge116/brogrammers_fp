@@ -22,6 +22,7 @@ exports.verify = async function(req, res) {
     res.status(400).send({ status: result.status, error: result.data });
   } else {
     res.send({ status: result.status });
+    console.log(`Successfully verified ${req.body.email}`);
   }
 };
 
@@ -34,6 +35,7 @@ exports.login = async function(req, res) {
   }
   if (result.status == "error") {
     res.status(400).send({ status: result.status, error: result.data });
+    console.log(`User ${req.body.username} failed login due to: ${result.data}`);
   } else {
     res.send({ status: result.status });
   }
