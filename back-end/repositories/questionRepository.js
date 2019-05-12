@@ -13,6 +13,10 @@ const client = new cassandra.Client({
   readTimeout: 0
 });
 
+const { Client } = require('@elastic/elasticsearch')
+const eclient = new Client({ node: 'http://192.168.122.49:9200' })
+
+
 module.exports = class QuestionRepository {
   /**
    * Creates a question associated with a username
@@ -110,7 +114,7 @@ module.exports = class QuestionRepository {
     // console.log(
     //   `~~~~~ add question finished with no errors \n with ID of ${new_id}`
     // );
-
+      const time = Date.now() / 1000;
     const new_question = new QuestionModel({
       id: new_id,
       username: username,
@@ -118,15 +122,31 @@ module.exports = class QuestionRepository {
       body: body,
       tags: tags,
       media: media,
-      timestamp: Date.now() / 1000
+      timestamp: time
     });
-    await new_question.save();
-    // Add to elastic search too
-    // await elastic.create({index: "searchIndex"});
-    return {
-      status: "OK",
-      data: new_id
-    };
+      await new_question.save();
+      await eclient.index({
+	  index: 'questions',
+	  type: 'question',
+	  id: new_id,
+	  body: {
+	      id: new_id,
+	      username: username,
+	      title: title,
+	      body: body,
+	      tags: tags,
+	      media: media,
+	      accepted_answer_id: null,
+	      timestamp: time * 1000
+	  },
+	  refresh: true
+      });
+      // Add to elastic search too
+      // await elastic.create({index: "searchIndex"});
+      return {
+	  status: "OK",
+	  data: new_id
+      };
   }
 
   /**
@@ -257,25 +277,28 @@ module.exports = class QuestionRepository {
     tags = tags ? tags : null;
     has_media = has_media ? true : false;
 
-    var search_results;
+    //var search_results;
     let query = {
       "size": search_limit,
       "range": {
         "timestamp": {"lte": search_timestamp}
       },
-      "multi_match": {
-        "query": search_q, 
-        "fields": ["title", "body"]
-      }
+      "query": {
+         "multi_match": {
+           "query": search_q, 
+           "fields": ["title", "body"]
+         }
+       }
     };
     const accepted_exists = search_accepted ? {"exists": {"field": "accepted_answer_id"}} : null;
     const media_exists = has_media ? {"exists": {"field": "media"}} : null;
+    console.log(tags);
     const tags_array = tags.map(function(value) {
       return {
         "term": {"tags": value}
       };
     });
-    // Use the must (and) clause to search for accepted answer, media, and or tags
+    /* // Use the must (and) clause to search for accepted answer, media, and or tags
     const must_array = [];
     if (accepted_exists) {
       must_array.push(accepted_exists);
@@ -287,18 +310,55 @@ module.exports = class QuestionRepository {
       must_array.push(...tags_array);
     }
     query.bool = {"must": must_array};
-    // Sort
-    if (sort_by === "timestamp") {
-      query.sort = [
-        {"timestamp": {"order": "desc"}}
-      ];
-    } else {
-      query.sort = [
-        {"score": {"order": "desc"}}
-      ];
-    }
-    const search_results = await QuestionModel.search(query);
-    /*
+      // Sort
+      if (sort_by === "timestamp") {
+	  query.sort = [
+              {"timestamp": {"order": "desc"}}
+	  ];
+      } else {
+	  query.sort = [
+              {"score": {"order": "desc"}}
+	  ];
+      }*/
+      //console.log(`Query multi_match ${query.query.multi_match.fields}`);
+      //console.log(`Query bool must ${query.bool.must}`);
+      //console.log(query);
+      const search_results = await eclient.search(
+	  {
+	      index: 'questions',
+	      body: {"size": 3,
+		     "query": {
+			 "bool": {
+			     "must": [
+				 {"multi_match" : {
+				     "query" : "",
+				     "fields" : [ "title", "body" ] 
+				 }
+				 },
+				 {
+				     "range" : {
+					 "timestamp": {
+					     "lte": 1557701017291
+					 }
+				     }
+				 }
+				 
+			 ]//, "filter": [{"range" : {
+			   //  "timestamp": {
+			//	 "lte": '1557694331.355'
+			 //    }
+			// }
+				      // }]
+			 
+		    }
+		     
+		     }
+		    }
+	  }
+      );
+      console.log(search_results.body.hits.hits);
+      //const search_results = await QuestionModel.search({query_string: {query: 'john'}}, {hydrate: true});
+      /*
     let query = { timestamp: { $lte: search_timestamp } };
     if (search_q) query.$text = { $search: search_q };
     //   console.log(query);
