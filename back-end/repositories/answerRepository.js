@@ -136,9 +136,8 @@ module.exports = class AnswerRepository {
    */
   async get_user_answers(username) {
     let found_answers = await AnswerModel.find({ username: username });
-    if (found_answers.length == 0)
-      return { status: "error", data: "User has not posted answers yet!" };
     let all_answers = [];
+    if (found_answers.length == 0) return { status: "OK", data: all_answers };
     found_answers.forEach(ans => all_answers.push(ans.id));
     return { status: "OK", data: all_answers };
   }
