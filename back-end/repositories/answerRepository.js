@@ -63,6 +63,27 @@ module.exports = class AnswerRepository {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
+        if (results2.rowLength == 0) {
+          console.log(
+        '"FAILURE ANSWER CREATE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
+          "author: " +
+          username +
+          "\n" +
+          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n" +
+          "length of media: " +
+          media.length +
+          "\n" +
+          `all the media: ${media}` +
+          "\n" +
+          "id : " +
+          new_id +
+          "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
+      );
+          return {
+            status: "error",
+            data: "Media does not exist"
+          }
+        }
         if (results2.rows[0].username != username) {
           return {
             status: "error",
