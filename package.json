@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^7.0.0",
     "amqplib": "^0.5.3",
     "concurrently": "^4.1.0"
   },

@@ -12,6 +12,10 @@ const client = new cassandra.Client({
   localDataCenter: "datacenter1",
   readTimeout: 0
 });
+const { Client } = require("@elastic/elasticsearch");
+const elastic = new Client({ 
+  node: "192.168.122.49:9200"
+});
 
 module.exports = class QuestionRepository {
   /**
@@ -121,6 +125,8 @@ module.exports = class QuestionRepository {
       timestamp: Date.now() / 1000
     });
     await new_question.save();
+    // Add to elastic search too
+    await elastic.create({index: "searchIndex"});
     return {
       status: "OK",
       data: new_id
