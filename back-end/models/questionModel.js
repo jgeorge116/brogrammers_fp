@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 
 var QuestionModelSchema = new Schema(
   {
-    id: { type: String, es_indexed: true},
+    id: { type: String },
     username: String,
-    title: { type: String, es_indexed: true },
-    body: { type: String, es_indexed: true },
+    title: { type: String },
+    body: { type: String },
     score: { type: Number, default: 0 },
     tags: { type: [String], default: [] },
     media: { type: [String], default: [] },
