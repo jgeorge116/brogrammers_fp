@@ -135,6 +135,12 @@ module.exports = class AnswerRepository {
    * @param {String} username
    */
   async get_user_answers(username) {
+    const found_user = await UserModel.findOne({
+      username: username
+    });
+    if (!found_user) {
+      return { status: "error", data: "User does not exit"};
+    }
     let found_answers = await AnswerModel.find({ username: username });
     let all_answers = [];
     if (found_answers.length == 0) return { status: "OK", data: all_answers };
