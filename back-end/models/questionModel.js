@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 var QuestionModelSchema = new Schema(
   {
-    id: String,
+    id: { type: String, es_indexed: true},
     username: String,
     title: { type: String, es_indexed: true },
     body: { type: String, es_indexed: true },
