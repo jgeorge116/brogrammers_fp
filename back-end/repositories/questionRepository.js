@@ -7,7 +7,7 @@ const UpvoteModel = require("../models/upvoteModel");
 const uuidv4 = require("uuid/v4");
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
-  contactPoints: ["192.168.122.50", "192.168.122.49"],
+  contactPoints: ["192.168.122.50"], //, "192.168.122.49"],
   //   contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1",
   readTimeout: 0
@@ -61,7 +61,7 @@ module.exports = class QuestionRepository {
     // console.log("author: " + username);
     const new_id = uuidv4();
     if (media) {
-   
+
 
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
