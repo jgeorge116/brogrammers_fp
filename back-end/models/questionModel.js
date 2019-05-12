@@ -19,7 +19,11 @@ var QuestionModelSchema = new Schema(
 QuestionModelSchema.set("collection", "questions");
 // QuestionModelSchema.index({title:'text',body:'text'});
 QuestionModelSchema.plugin(mongoosastic, {
-  host: "192.168.122.49:9200"
+  host: "192.168.122.49",
+  port: 9200
 });
 
-module.exports = mongoose.model("QuestionModel", QuestionModelSchema);
+var questionModel = mongoose.model("QuestionModel", QuestionModelSchema);
+//module.exports = mongoose.model("QuestionModel", QuestionModelSchema);
+module.exports = questionModel;
+
