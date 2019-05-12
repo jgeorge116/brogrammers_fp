@@ -12,10 +12,6 @@ const client = new cassandra.Client({
   localDataCenter: "datacenter1",
   readTimeout: 0
 });
-const { Client } = require("@elastic/elasticsearch");
-const elastic = new Client({ 
-  node: "192.168.122.49:9200"
-});
 
 module.exports = class QuestionRepository {
   /**
@@ -126,7 +122,7 @@ module.exports = class QuestionRepository {
     });
     await new_question.save();
     // Add to elastic search too
-    await elastic.create({index: "searchIndex"});
+    // await elastic.create({index: "searchIndex"});
     return {
       status: "OK",
       data: new_id
@@ -409,6 +405,7 @@ module.exports = class QuestionRepository {
         console.log("finished deleting media");
       });
     await AnswerModel.deleteMany({ question_id: id });
+    await found_question.remove(); // remove for elastic search
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };
   }
