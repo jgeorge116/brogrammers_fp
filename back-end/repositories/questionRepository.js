@@ -258,6 +258,47 @@ module.exports = class QuestionRepository {
     has_media = has_media ? true : false;
 
     var search_results;
+    let query = {
+      "size": search_limit,
+      "range": {
+        "timestamp": {"lte": search_timestamp}
+      },
+      "multi_match": {
+        "query": search_q, 
+        "fields": ["title", "body"]
+      }
+    };
+    const accepted_exists = search_accepted ? {"exists": {"field": "accepted_answer_id"}} : null;
+    const media_exists = has_media ? {"exists": {"field": "media"}} : null;
+    const tags_array = tags.map(function(value) {
+      return {
+        "term": {"tags": value}
+      };
+    });
+    // Use the must (and) clause to search for accepted answer, media, and or tags
+    const must_array = [];
+    if (accepted_exists) {
+      must_array.push(accepted_exists);
+    }
+    if (media_exists) {
+      must_array.push(media_exists);
+    }
+    if (tags) {
+      must_array.push(...tags_array);
+    }
+    query.bool = {"must": must_array};
+    // Sort
+    if (sort_by === "timestamp") {
+      query.sort = [
+        {"timestamp": {"order": "desc"}}
+      ];
+    } else {
+      query.sort = [
+        {"score": {"order": "desc"}}
+      ];
+    }
+    const search_results = await QuestionModel.search(query);
+    /*
     let query = { timestamp: { $lte: search_timestamp } };
     if (search_q) query.$text = { $search: search_q };
     //   console.log(query);
@@ -284,7 +325,7 @@ module.exports = class QuestionRepository {
       })
         .limit(parsed_int)
         .sort({ score: { $meta: "textScore" } });
-    }
+    }*/
     var all_questions = [];
     for (var result in search_results) {
       var question_info = await this.question_to_api_format(
