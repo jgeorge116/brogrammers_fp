@@ -173,7 +173,7 @@ module.exports = class QuestionRepository {
         question_id: id,
         ip: info.query
       });
-      new_view.save();
+      await new_view.save();
     } else {
       // Don't increment if there is a view with this username
       const find_view = await ViewQuestionModel.findOne({
@@ -186,7 +186,7 @@ module.exports = class QuestionRepository {
         question_id: id,
         username: info.query
       });
-      new_view.save();
+      await new_view.save();
     }
   }
 
