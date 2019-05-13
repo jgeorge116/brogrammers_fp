@@ -455,20 +455,18 @@ module.exports = class QuestionRepository {
     if (found_upvote && found_upvote.value === upvote) {
 	console.log("type 1");
       new_score = new_score - upvote;
-      await UpvoteModel.update(
+      await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
           username: username,
           type: "question"
         },
-        { value: 0 },
-        { multi: true }
+        { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.update(
+        await UserModel.updateMany(
           { username: found_question.username },
-          { $inc: { reputation: -upvote } },
-          { multi: true }
+          { $inc: { reputation: -upvote } }
         );
       }
     } else if (found_upvote) {
@@ -479,21 +477,19 @@ module.exports = class QuestionRepository {
 	} else {
 	      new_score = new_score + upvote + upvote;
 	}
-      await UpvoteModel.update(
+      await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
           username: username,
           type: "question"
         },
-        { value: upvote },
-        { multi: true }
+        { value: upvote }
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.update(
+        await UserModel.updateMany(
           { username: found_question.username },
-          { $inc: { reputation: upvote } },
-          { multi: true }
+          { $inc: { reputation: upvote } }
         );
       }
     } else {
@@ -508,17 +504,15 @@ module.exports = class QuestionRepository {
       await new_upvote.save();
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.update(
+        await UserModel.updateMany(
           { username: found_question.username },
-          { $inc: { reputation: upvote } },
-          { multi: true }
+          { $inc: { reputation: upvote } }
         );
       }
     }
-    await QuestionModel.update(
+    await QuestionModel.updateMany(
       { id: questionID },
-      { $set: {score: new_score} },
-      { multi: true }
+      { $set: {score: new_score} }
     );
     return { status: "OK" };
   }
