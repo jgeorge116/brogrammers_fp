@@ -457,6 +457,7 @@ module.exports = class QuestionRepository {
     var new_score = found_question.score;
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
+	console.log("type 1");
       new_score = new_score - upvote;
       await UpvoteModel.updateOne(
         {
@@ -475,7 +476,11 @@ module.exports = class QuestionRepository {
     } else if (found_upvote) {
       //   console.log("votes changed");
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-      new_score = new_score + upvote + upvote;
+	if (found_upvote.value === 0) {
+		new_score = new_score + upvote;
+	} else {
+	      new_score = new_score + upvote + upvote;
+	}
       await UpvoteModel.updateOne(
         {
           question_id: found_upvote.question_id,
