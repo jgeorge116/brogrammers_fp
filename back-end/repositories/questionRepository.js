@@ -399,7 +399,7 @@ module.exports = class QuestionRepository {
         console.log("finished deleting media");
       });
     await AnswerModel.deleteMany({ question_id: id });
-    await QuestionModel.deleteOne({ id: id });
+    await QuestionModel.deleteMany({ id: id });
     return { status: "OK", data: "Success" };
   }
 
