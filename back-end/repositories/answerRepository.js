@@ -197,20 +197,18 @@ module.exports = class AnswerRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.update(
+      await UpvoteModel.updateMany(
         {
           answer_id: found_upvote.answer_id,
           username: username,
           type: "answer"
         },
-        { value: 0 },
-        { multi: true }
+        { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.update(
+        await UserModel.updateMany(
           { username: found_answer.username },
-          { $inc: { reputation: -upvote } },
-          { multi: true }
+          { $inc: { reputation: -upvote } }
         );
       }
     }
@@ -218,21 +216,19 @@ module.exports = class AnswerRepository {
     else if (found_upvote) {
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
 
-      await UpvoteModel.update(
+      await UpvoteModel.updateMany(
         {
           answer_id: found_upvote.answer_id,
           username: username,
           type: "answer"
         },
-        { value: upvote },
-        { multi: true }
+        { value: upvote }
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.update(
+        await UserModel.updateMany(
           { username: found_answer.username },
-          { $inc: { reputation: upvote } },
-          { multi: true }
+          { $inc: { reputation: upvote } }
         );
       }
     } else {
@@ -246,10 +242,9 @@ module.exports = class AnswerRepository {
       await new_upvote.save();
       // Set reputation of answerer unless it goes below 1
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.update(
+        await UserModel.updateMany(
           { username: found_answer.username },
-          { $inc: { reputation: upvote } },
-          { multi: true }
+          { $inc: { reputation: upvote } }
         );
       }
     }
@@ -278,11 +273,10 @@ module.exports = class AnswerRepository {
       return { status: "error" };
     }
     // Update the answer and question models
-    await AnswerModel.update({ id: answerID }, { is_accepted: true }, { multi: true });
-    await QuestionModel.update(
+    await AnswerModel.updateMany({ id: answerID }, { is_accepted: true });
+    await QuestionModel.updateMany(
       { id: found_question.id },
-      { accepted_answer_id: answerID },
-      { multi: true }
+      { accepted_answer_id: answerID }
     );
     return { status: "OK" };
   }
