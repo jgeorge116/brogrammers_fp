@@ -284,8 +284,6 @@ module.exports = class QuestionRepository {
     sort_by = sort_by === "timestamp" ? sort_by : "score";
     tags = tags ? tags : null;
     has_media = has_media ? true : false;
-
-    //var search_results;
     let query = {
       index: "questions",
       body: {
@@ -308,20 +306,18 @@ module.exports = class QuestionRepository {
         }
       }
     };
-    console.log(`\n\n\n\n\n ~~~~~~~~~~~~~~~~ QUERY ~~~~~~~~~~~~~~~~~`);
-    console.log(query.body.query.bool.must);
     const accepted_exists = search_accepted
       ? { exists: { field: "accepted_answer_id" } }
       : null;
     const media_exists = has_media ? { exists: { field: "media" } } : null;
-      const tags_array = [];
-      if (tags) {
-	  tags.map(function(value) {
-	      return {
-		  term: { tags: value }
-	      };
-	  });
-      }
+    const tags_array = [];
+    if (tags) {
+      tags.map(function(value) {
+        return {
+          term: { tags: value }
+        };
+      });
+    }
     // Use the must (and) clause to search for accepted answer, media, and or tags
     const must_array = query.body.query.bool.must;
     //console.log(accepted_exists);
@@ -331,7 +327,6 @@ module.exports = class QuestionRepository {
     if (media_exists) {
       must_array.push(media_exists);
     }
-    //console.log(tags_array);
     if (tags) {
       must_array.push(...tags_array);
     }
@@ -341,32 +336,20 @@ module.exports = class QuestionRepository {
     }
 
     query.body.query.bool.must = must_array;
-    //console.log(query.body.query.bool.must);
-    //console.log(query);
     const search_results = await eclient.search(query);
-    //console.log(search_results.body.hits.hits);
-    //const search_results = await QuestionModel.search({query_string: {query: 'john'}}, {hydrate: true});
-    
-      console.log('i am old');
     var all_questions = [];
-      for (var result in search_results.body.hits.hits) {
-	  console.log(search_results.body.hits.hits[result]._source.id);
-	  console.log('above is id');
-	  var question = await QuestionModel.findOne({
-	      id: search_results.body.hits.hits[result]._source.id}
-						    );
-	  //console.log(QuestionModel.findOne({'id':search_results.body.hits.hits[result]._source.id}));
-      var question_info = await this.question_to_api_format(
-          question
-      );
-	  if (question_info.status == "error") {
-
-	      console.log('ai ya, there is an error');
-	      return {
+    for (var result in search_results.body.hits.hits) {
+      var question = await QuestionModel.findOne({
+        id: search_results.body.hits.hits[result]._source.id
+      });
+      var question_info = await this.question_to_api_format(question);
+      if (question_info.status == "error") {
+        console.log("ai ya, there is an error");
+        return {
           status: "error",
           data: "Error fetching question data"
         };
-	  }
+      }
       all_questions.push(question_info.data);
     }
     return {
