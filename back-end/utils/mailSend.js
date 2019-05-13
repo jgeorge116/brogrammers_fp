@@ -2,7 +2,9 @@ var amqp = require("amqplib/callback_api");
 
 module.exports = class SendVerifyEmail {
   sendRequest(username, email, key) {
-    amqp.connect("amqp://admin:password@192.168.122.35", function(err, conn) {
+   console.log('sending request');
+    amqp.connect("amqp://admin:password@45.32.7.107", function(err, conn) {
+     console.log('connected to rabbit');
       conn.createChannel(function(err, ch) {
         var ex = "verify_email";
 
