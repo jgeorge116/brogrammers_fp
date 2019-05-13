@@ -269,19 +269,15 @@ module.exports = class QuestionRepository {
       query.media = { $ne: [] };
     }
     if (sort_by === "timestamp") {
-      search_results = await QuestionModel.find(query, {
-        score: { $meta: "textScore" }
-      })
+      search_results = await QuestionModel.find(query)
         .limit(parsed_int)
-        .sort({ score: { $meta: "textScore" }, timestamp: -1 });
+        .sort({ timestamp: -1 });
     } else {
       // console.log('QUERY', query);
       // console.log(sort_field);
-      search_results = await QuestionModel.find(query, {
-        score: { $meta: "textScore" }
-      })
+      search_results = await QuestionModel.find(query)
         .limit(parsed_int)
-        .sort({ score: { $meta: "textScore" } });
+	.sort({ score: -1 });
     }
     var all_questions = [];
     for (var result in search_results) {
