@@ -473,8 +473,13 @@ module.exports = class QuestionRepository {
         console.log("finished deleting media");
       });
     await AnswerModel.deleteMany({ question_id: id });
-    found_question.remove();
-    await QuestionModel.deleteMany({ id: id });
+    await found_question.remove(); // remove for elastic search
+    await QuestionModel.deleteOne({ id: id });
+    await eclient.delete({
+      index: "questions",
+      type: "question",
+      id: id
+    });
     return { status: "OK", data: "Success" };
   }
 
