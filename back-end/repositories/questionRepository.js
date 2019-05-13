@@ -294,7 +294,7 @@ module.exports = class QuestionRepository {
         query: {
           bool: {
             must: [
-              search_input,
+              query_input,
 
               {
                 range: {
@@ -314,21 +314,24 @@ module.exports = class QuestionRepository {
       ? { exists: { field: "accepted_answer_id" } }
       : null;
     const media_exists = has_media ? { exists: { field: "media" } } : null;
-    const tags_array = tags.map(function(value) {
-      return {
-        term: { tags: value }
-      };
-    });
+      const tags_array = [];
+      if (tags) {
+	  tags.map(function(value) {
+	      return {
+		  term: { tags: value }
+	      };
+	  });
+      }
     // Use the must (and) clause to search for accepted answer, media, and or tags
     const must_array = query.body.query.bool.must;
-    console.log(accepted_exists);
+    //console.log(accepted_exists);
     if (accepted_exists) {
       must_array.push(accepted_exists);
     }
     if (media_exists) {
       must_array.push(media_exists);
     }
-    console.log(tags_array);
+    //console.log(tags_array);
     if (tags) {
       must_array.push(...tags_array);
     }
@@ -338,49 +341,32 @@ module.exports = class QuestionRepository {
     }
 
     query.body.query.bool.must = must_array;
-    console.log(query.body.query.bool.must);
-    console.log(query);
+    //console.log(query.body.query.bool.must);
+    //console.log(query);
     const search_results = await eclient.search(query);
-    console.log(search_results.body.hits.hits);
+    //console.log(search_results.body.hits.hits);
     //const search_results = await QuestionModel.search({query_string: {query: 'john'}}, {hydrate: true});
-    /*
-    let query = { timestamp: { $lte: search_timestamp } };
-    if (search_q) query.$text = { $search: search_q };
-    //   console.log(query);
-    if (search_accepted) {
-      query.accepted_answer_id = { $ne: null };
-    }
-    if (tags) {
-      query.tags = tags;
-    }
-    if (has_media) {
-      query.media = { $ne: [] };
-    }
-    if (sort_by === "timestamp") {
-      search_results = await QuestionModel.find(query, {
-        score: { $meta: "textScore" }
-      })
-        .limit(parsed_int)
-        .sort({ score: { $meta: "textScore" }, timestamp: -1 });
-    } else {
-      // console.log('QUERY', query);
-      // console.log(sort_field);
-      search_results = await QuestionModel.find(query, {
-        score: { $meta: "textScore" }
-      })
-        .limit(parsed_int)
-        .sort({ score: { $meta: "textScore" } });
-    }*/
+    
+      console.log('i am old');
     var all_questions = [];
-    for (var result in search_results) {
+      for (var result in search_results.body.hits.hits) {
+	  console.log(search_results.body.hits.hits[result]._source.id);
+	  console.log('above is id');
+	  var question = await QuestionModel.findOne({
+	      id: search_results.body.hits.hits[result]._source.id}
+						    );
+	  //console.log(QuestionModel.findOne({'id':search_results.body.hits.hits[result]._source.id}));
       var question_info = await this.question_to_api_format(
-        search_results[result]
+          question
       );
-      if (question_info.status == "error")
-        return {
+	  if (question_info.status == "error") {
+
+	      console.log('ai ya, there is an error');
+	      return {
           status: "error",
           data: "Error fetching question data"
         };
+	  }
       all_questions.push(question_info.data);
     }
     return {
