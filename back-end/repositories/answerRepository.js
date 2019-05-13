@@ -282,16 +282,22 @@ module.exports = class AnswerRepository {
       { id: found_question.id },
       { accepted_answer_id: answerID }
     );
-
-    await eclient.update({
-      index: "questions",
-      type: "question",
-      id: found_question.id,
-      body: {
-        accepted_answer_id: null
-      },
-      refresh: true
+      console.log(found_question.id);
+      console.log(answerID);
+    eclient.update({
+      "index": "questions",
+      "type": "question",
+	"id": found_question.id,
+	"body": {
+	    doc: {
+		"accepted_answer_id": answerID
+	    }
+	}
+    }, (err, { body }) => {
+	if (err) console.log(err)
     });
+
+      
     return { status: "OK" };
   }
 

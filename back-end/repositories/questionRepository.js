@@ -134,9 +134,9 @@ module.exports = class QuestionRepository {
         body: body,
         tags: tags,
         media: media,
-        accepted_answer_id: null,
         timestamp: time * 1000,
-        score: 0
+          score: 0,
+	  accepted_answer_id: "empty"
       },
       refresh: true
     });
@@ -230,10 +230,13 @@ module.exports = class QuestionRepository {
     tags,
     has_media
   ) {
-    var search_timestamp = timestamp;
-    if (!search_timestamp) {
+      var search_timestamp;
+    if (!timestamp) {
       search_timestamp = new Date().getTime();
+    } else {
+	search_timestamp = timestamp * 1000;
     }
+      console.log(`TIME ${search_timestamp}`);
     if (search_timestamp < 0) {
       return {
         status: "error",
@@ -307,7 +310,7 @@ module.exports = class QuestionRepository {
       }
     };
     const accepted_exists = search_accepted
-      ? { exists: { field: "accepted_answer_id" } }
+      ? { term: { accepted_answer_id: "empty" } }
       : null;
     const media_exists = has_media ? { exists: { field: "media" } } : null;
     const tags_array = [];
@@ -322,7 +325,7 @@ module.exports = class QuestionRepository {
     const must_array = query.body.query.bool.must;
     //console.log(accepted_exists);
     if (accepted_exists) {
-      must_array.push(accepted_exists);
+      query.body.query.bool.must_not = accepted_exists;
     }
     if (media_exists) {
       must_array.push(media_exists);
@@ -335,7 +338,12 @@ module.exports = class QuestionRepository {
       query.body.sort = { timestamp: { order: "desc" } };
     }
 
-    query.body.query.bool.must = must_array;
+      query.body.query.bool.must = must_array;
+      /*console.log('must');
+      console.log(query.body.query.bool.must);
+      console.log('must not below');
+      console.log(query.body.query.bool.must_not);
+      console.log(query.body.query.bool.filter);*/
     const search_results = await eclient.search(query);
     var all_questions = [];
     for (var result in search_results.body.hits.hits) {
