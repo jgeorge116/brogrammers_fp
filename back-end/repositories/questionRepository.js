@@ -321,7 +321,7 @@ module.exports = class QuestionRepository {
     const answer_count = await AnswerModel.countDocuments({
       question_id: format_question.id
     });
-
+    /*
     const upvote_count = await UpvoteModel.countDocuments({
       question_id: format_question.id,
       type: "question",
@@ -334,7 +334,7 @@ module.exports = class QuestionRepository {
       value: -1
     });
 
-    const score = upvote_count - downvote_count;
+    const score = upvote_count - downvote_count;*/
 
     var question = {
       id: format_question.id,
@@ -345,7 +345,7 @@ module.exports = class QuestionRepository {
       },
       title: format_question.title,
       body: format_question.body,
-      score: score,
+      score: format_question.score,
       view_count: view_count,
       answer_count: answer_count,
       timestamp: format_question.timestamp,
@@ -453,8 +453,11 @@ module.exports = class QuestionRepository {
     if (!found_user) {
       return { status: "error" };
     }
+    // Update the score based on conditions
+    var new_score = found_question.score;
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
+      new_score = new_score - upvote;
       await UpvoteModel.updateOne(
         {
           question_id: found_upvote.question_id,
@@ -472,6 +475,7 @@ module.exports = class QuestionRepository {
     } else if (found_upvote) {
       //   console.log("votes changed");
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
+      new_score = new_score + upvote + upvote;
       await UpvoteModel.updateOne(
         {
           question_id: found_upvote.question_id,
@@ -489,6 +493,7 @@ module.exports = class QuestionRepository {
       }
     } else {
       // Create and save upvote
+      new_score = new_score + upvote;
       const new_upvote = new UpvoteModel({
         type: "question",
         username: username,
@@ -504,6 +509,10 @@ module.exports = class QuestionRepository {
         );
       }
     }
+    await QuestionModel.updateOne(
+      { id: questionID },
+      { $set: {score: new_score} }
+    );
     return { status: "OK" };
   }
 
