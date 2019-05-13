@@ -14,7 +14,7 @@ const client = new cassandra.Client({
 });
 
 const { Client } = require("@elastic/elasticsearch");
-const eclient = new Client({ node: "http://192.168.122.49:9200" });
+const eclient = new Client({ node: "http://130.245.170.230:9200" });
 
 module.exports = class QuestionRepository {
   /**
@@ -473,8 +473,8 @@ module.exports = class QuestionRepository {
         console.log("finished deleting media");
       });
     await AnswerModel.deleteMany({ question_id: id });
-    await found_question.remove(); // remove for elastic search
-    await QuestionModel.deleteOne({ id: id });
+    // await found_question.remove(); // remove for elastic search (mongoosastic)
+    await QuestionModel.deleteMany({ id: id });
     await eclient.deleteByQuery({
       index: "questions",
       type: "question",
@@ -538,7 +538,6 @@ module.exports = class QuestionRepository {
     var new_score = found_question.score;
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-	console.log("type 1");
       new_score = new_score - upvote;
       await UpvoteModel.updateMany(
         {

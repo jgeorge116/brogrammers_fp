@@ -13,7 +13,7 @@ const client = new cassandra.Client({
 });
 
 const { Client } = require("@elastic/elasticsearch");
-const eclient = new Client({ node: "http://192.168.122.49:9200" });
+const eclient = new Client({ node: "http://130.245.170.230:9200" });
 
 module.exports = class AnswerRepository {
   /**
