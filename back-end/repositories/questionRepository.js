@@ -135,8 +135,8 @@ module.exports = class QuestionRepository {
         tags: tags,
         media: media,
         accepted_answer_id: null,
-          timestamp: time * 1000,
-	  score: 0
+        timestamp: time * 1000,
+        score: 0
       },
       refresh: true
     });
@@ -264,51 +264,52 @@ module.exports = class QuestionRepository {
     if (!search_q) {
       search_q = "";
     }
-      var query_input = {};
-      if (search_q === "") {
-	  query_input = { match_all:{}};
-      }else {
-	  query_input = {
-              multi_match: {
-                  query: search_q,
-                  fields: ["title", "body"]
+    var query_input = {};
+    if (search_q === "") {
+      query_input = { match_all: {} };
+    } else {
+      query_input = {
+        multi_match: {
+          query: search_q,
+          fields: ["title", "body"]
+        }
+      };
+    }
+    if (typeof search_q !== "string") {
+      return {
+        status: "error",
+        data: "q has to be a string"
+      };
+    }
+    sort_by = sort_by === "timestamp" ? sort_by : "score";
+    tags = tags ? tags : null;
+    has_media = has_media ? true : false;
+
+    //var search_results;
+    let query = {
+      index: "questions",
+      body: {
+        size: search_limit,
+        sort: { score: { order: "desc" } },
+        query: {
+          bool: {
+            must: [
+              search_input,
+
+              {
+                range: {
+                  timestamp: {
+                    lte: search_timestamp
+                  }
+                }
               }
-	  };
-	  if (typeof search_q !== "string") {
-	      return {
-		  status: "error",
-		  data: "q has to be a string"
-	      };
-	  }
-	  sort_by = sort_by === "timestamp" ? sort_by : "score";
-	  tags = tags ? tags : null;
-	  has_media = has_media ? true : false;
-	  
-	  //var search_results;
-	  let query = {
-	index: "questions",
-	body: {
-          size: search_limit,
-	  sort: { score: { order: "desc" } },
-          query: {
-            bool: {
-              must: [
-		  search_input,
-		  
-		  {
-                      range: {
-			  timestamp: {
-			      lte: search_timestamp
-			  }
-                      }
-		  }
-              ]
+            ]
           }
         }
-	}
-	  };
-      console.log(`\n\n\n\n\n ~~~~~~~~~~~~~~~~ QUERY ~~~~~~~~~~~~~~~~~`);
-      console.log(query.body.query.bool.must);
+      }
+    };
+    console.log(`\n\n\n\n\n ~~~~~~~~~~~~~~~~ QUERY ~~~~~~~~~~~~~~~~~`);
+    console.log(query.body.query.bool.must);
     const accepted_exists = search_accepted
       ? { exists: { field: "accepted_answer_id" } }
       : null;
@@ -319,29 +320,29 @@ module.exports = class QuestionRepository {
       };
     });
     // Use the must (and) clause to search for accepted answer, media, and or tags
-      const must_array = query.body.query.bool.must;
-      console.log(accepted_exists);
+    const must_array = query.body.query.bool.must;
+    console.log(accepted_exists);
     if (accepted_exists) {
       must_array.push(accepted_exists);
     }
     if (media_exists) {
       must_array.push(media_exists);
     }
-      console.log(tags_array);
+    console.log(tags_array);
     if (tags) {
       must_array.push(...tags_array);
     }
     // Sort
     if (sort_by === "timestamp") {
-	query.body.sort = { timestamp: { order: "desc" } };
-    } 
-	  
-	  query.body.query.bool.must = must_array;
-	  console.log(query.body.query.bool.must);
-	  console.log(query);
-	  const search_results = await eclient.search(query);
-	  console.log(search_results.body.hits.hits);
-	  //const search_results = await QuestionModel.search({query_string: {query: 'john'}}, {hydrate: true});
+      query.body.sort = { timestamp: { order: "desc" } };
+    }
+
+    query.body.query.bool.must = must_array;
+    console.log(query.body.query.bool.must);
+    console.log(query);
+    const search_results = await eclient.search(query);
+    console.log(search_results.body.hits.hits);
+    //const search_results = await QuestionModel.search({query_string: {query: 'john'}}, {hydrate: true});
     /*
     let query = { timestamp: { $lte: search_timestamp } };
     if (search_q) query.$text = { $search: search_q };
@@ -386,7 +387,7 @@ module.exports = class QuestionRepository {
       status: "OK",
       data: all_questions
     };
-      }
+  }
 
   /**
    * Format a question into the one specified in the doc
