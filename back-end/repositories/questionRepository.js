@@ -475,10 +475,14 @@ module.exports = class QuestionRepository {
     await AnswerModel.deleteMany({ question_id: id });
     await found_question.remove(); // remove for elastic search
     await QuestionModel.deleteOne({ id: id });
-    await eclient.delete({
+    await eclient.deleteByQuery({
       index: "questions",
       type: "question",
-      id: id
+      body: {
+        query: {
+          match: { id: id }
+        }
+      }
     });
     return { status: "OK", data: "Success" };
   }
