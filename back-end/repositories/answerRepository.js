@@ -12,6 +12,9 @@ const client = new cassandra.Client({
   readTimeout: 0
 });
 
+const { Client } = require("@elastic/elasticsearch");
+const eclient = new Client({ node: "http://192.168.122.49:9200" });
+
 module.exports = class AnswerRepository {
   /**
    * Creates an answer authored by the username to a specific
@@ -45,44 +48,45 @@ module.exports = class AnswerRepository {
     }
     const new_id = uuidv4();
     if (media) {
-    //   console.log(
-    //     '"*******************************"' +
-    //       "author: " +
-    //       username +
-    //       "\n" +
-    //       "length of media: " +
-    //       media.length +
-    //       "\n" +
-    //       `all the media: ${media}` +
-    //       "\n" +
-    //       "id: " +
-    //       new_id +
-    //       "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-    //   );
+      //   console.log(
+      //     '"*******************************"' +
+      //       "author: " +
+      //       username +
+      //       "\n" +
+      //       "length of media: " +
+      //       media.length +
+      //       "\n" +
+      //       `all the media: ${media}` +
+      //       "\n" +
+      //       "id: " +
+      //       new_id +
+      //       "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+      //   );
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
         if (results2.rowLength == 0) {
           console.log(
-        '"FAILURE ANSWER CREATE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
-          "author: " +
-          username +
-          "\n" +
-          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n" +
-          "length of media: " +
-          media.length +
-          "\n" +
-          `all the media: ${media}` +
-          "\n" +
-          "id : " +
-          new_id +
-          "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
-      );
+            '"FAILURE ANSWER CREATE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
+              "author: " +
+              username +
+              "\n" +
+              `MEDIA DOES NOT EXIST: ${media[i]}` +
+              "\n" +
+              "length of media: " +
+              media.length +
+              "\n" +
+              `all the media: ${media}` +
+              "\n" +
+              "id : " +
+              new_id +
+              "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
+          );
           return {
             status: "error",
             data: "Media does not exist"
-          }
+          };
         }
         if (results2.rows[0].username != username) {
           return {
@@ -160,7 +164,7 @@ module.exports = class AnswerRepository {
       username: username
     });
     if (!found_user) {
-      return { status: "error", data: "User does not exit"};
+      return { status: "error", data: "User does not exit" };
     }
     let found_answers = await AnswerModel.find({ username: username });
     let all_answers = [];
@@ -278,6 +282,22 @@ module.exports = class AnswerRepository {
       { id: found_question.id },
       { accepted_answer_id: answerID }
     );
+      console.log(found_question.id);
+      console.log(answerID);
+    eclient.update({
+      "index": "questions",
+      "type": "question",
+	"id": found_question.id,
+	"body": {
+	    doc: {
+		"accepted_answer_id": answerID
+	    }
+	}
+    }, (err, { body }) => {
+	if (err) console.log(err)
+    });
+
+      
     return { status: "OK" };
   }
 

@@ -13,6 +13,9 @@ const client = new cassandra.Client({
   readTimeout: 0
 });
 
+const { Client } = require("@elastic/elasticsearch");
+const eclient = new Client({ node: "http://192.168.122.49:9200" });
+
 module.exports = class QuestionRepository {
   /**
    * Creates a question associated with a username
@@ -61,8 +64,6 @@ module.exports = class QuestionRepository {
     // console.log("author: " + username);
     const new_id = uuidv4();
     if (media) {
-
-
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
@@ -70,24 +71,25 @@ module.exports = class QuestionRepository {
         //console.log(results2);
         if (results2.rowLength == 0) {
           console.log(
-        '"FAILURE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
-          "author: " +
-          username +
-          "\n" +
-          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n" +
-          "length of media: " +
-          media.length +
-          "\n" +
-          `all the media: ${media}` +
-          "\n" +
-          "id : " +
-          new_id +
-          "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
-      );
+            '"FAILURE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
+              "author: " +
+              username +
+              "\n" +
+              `MEDIA DOES NOT EXIST: ${media[i]}` +
+              "\n" +
+              "length of media: " +
+              media.length +
+              "\n" +
+              `all the media: ${media}` +
+              "\n" +
+              "id : " +
+              new_id +
+              "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
+          );
           return {
             status: "error",
             data: "Media does not exist"
-          }
+          };
         }
         if (results2.rows[0].username != username) {
           return {
@@ -110,7 +112,7 @@ module.exports = class QuestionRepository {
     // console.log(
     //   `~~~~~ add question finished with no errors \n with ID of ${new_id}`
     // );
-
+    const time = Date.now() / 1000;
     const new_question = new QuestionModel({
       id: new_id,
       username: username,
@@ -118,9 +120,28 @@ module.exports = class QuestionRepository {
       body: body,
       tags: tags,
       media: media,
-      timestamp: Date.now() / 1000
+      timestamp: time
     });
     await new_question.save();
+    await eclient.index({
+      index: "questions",
+      type: "question",
+      id: new_id,
+      body: {
+        id: new_id,
+        username: username,
+        title: title,
+        body: body,
+        tags: tags,
+        media: media,
+        timestamp: time * 1000,
+          score: 0,
+	  accepted_answer_id: "empty"
+      },
+      refresh: true
+    });
+    // Add to elastic search too
+    // await elastic.create({index: "searchIndex"});
     return {
       status: "OK",
       data: new_id
@@ -209,10 +230,13 @@ module.exports = class QuestionRepository {
     tags,
     has_media
   ) {
-    var search_timestamp = timestamp;
-    if (!search_timestamp) {
+      var search_timestamp;
+    if (!timestamp) {
       search_timestamp = new Date().getTime();
+    } else {
+	search_timestamp = timestamp * 1000;
     }
+      console.log(`TIME ${search_timestamp}`);
     if (search_timestamp < 0) {
       return {
         status: "error",
@@ -221,15 +245,14 @@ module.exports = class QuestionRepository {
     }
     // Search limit defaults to 25, and maxes out at 100
     var search_limit = limit;
-    if (!search_limit) {
+    if (!search_limit || search_limit < 1) {
       search_limit = 25;
     }
-    var parsed_int = search_limit;
-    if (parsed_int < 1) parsed_int = 25;
-
-    if (parsed_int > 100) {
-      parsed_int = 100;
+    if (search_limit > 100) {
+      search_limit = 100;
     }
+
+    // check if question is accepted
     var search_accepted = accepted;
     if (!search_accepted) {
       search_accepted = false;
@@ -241,9 +264,19 @@ module.exports = class QuestionRepository {
       };
     }
     var search_q = q;
-    console.log(search_q);
     if (!search_q) {
       search_q = "";
+    }
+    var query_input = {};
+    if (search_q === "") {
+      query_input = { match_all: {} };
+    } else {
+      query_input = {
+        multi_match: {
+          query: search_q,
+          fields: ["title", "body"]
+        }
+      };
     }
     if (typeof search_q !== "string") {
       return {
@@ -254,45 +287,77 @@ module.exports = class QuestionRepository {
     sort_by = sort_by === "timestamp" ? sort_by : "score";
     tags = tags ? tags : null;
     has_media = has_media ? true : false;
+    let query = {
+      index: "questions",
+      body: {
+        size: search_limit,
+        sort: { score: { order: "desc" } },
+        query: {
+          bool: {
+            must: [
+              query_input,
 
-    var search_results;
-    let query = { timestamp: { $lte: search_timestamp } };
-    if (search_q) query.$text = { $search: search_q };
-    //   console.log(query);
-    if (search_accepted) {
-      query.accepted_answer_id = { $ne: null };
+              {
+                range: {
+                  timestamp: {
+                    lte: search_timestamp
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    };
+    const accepted_exists = search_accepted
+      ? { term: { accepted_answer_id: "empty" } }
+      : null;
+    const media_exists = has_media ? { exists: { field: "media" } } : null;
+    const tags_array = [];
+    if (tags) {
+      tags.map(function(value) {
+        return {
+          term: { tags: value }
+        };
+      });
+    }
+    // Use the must (and) clause to search for accepted answer, media, and or tags
+    const must_array = query.body.query.bool.must;
+    //console.log(accepted_exists);
+    if (accepted_exists) {
+      query.body.query.bool.must_not = accepted_exists;
+    }
+    if (media_exists) {
+      must_array.push(media_exists);
     }
     if (tags) {
-      query.tags = tags;
+      must_array.push(...tags_array);
     }
-    if (has_media) {
-      query.media = { $ne: [] };
-    }
+    // Sort
     if (sort_by === "timestamp") {
-      search_results = await QuestionModel.find(query, {
-        score: { $meta: "textScore" }
-      })
-        .limit(parsed_int)
-        .sort({ score: { $meta: "textScore" }, timestamp: -1 });
-    } else {
-      // console.log('QUERY', query);
-      // console.log(sort_field);
-      search_results = await QuestionModel.find(query, {
-        score: { $meta: "textScore" }
-      })
-        .limit(parsed_int)
-        .sort({ score: { $meta: "textScore" } });
+      query.body.sort = { timestamp: { order: "desc" } };
     }
+
+      query.body.query.bool.must = must_array;
+      /*console.log('must');
+      console.log(query.body.query.bool.must);
+      console.log('must not below');
+      console.log(query.body.query.bool.must_not);
+      console.log(query.body.query.bool.filter);*/
+    const search_results = await eclient.search(query);
     var all_questions = [];
-    for (var result in search_results) {
-      var question_info = await this.question_to_api_format(
-        search_results[result]
-      );
-      if (question_info.status == "error")
+    for (var result in search_results.body.hits.hits) {
+      var question = await QuestionModel.findOne({
+        id: search_results.body.hits.hits[result]._source.id
+      });
+      var question_info = await this.question_to_api_format(question);
+      if (question_info.status == "error") {
+        console.log("ai ya, there is an error");
         return {
           status: "error",
           data: "Error fetching question data"
         };
+      }
       all_questions.push(question_info.data);
     }
     return {
@@ -371,8 +436,13 @@ module.exports = class QuestionRepository {
       return { status: "error", data: "Question does not exist!" };
     }
     if (found_question.username != username) {
-      console.log("Author of question: "  + found_question.username + "\n"
-      + "Current user: " + username);
+      console.log(
+        "Author of question: " +
+          found_question.username +
+          "\n" +
+          "Current user: " +
+          username
+      );
       return { status: "error", data: "User must be the original asker!" };
     }
     if (found_question.media) {
@@ -403,6 +473,7 @@ module.exports = class QuestionRepository {
         console.log("finished deleting media");
       });
     await AnswerModel.deleteMany({ question_id: id });
+    await found_question.remove(); // remove for elastic search
     await QuestionModel.deleteOne({ id: id });
     return { status: "OK", data: "Success" };
   }
