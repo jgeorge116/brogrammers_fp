@@ -292,7 +292,8 @@ module.exports = class AnswerRepository {
 	    doc: {
 		"accepted_answer_id": answerID
 	    }
-	}
+  },
+    refresh: true
     });
 
       
