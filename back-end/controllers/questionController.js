@@ -135,7 +135,11 @@ exports.upvote_question = async (req, res) => {
         req.body.upvote,
         token.username
       );
-      res.send({ status: result.status });
+      if (result.status === "error") {
+        res.status(400).send({ status: result.status });
+      } else {
+        res.send({ status: result.status });
+      }
     }
   }
 };
