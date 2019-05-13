@@ -197,18 +197,20 @@ module.exports = class AnswerRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.updateOne(
+      await UpvoteModel.update(
         {
           answer_id: found_upvote.answer_id,
           username: username,
           type: "answer"
         },
-        { value: 0 }
+        { value: 0 },
+        { multi: true }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.update(
           { username: found_answer.username },
-          { $inc: { reputation: -upvote } }
+          { $inc: { reputation: -upvote } },
+          { multi: true }
         );
       }
     }
@@ -216,19 +218,21 @@ module.exports = class AnswerRepository {
     else if (found_upvote) {
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
 
-      await UpvoteModel.updateOne(
+      await UpvoteModel.update(
         {
           answer_id: found_upvote.answer_id,
           username: username,
           type: "answer"
         },
-        { value: upvote }
+        { value: upvote },
+        { multi: true }
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.update(
           { username: found_answer.username },
-          { $inc: { reputation: upvote } }
+          { $inc: { reputation: upvote } },
+          { multi: true }
         );
       }
     } else {
@@ -242,9 +246,10 @@ module.exports = class AnswerRepository {
       await new_upvote.save();
       // Set reputation of answerer unless it goes below 1
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.update(
           { username: found_answer.username },
-          { $inc: { reputation: upvote } }
+          { $inc: { reputation: upvote } },
+          { multi: true }
         );
       }
     }
@@ -273,10 +278,11 @@ module.exports = class AnswerRepository {
       return { status: "error" };
     }
     // Update the answer and question models
-    await AnswerModel.updateOne({ id: answerID }, { is_accepted: true });
-    await QuestionModel.updateOne(
+    await AnswerModel.update({ id: answerID }, { is_accepted: true }, { multi: true });
+    await QuestionModel.update(
       { id: found_question.id },
-      { accepted_answer_id: answerID }
+      { accepted_answer_id: answerID },
+      { multi: true }
     );
     return { status: "OK" };
   }

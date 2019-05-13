@@ -455,18 +455,20 @@ module.exports = class QuestionRepository {
     if (found_upvote && found_upvote.value === upvote) {
 	console.log("type 1");
       new_score = new_score - upvote;
-      await UpvoteModel.updateOne(
+      await UpvoteModel.update(
         {
           question_id: found_upvote.question_id,
           username: username,
           type: "question"
         },
-        { value: 0 }
+        { value: 0 },
+        { multi: true }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.update(
           { username: found_question.username },
-          { $inc: { reputation: -upvote } }
+          { $inc: { reputation: -upvote } },
+          { multi: true }
         );
       }
     } else if (found_upvote) {
@@ -477,13 +479,14 @@ module.exports = class QuestionRepository {
 	} else {
 	      new_score = new_score + upvote + upvote;
 	}
-      await UpvoteModel.updateOne(
+      await UpvoteModel.update(
         {
           question_id: found_upvote.question_id,
           username: username,
           type: "question"
         },
-        { value: upvote }
+        { value: upvote },
+        { multi: true }
       );
 
       if (found_user.reputation + upvote >= 1) {
@@ -504,15 +507,17 @@ module.exports = class QuestionRepository {
       await new_upvote.save();
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.update(
           { username: found_question.username },
-          { $inc: { reputation: upvote } }
+          { $inc: { reputation: upvote } },
+          { multi: true }
         );
       }
     }
-    await QuestionModel.updateOne(
+    await QuestionModel.update(
       { id: questionID },
-      { $set: {score: new_score} }
+      { $set: {score: new_score} },
+      { multi: true }
     );
     return { status: "OK" };
   }
