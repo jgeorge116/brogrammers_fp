@@ -482,7 +482,8 @@ module.exports = class QuestionRepository {
         query: {
           match: { id: id }
         }
-      }
+      },
+      refresh: true
     });
     return { status: "OK", data: "Success" };
   }
