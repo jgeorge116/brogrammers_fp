@@ -120,6 +120,16 @@ module.exports = class AnswerRepository {
       { id: id },
       { $inc: { answer_count: 1 } }
     )
+    await eclient.update({
+      "script" : "ctx._source.answer_count+=1",
+      "index": "questions",
+      "type": "question",
+      "id": found_question.id,
+      "refresh": true
+    }, (err, { body }) => {
+    if (err) console.log(err)
+    });
+
     return { status: "OK", data: new_id };
   }
 
@@ -223,7 +233,8 @@ module.exports = class AnswerRepository {
           "script" : "ctx._source.user.reputation-=1",
           "index": "questions",
           "type": "question",
-          "id": found_answer.question_id
+          "id": found_answer.question_id,
+          "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });
@@ -252,7 +263,8 @@ module.exports = class AnswerRepository {
           "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
-          "id": found_answer.question_id
+          "id": found_answer.question_id,
+	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });
@@ -277,7 +289,8 @@ module.exports = class AnswerRepository {
           "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
-          "id": found_answer.question_id
+          "id": found_answer.question_id,
+	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });

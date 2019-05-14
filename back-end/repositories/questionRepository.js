@@ -220,7 +220,8 @@ module.exports = class QuestionRepository {
       "script": "ctx._source.view_count+=1",
       "index": "questions",
       "type": "question",
-      "id": id
+      "id": id,
+      "refresh": true
     });
   }
 
@@ -542,7 +543,7 @@ module.exports = class QuestionRepository {
    * @param {Boolean} upvote
    * @param {String} username
    */
-  async upvote_question(questionID, upvote, username) {
+   async upvote_question(questionID, upvote, username) {
     const found_question = await QuestionModel.findOne({
       id: questionID
     });
@@ -579,16 +580,11 @@ module.exports = class QuestionRepository {
         );
         
         await eclient.update({
+          "script" : "ctx._source.user.reputation-=1",
           "index": "questions",
           "type": "question",
           "id": found_question.id,
-          "body": {
-            doc: {
-              "user": {
-                "reputation": -upvote
-              }
-            }
-          }
+	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });
@@ -612,16 +608,11 @@ module.exports = class QuestionRepository {
         );
 
         await eclient.update({
+          "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
           "id": found_question.id,
-          "body": {
-            doc: {
-              "user": {
-                "reputation": upvote
-              }
-            }
-          }
+	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });
@@ -643,16 +634,11 @@ module.exports = class QuestionRepository {
         );
 
         await eclient.update({
+          "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
           "id": found_question.id,
-          "body": {
-            doc: {
-              "user": {
-                "reputation": upvote
-              }
-            }
-          }
+	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });
