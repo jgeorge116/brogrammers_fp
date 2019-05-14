@@ -677,7 +677,8 @@ module.exports = class QuestionRepository {
       "id": found_question.id,
       "body": {
         "script": "ctx._source.score="+new_score+";ctx._source.user_reputation+="+new_upvote2
-      }
+      },
+      "refresh": "wait_for"
     });
     return { status: "OK" };
   }
