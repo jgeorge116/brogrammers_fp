@@ -360,7 +360,14 @@ module.exports = class QuestionRepository {
       console.log('must not below');
       console.log(query.body.query.bool.must_not);
       console.log(query.body.query.bool.filter);*/
-    const search_results = await eclient.search(query);
+    try {
+      var search_results = await eclient.search(query);
+    } catch (e) {
+      return { 
+        status: "OK", 
+        data: [] 
+      };
+    }
     var all_questions = [];
     for (var result in search_results.body.hits.hits) {
       /*var question = await QuestionModel.findOne({
