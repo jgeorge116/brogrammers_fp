@@ -115,6 +115,11 @@ module.exports = class AnswerRepository {
       media: media
     });
     await new_answer.save();
+    // Increment the question's answer_count
+    await QuestionModel.updateMany(
+      { id: id },
+      { $inc: { answer_count: 1 } }
+    )
     return { status: "OK", data: new_id };
   }
 
