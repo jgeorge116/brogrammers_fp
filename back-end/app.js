@@ -28,7 +28,7 @@ if (cluster.isMaster) {
   const mongoose = require("mongoose");
   // please so it's easier to switch between testing locally
 //   mongoose.connect("mongodb://127.0.0.1:27017/stackOverflowDB", {
-  mongoose.connect("mongodb://192.168.122.49:27017/stackOverflowDB", {
+  mongoose.connect("mongodb://192.168.122.33:27017/stackOverflowDB", {
     useCreateIndex: true,
     useNewUrlParser: true
   });

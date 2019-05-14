@@ -347,18 +347,33 @@ module.exports = class QuestionRepository {
     const search_results = await eclient.search(query);
     var all_questions = [];
     for (var result in search_results.body.hits.hits) {
-      var question = await QuestionModel.findOne({
+      /*var question = await QuestionModel.findOne({
         id: search_results.body.hits.hits[result]._source.id
-      });
-      var question_info = await this.question_to_api_format(question);
+      });*/
+      var question = search_results.body.hits.hits[result]._source;
+     /* once jeffrey implements some things */
+      question.user = {
+        username: 'i am sammi', // question.username,
+        reputation: 'hi jackie' //question.user_repuation
+      }
+      question.view_count = 5000; // question.view_count
+      question.answer_count = 30000; //question.answer_count
+      if (question.accepted_answer_id == 'empty') {
+        question.accepted_answer_id = null;
+      }
+      if (!question.media) question.media = [];
+      // delete question.user_id
+      delete question.username;
+      // delete question.user_reputation
+      /*var question_info = await this.question_to_api_format(question);
       if (question_info.status == "error") {
         console.log("ai ya, there is an error");
         return {
           status: "error",
           data: "Error fetching question data"
         };
-      }
-      all_questions.push(question_info.data);
+      }*/
+      all_questions.push(question);
     }
     return {
       status: "OK",
