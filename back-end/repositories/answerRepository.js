@@ -218,7 +218,7 @@ module.exports = class AnswerRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           answer_id: found_upvote.answer_id,
           username: username,
@@ -227,7 +227,7 @@ module.exports = class AnswerRepository {
         { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_answer.username },
           { $inc: { reputation: -upvote } }
         );
@@ -248,7 +248,7 @@ module.exports = class AnswerRepository {
     else if (found_upvote) {
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
 
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           answer_id: found_upvote.answer_id,
           username: username,
@@ -258,7 +258,7 @@ module.exports = class AnswerRepository {
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );
@@ -286,7 +286,7 @@ module.exports = class AnswerRepository {
       await new_upvote.save();
       // Set reputation of answerer unless it goes below 1
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );

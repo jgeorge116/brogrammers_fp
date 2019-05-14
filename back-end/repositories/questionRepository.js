@@ -567,7 +567,7 @@ module.exports = class QuestionRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
           username: username,
@@ -576,7 +576,7 @@ module.exports = class QuestionRepository {
         { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: -upvote } }
         );
@@ -596,7 +596,7 @@ module.exports = class QuestionRepository {
     } else if (found_upvote) {
       //   console.log("votes changed");
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
           username: username,
@@ -606,7 +606,7 @@ module.exports = class QuestionRepository {
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
@@ -634,7 +634,7 @@ module.exports = class QuestionRepository {
       await new_upvote.save();
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
