@@ -1,9 +1,11 @@
 # Tempory Fix 
 ## Type this before starting new submission 
 curl -XDELETE 'http://192.168.122.49:9200/questions/question/_query' -d '{"query":{"match_all":{}}' -H 'Content-Type: application/json'
-## Indexing for full text search
+## Indexing for full text search (delete indexes first)
+curl -X DELETE 192.168.122.49:9200/questions
 
 db.questions.createIndex({ title: "text", body: "text" }, { default_language: "none" })
+
 
 # Helpful Tutorials
 

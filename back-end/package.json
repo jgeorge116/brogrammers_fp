@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jgeorge116/brogrammers_fp#readme",
   "dependencies": {
+    "@elastic/elasticsearch": "^7.0.0",
     "amqplib": "^0.5.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",

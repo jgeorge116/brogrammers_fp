@@ -13,7 +13,7 @@ const client = new cassandra.Client({
 });
 
 const { Client } = require("@elastic/elasticsearch");
-const eclient = new Client({ node: "http://192.168.122.49:9200" });
+const eclient = new Client({ node: "http://130.245.170.230:9200" });
 
 module.exports = class AnswerRepository {
   /**
@@ -115,6 +115,23 @@ module.exports = class AnswerRepository {
       media: media
     });
     await new_answer.save();
+    // Increment the question's answer_count
+    await QuestionModel.updateMany(
+      { id: question_id },
+      { $inc: { answer_count: 1 } }
+    )
+    await eclient.update({
+      "index": "questions",
+      "type": "question",
+      "id": question_id,
+      "body": {
+          "script" : "ctx._source.answer_count+=1"
+      },
+      "refresh": true
+    }, (err, { body }) => {
+    if (err) console.log(err)
+    });
+
     return { status: "OK", data: new_id };
   }
 
@@ -179,7 +196,7 @@ module.exports = class AnswerRepository {
    * @param {Boolean} upvote
    * @param {String} username
    */
-  async upvote_answer(answerID, upvote, username) {
+   async upvote_answer(answerID, upvote, username) {
     const found_answer = await AnswerModel.findOne({
       id: answerID
     });
@@ -201,7 +218,7 @@ module.exports = class AnswerRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           answer_id: found_upvote.answer_id,
           username: username,
@@ -210,17 +227,28 @@ module.exports = class AnswerRepository {
         { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_answer.username },
           { $inc: { reputation: -upvote } }
         );
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id,
+          "body": {
+              "script" : "ctx._source.user_reputation-="+upvote
+          },
+          "refresh": true
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     }
     // Upvoting after downvoting or vice versa, deletes previous upvote
     else if (found_upvote) {
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
 
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           answer_id: found_upvote.answer_id,
           username: username,
@@ -230,10 +258,22 @@ module.exports = class AnswerRepository {
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );
+        
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id,
+	  "body": {
+              "script" : "ctx._source.user_reputation+="+upvote
+          },
+	  "refresh": true
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     } else {
       // Create and save upvote
@@ -246,10 +286,22 @@ module.exports = class AnswerRepository {
       await new_upvote.save();
       // Set reputation of answerer unless it goes below 1
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );
+
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id,
+          "body": {
+              "script" : "ctx._source.user_reputation+="+upvote
+          },
+          "refresh": true
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     }
     return { status: "OK" };
@@ -277,14 +329,14 @@ module.exports = class AnswerRepository {
       return { status: "error" };
     }
     // Update the answer and question models
-    await AnswerModel.updateOne({ id: answerID }, { is_accepted: true });
-    await QuestionModel.updateOne(
+    await AnswerModel.updateMany({ id: answerID }, { is_accepted: true });
+    await QuestionModel.updateMany(
       { id: found_question.id },
       { accepted_answer_id: answerID }
     );
       console.log(found_question.id);
       console.log(answerID);
-    eclient.update({
+    await eclient.update({
       "index": "questions",
       "type": "question",
 	"id": found_question.id,
@@ -292,9 +344,8 @@ module.exports = class AnswerRepository {
 	    doc: {
 		"accepted_answer_id": answerID
 	    }
-	}
-    }, (err, { body }) => {
-	if (err) console.log(err)
+  },
+    refresh: true
     });
 
       

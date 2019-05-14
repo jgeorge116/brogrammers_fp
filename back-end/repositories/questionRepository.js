@@ -14,7 +14,7 @@ const client = new cassandra.Client({
 });
 
 const { Client } = require("@elastic/elasticsearch");
-const eclient = new Client({ node: "http://192.168.122.49:9200" });
+const eclient = new Client({ node: "http://130.245.170.230:9200" });
 
 module.exports = class QuestionRepository {
   /**
@@ -123,6 +123,7 @@ module.exports = class QuestionRepository {
       timestamp: time
     });
     await new_question.save();
+    const user = await UserModel.findOne( {username: username});
     await eclient.index({
       index: "questions",
       type: "question",
@@ -135,13 +136,14 @@ module.exports = class QuestionRepository {
         tags: tags,
         media: media,
         timestamp: time * 1000,
-          score: 0,
-	  accepted_answer_id: "empty"
+        score: 0,
+	accepted_answer_id: "empty",
+        user_reputation: user.reputation,
+        answer_count: 0,
+        view_count: 0
       },
       refresh: true
     });
-    // Add to elastic search too
-    // await elastic.create({index: "searchIndex"});
     return {
       status: "OK",
       data: new_id
@@ -194,7 +196,7 @@ module.exports = class QuestionRepository {
         question_id: id,
         ip: info.query
       });
-      new_view.save();
+      await new_view.save();
     } else {
       // Don't increment if there is a view with this username
       const find_view = await ViewQuestionModel.findOne({
@@ -207,8 +209,22 @@ module.exports = class QuestionRepository {
         question_id: id,
         username: info.query
       });
-      new_view.save();
+      await new_view.save();
     }
+    // Increment the view counter
+    await QuestionModel.updateMany(
+      { id: id },
+      { $inc: { view_count: 1 } }
+    )
+    await eclient.update({
+      "index": "questions",
+      "type": "question",
+      "id": id,
+	"body": {
+      		"script": "ctx._source.view_count+=1"
+	},
+      "refresh": true
+    });
   }
 
   /**
@@ -347,18 +363,31 @@ module.exports = class QuestionRepository {
     const search_results = await eclient.search(query);
     var all_questions = [];
     for (var result in search_results.body.hits.hits) {
-      var question = await QuestionModel.findOne({
+      /*var question = await QuestionModel.findOne({
         id: search_results.body.hits.hits[result]._source.id
-      });
-      var question_info = await this.question_to_api_format(question);
+      });*/
+      var question = search_results.body.hits.hits[result]._source;
+      question.user = {
+        username: question.username,
+        reputation: question.user_reputation
+      }
+      question.view_count = question.view_count;
+      question.answer_count = question.answer_count;
+      if (question.accepted_answer_id == 'empty') {
+        question.accepted_answer_id = null;
+      }
+      if (!question.media) question.media = [];
+      delete question.username;
+      delete question.user_reputation
+      /*var question_info = await this.question_to_api_format(question);
       if (question_info.status == "error") {
         console.log("ai ya, there is an error");
         return {
           status: "error",
           data: "Error fetching question data"
         };
-      }
-      all_questions.push(question_info.data);
+      }*/
+      all_questions.push(question);
     }
     return {
       status: "OK",
@@ -380,13 +409,13 @@ module.exports = class QuestionRepository {
         data: "User who created question does not exist"
       };
     }
+    /*
     const view_count = await ViewQuestionModel.countDocuments({
       question_id: format_question.id
     });
     const answer_count = await AnswerModel.countDocuments({
       question_id: format_question.id
     });
-
     const upvote_count = await UpvoteModel.countDocuments({
       question_id: format_question.id,
       type: "question",
@@ -399,7 +428,7 @@ module.exports = class QuestionRepository {
       value: -1
     });
 
-    const score = upvote_count - downvote_count;
+    const score = upvote_count - downvote_count;*/
 
     var question = {
       id: format_question.id,
@@ -410,9 +439,9 @@ module.exports = class QuestionRepository {
       },
       title: format_question.title,
       body: format_question.body,
-      score: score,
-      view_count: view_count,
-      answer_count: answer_count,
+      score: format_question.score,
+      view_count: format_question.view_count,
+      answer_count: format_question.answer_count,
       timestamp: format_question.timestamp,
       media: format_question.media,
       tags: format_question.tags,
@@ -473,8 +502,18 @@ module.exports = class QuestionRepository {
         console.log("finished deleting media");
       });
     await AnswerModel.deleteMany({ question_id: id });
-    await found_question.remove(); // remove for elastic search
-    await QuestionModel.deleteOne({ id: id });
+    // await found_question.remove(); // remove for elastic search (mongoosastic)
+    await QuestionModel.deleteMany({ id: id });
+    await eclient.deleteByQuery({
+      index: "questions",
+      type: "question",
+      body: {
+        query: {
+          match: { id: id }
+        }
+      },
+      refresh: true
+    });
     return { status: "OK", data: "Success" };
   }
 
@@ -504,7 +543,7 @@ module.exports = class QuestionRepository {
    * @param {Boolean} upvote
    * @param {String} username
    */
-  async upvote_question(questionID, upvote, username) {
+   async upvote_question(questionID, upvote, username) {
     const found_question = await QuestionModel.findOne({
       id: questionID
     });
@@ -526,7 +565,7 @@ module.exports = class QuestionRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
           username: username,
@@ -535,15 +574,27 @@ module.exports = class QuestionRepository {
         { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: -upvote } }
         );
+        
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_question.id,
+	  "body": {
+	  	"script" : "ctx._source.user_reputation-="+upvote
+          },
+	  "refresh": true
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     } else if (found_upvote) {
       //   console.log("votes changed");
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-      await UpvoteModel.updateOne(
+      await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
           username: username,
@@ -553,10 +604,22 @@ module.exports = class QuestionRepository {
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_question.id,
+          "body": {
+                "script" : "ctx._source.user_reputation+="+upvote
+          },
+          "refresh": true
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
+
       }
     } else {
       // Create and save upvote
@@ -569,10 +632,22 @@ module.exports = class QuestionRepository {
       await new_upvote.save();
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateOne(
+        await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
+
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_question.id,
+          "body": {
+                "script" : "ctx._source.user_reputation+="+upvote
+          },
+          "refresh": true
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     }
     return { status: "OK" };
