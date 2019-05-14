@@ -564,6 +564,7 @@ module.exports = class QuestionRepository {
       return { status: "error" };
     }
     // Upvoting after already upvoting undoes it
+    var new_score = found_question.score;
     if (found_upvote && found_upvote.value === upvote) {
       await UpvoteModel.updateMany(
         {
@@ -573,6 +574,7 @@ module.exports = class QuestionRepository {
         },
         { value: 0 }
       );
+      new_score -= upvote;
       if (found_user.reputation + -upvote >= 1) {
         await UserModel.updateMany(
           { username: found_question.username },
@@ -602,7 +604,11 @@ module.exports = class QuestionRepository {
         },
         { value: upvote }
       );
-
+        if (found_upvote.value === 0) {
+          new_score += upvote;
+        } else {
+          new_score = new_score + upvote + upvote;
+        }
       if (found_user.reputation + upvote >= 1) {
         await UserModel.updateMany(
           { username: found_question.username },
@@ -630,7 +636,7 @@ module.exports = class QuestionRepository {
         value: upvote
       });
       await new_upvote.save();
-
+      new_score += upvote;
       if (found_user.reputation + upvote >= 1) {
         await UserModel.updateMany(
           { username: found_question.username },
@@ -650,6 +656,19 @@ module.exports = class QuestionRepository {
         });
       }
     }
+    await QuestionModel.updateMany(
+      { id: found_question.id },
+      { $set: { score: new_score }}
+    );
+    await eclient.update({
+      "index": "questions",
+      "type": "question",
+      "body": {
+        "doc": {
+          "score": new_score
+        }
+      }
+    });
     return { status: "OK" };
   }
 
