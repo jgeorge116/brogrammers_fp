@@ -236,7 +236,7 @@ module.exports = class AnswerRepository {
           "type": "question",
           "id": found_answer.question_id,
           "body": {
-              "script" : "ctx._source.user.reputation-=1"
+              "script" : "ctx._source.user_reputation-="+upvote
           },
           "refresh": true
         }, (err, { body }) => {
@@ -268,7 +268,7 @@ module.exports = class AnswerRepository {
           "type": "question",
           "id": found_answer.question_id,
 	  "body": {
-              "script" : "ctx._source.user.reputation+=1"
+              "script" : "ctx._source.user_reputation+="+upvote
           },
 	  "refresh": true
         }, (err, { body }) => {
@@ -296,7 +296,7 @@ module.exports = class AnswerRepository {
           "type": "question",
           "id": found_answer.question_id,
           "body": {
-              "script" : "ctx._source.user.reputation+=1"
+              "script" : "ctx._source.user_reputation+="+upvote
           },
           "refresh": true
         }, (err, { body }) => {

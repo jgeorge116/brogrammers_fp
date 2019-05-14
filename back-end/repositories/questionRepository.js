@@ -367,8 +367,6 @@ module.exports = class QuestionRepository {
         id: search_results.body.hits.hits[result]._source.id
       });*/
       var question = search_results.body.hits.hits[result]._source;
-      console.log(question);
-     /* once jeffrey implements some things */
       question.user = {
         username: question.username,
         reputation: question.user_reputation
@@ -586,7 +584,7 @@ module.exports = class QuestionRepository {
           "type": "question",
           "id": found_question.id,
 	  "body": {
-	  	"script" : "ctx._source.user.reputation-=1"
+	  	"script" : "ctx._source.user_reputation-="+upvote
           },
 	  "refresh": true
         }, (err, { body }) => {
@@ -615,7 +613,7 @@ module.exports = class QuestionRepository {
           "type": "question",
           "id": found_question.id,
           "body": {
-                "script" : "ctx._source.user.reputation+=1"
+                "script" : "ctx._source.user_reputation+="+upvote
           },
           "refresh": true
         }, (err, { body }) => {
@@ -644,7 +642,7 @@ module.exports = class QuestionRepository {
           "type": "question",
           "id": found_question.id,
           "body": {
-                "script" : "ctx._source.user.reputation+=1"
+                "script" : "ctx._source.user_reputation+="+upvote
           },
           "refresh": true
         }, (err, { body }) => {
