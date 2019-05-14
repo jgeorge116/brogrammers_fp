@@ -117,14 +117,16 @@ module.exports = class AnswerRepository {
     await new_answer.save();
     // Increment the question's answer_count
     await QuestionModel.updateMany(
-      { id: id },
+      { id: question_id },
       { $inc: { answer_count: 1 } }
     )
     await eclient.update({
-      "script" : "ctx._source.answer_count+=1",
       "index": "questions",
       "type": "question",
-      "id": found_question.id,
+      "id": question_id,
+      "body": {
+          "script" : "ctx._source.answer_count+=1"
+      },
       "refresh": true
     }, (err, { body }) => {
     if (err) console.log(err)
@@ -230,10 +232,12 @@ module.exports = class AnswerRepository {
           { $inc: { reputation: -upvote } }
         );
         await eclient.update({
-          "script" : "ctx._source.user.reputation-=1",
           "index": "questions",
           "type": "question",
           "id": found_answer.question_id,
+          "body": {
+              "script" : "ctx._source.user.reputation-=1"
+          },
           "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
@@ -260,10 +264,12 @@ module.exports = class AnswerRepository {
         );
         
         await eclient.update({
-          "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
           "id": found_answer.question_id,
+	  "body": {
+              "script" : "ctx._source.user.reputation+=1"
+          },
 	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
@@ -286,11 +292,13 @@ module.exports = class AnswerRepository {
         );
 
         await eclient.update({
-          "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
           "id": found_answer.question_id,
-	  "refresh": true
+          "body": {
+              "script" : "ctx._source.user.reputation+=1"
+          },
+          "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });

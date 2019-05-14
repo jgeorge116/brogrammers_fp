@@ -217,10 +217,12 @@ module.exports = class QuestionRepository {
       { $inc: { view_count: 1 } }
     )
     await eclient.update({
-      "script": "ctx._source.view_count+=1",
       "index": "questions",
       "type": "question",
       "id": id,
+	"body": {
+      		"script": "ctx._source.view_count+=1"
+	},
       "refresh": true
     });
   }
@@ -580,10 +582,12 @@ module.exports = class QuestionRepository {
         );
         
         await eclient.update({
-          "script" : "ctx._source.user.reputation-=1",
           "index": "questions",
           "type": "question",
           "id": found_question.id,
+	  "body": {
+	  	"script" : "ctx._source.user.reputation-=1"
+          },
 	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
@@ -606,16 +610,18 @@ module.exports = class QuestionRepository {
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
-
         await eclient.update({
-          "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
           "id": found_question.id,
-	  "refresh": true
+          "body": {
+                "script" : "ctx._source.user.reputation+=1"
+          },
+          "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });
+
       }
     } else {
       // Create and save upvote
@@ -634,11 +640,13 @@ module.exports = class QuestionRepository {
         );
 
         await eclient.update({
-          "script" : "ctx._source.user.reputation+=1",
           "index": "questions",
           "type": "question",
           "id": found_question.id,
-	  "refresh": true
+          "body": {
+                "script" : "ctx._source.user.reputation+=1"
+          },
+          "refresh": true
         }, (err, { body }) => {
         if (err) console.log(err)
         });
