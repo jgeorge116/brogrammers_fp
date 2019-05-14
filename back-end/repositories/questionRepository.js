@@ -220,7 +220,8 @@ module.exports = class QuestionRepository {
       "script": "ctx._source.view_count+=1",
       "index": "questions",
       "type": "question",
-      "id": id
+      "id": id,
+      refresh: true
     });
   }
 
