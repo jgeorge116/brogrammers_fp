@@ -572,7 +572,7 @@ module.exports = class QuestionRepository {
     }
     // Upvoting after already upvoting undoes it
     var new_score = found_question.score;
-    var new_upvote = 0;
+    var new_upvote2 = 0;
     if (found_upvote && found_upvote.value === upvote) {
       await UpvoteModel.updateMany(
         {
@@ -600,7 +600,7 @@ module.exports = class QuestionRepository {
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE QUESTION IF", err)
         });*/
-        new_upvote = -upvote;
+        new_upvote2 = -upvote;
       }
     } else if (found_upvote) {
       //   console.log("votes changed");
@@ -635,7 +635,7 @@ module.exports = class QuestionRepository {
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE IF", err)
         });*/
-        new_upvote = upvote;
+        new_upvote2 = upvote;
       }
     } else {
       // Create and save upvote
@@ -664,7 +664,7 @@ module.exports = class QuestionRepository {
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE", err)
         });*/
-        new_upvote = upvote;
+        new_upvote2 = upvote;
       }
     }
     await QuestionModel.updateMany(
@@ -676,7 +676,7 @@ module.exports = class QuestionRepository {
       "type": "question",
       "id": found_question.id,
       "body": {
-        "script": "ctx._source.score="+new_score+";ctx._source.user_reputation+="+new_upvote
+        "script": "ctx._source.score="+new_score+";ctx._source.user_reputation+="+new_upvote2
       }
     });
     return { status: "OK" };
