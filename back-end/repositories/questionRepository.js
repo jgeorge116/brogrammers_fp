@@ -572,6 +572,7 @@ module.exports = class QuestionRepository {
     }
     // Upvoting after already upvoting undoes it
     var new_score = found_question.score;
+    var new_upvote = 0;
     if (found_upvote && found_upvote.value === upvote) {
       await UpvoteModel.updateMany(
         {
@@ -587,7 +588,7 @@ module.exports = class QuestionRepository {
           { username: found_question.username },
           { $inc: { reputation: -upvote } }
         );
-        
+        /*
         await eclient.update({
           "index": "questions",
           "type": "question",
@@ -598,7 +599,8 @@ module.exports = class QuestionRepository {
 	  "refresh": true
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE QUESTION IF", err)
-        });
+        });*/
+        new_upvote = -upvote;
       }
     } else if (found_upvote) {
       //   console.log("votes changed");
@@ -621,6 +623,7 @@ module.exports = class QuestionRepository {
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
+        /*
         await eclient.update({
           "index": "questions",
           "type": "question",
@@ -631,8 +634,8 @@ module.exports = class QuestionRepository {
           "refresh": true
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE IF", err)
-        });
-
+        });*/
+        new_upvote = upvote;
       }
     } else {
       // Create and save upvote
@@ -649,7 +652,7 @@ module.exports = class QuestionRepository {
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
-
+          /*
         await eclient.update({
           "index": "questions",
           "type": "question",
@@ -660,7 +663,8 @@ module.exports = class QuestionRepository {
           "refresh": true
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE", err)
-        });
+        });*/
+        new_upvote = upvote;
       }
     }
     await QuestionModel.updateMany(
@@ -672,9 +676,7 @@ module.exports = class QuestionRepository {
       "type": "question",
       "id": found_question.id,
       "body": {
-        "doc": {
-          "score": new_score
-        }
+        "script": "ctx._source.score="+new_score+";ctx._source.user_reputation+="+new_upvote
       }
     });
     return { status: "OK" };
