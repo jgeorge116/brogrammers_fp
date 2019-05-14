@@ -488,7 +488,7 @@ module.exports = class QuestionRepository {
         await client.execute(query, params);
       }
     }
-    AnswerModel.find({ question_id: id })
+    await AnswerModel.find({ question_id: id })
       .stream()
       .on("data", async function(doc) {
         if (doc.media) {
@@ -509,7 +509,6 @@ module.exports = class QuestionRepository {
         console.log("finished deleting media");
       });
     await AnswerModel.deleteMany({ question_id: id });
-    // await found_question.remove(); // remove for elastic search (mongoosastic)
     await QuestionModel.deleteMany({ id: id });
     await eclient.deleteByQuery({
       index: "questions",
