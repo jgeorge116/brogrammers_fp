@@ -127,7 +127,7 @@ module.exports = class AnswerRepository {
       "body": {
           "script" : "ctx._source.answer_count+=1"
       },
-      "refresh": true
+      "refresh": "wait_for"
     }, (err, { body }) => {
     if (err) console.log("\n\nERROR IN CREATE ANSWER", err)
     });
@@ -238,7 +238,7 @@ module.exports = class AnswerRepository {
           "body": {
               "script" : "ctx._source.user_reputation-="+upvote
           },
-          "refresh": true
+          "refresh": "wait_for"
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE ANSWER IF", err)
         });
@@ -270,7 +270,7 @@ module.exports = class AnswerRepository {
 	  "body": {
               "script" : "ctx._source.user_reputation+="+upvote
           },
-	  "refresh": true
+	  "refresh": "wait_for"
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE ANSWER ELSE IF", err)
         });
@@ -298,7 +298,7 @@ module.exports = class AnswerRepository {
           "body": {
               "script" : "ctx._source.user_reputation+="+upvote
           },
-          "refresh": true
+          "refresh": "wait_for"
         }, (err, { body }) => {
         if (err) console.log("\n\nERROR IN UPVOTE ANSWER ELSE", err)
         });
@@ -345,7 +345,7 @@ module.exports = class AnswerRepository {
 		"accepted_answer_id": answerID
 	    }
   },
-    refresh: true
+    refresh: "wait_for"
     });
 
       

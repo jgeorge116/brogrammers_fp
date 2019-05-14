@@ -142,7 +142,7 @@ module.exports = class QuestionRepository {
         answer_count: 0,
         view_count: 0
       },
-      refresh: true
+      refresh: "wait_for"
     });
     return {
       status: "OK",
@@ -223,7 +223,7 @@ module.exports = class QuestionRepository {
 	"body": {
       		"script": "ctx._source.view_count+=1"
 	},
-      "refresh": true
+      "refresh": "wait_for"
     });
   }
 
@@ -519,7 +519,7 @@ module.exports = class QuestionRepository {
           match: { id: id }
         }
       },
-      refresh: true
+      refresh: "wait_for"
     });
     return { status: "OK", data: "Success" };
   }
