@@ -590,7 +590,7 @@ module.exports = class QuestionRepository {
           },
 	  "refresh": true
         }, (err, { body }) => {
-        if (err) console.log(err)
+        if (err) console.log("\n\nERROR IN UPVOTE QUESTION IF", err)
         });
       }
     } else if (found_upvote) {
@@ -623,7 +623,7 @@ module.exports = class QuestionRepository {
           },
           "refresh": true
         }, (err, { body }) => {
-        if (err) console.log(err)
+        if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE IF", err)
         });
 
       }
@@ -652,7 +652,7 @@ module.exports = class QuestionRepository {
           },
           "refresh": true
         }, (err, { body }) => {
-        if (err) console.log(err)
+        if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE", err)
         });
       }
     }

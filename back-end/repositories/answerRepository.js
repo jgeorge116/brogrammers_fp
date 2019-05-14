@@ -129,7 +129,7 @@ module.exports = class AnswerRepository {
       },
       "refresh": true
     }, (err, { body }) => {
-    if (err) console.log(err)
+    if (err) console.log("\n\nERROR IN CREATE ANSWER", err)
     });
 
     return { status: "OK", data: new_id };
@@ -240,7 +240,7 @@ module.exports = class AnswerRepository {
           },
           "refresh": true
         }, (err, { body }) => {
-        if (err) console.log(err)
+        if (err) console.log("\n\nERROR IN UPVOTE ANSWER IF", err)
         });
       }
     }
@@ -272,7 +272,7 @@ module.exports = class AnswerRepository {
           },
 	  "refresh": true
         }, (err, { body }) => {
-        if (err) console.log(err)
+        if (err) console.log("\n\nERROR IN UPVOTE ANSWER ELSE IF", err)
         });
       }
     } else {
@@ -300,7 +300,7 @@ module.exports = class AnswerRepository {
           },
           "refresh": true
         }, (err, { body }) => {
-        if (err) console.log(err)
+        if (err) console.log("\n\nERROR IN UPVOTE ANSWER ELSE", err)
         });
       }
     }
