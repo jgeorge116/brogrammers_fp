@@ -184,7 +184,7 @@ module.exports = class AnswerRepository {
    * @param {Boolean} upvote
    * @param {String} username
    */
-  async upvote_answer(answerID, upvote, username) {
+   async upvote_answer(answerID, upvote, username) {
     const found_answer = await AnswerModel.findOne({
       id: answerID
     });
@@ -206,7 +206,7 @@ module.exports = class AnswerRepository {
     }
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      await UpvoteModel.updateMany(
+      await UpvoteModel.updateOne(
         {
           answer_id: found_upvote.answer_id,
           username: username,
@@ -215,17 +215,25 @@ module.exports = class AnswerRepository {
         { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateMany(
+        await UserModel.updateOne(
           { username: found_answer.username },
           { $inc: { reputation: -upvote } }
         );
+        await eclient.update({
+          "script" : "ctx._source.user.reputation-=1",
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     }
     // Upvoting after downvoting or vice versa, deletes previous upvote
     else if (found_upvote) {
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
 
-      await UpvoteModel.updateMany(
+      await UpvoteModel.updateOne(
         {
           answer_id: found_upvote.answer_id,
           username: username,
@@ -235,10 +243,19 @@ module.exports = class AnswerRepository {
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateMany(
+        await UserModel.updateOne(
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );
+        
+        await eclient.update({
+          "script" : "ctx._source.user.reputation+=1",
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     } else {
       // Create and save upvote
@@ -251,10 +268,19 @@ module.exports = class AnswerRepository {
       await new_upvote.save();
       // Set reputation of answerer unless it goes below 1
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateMany(
+        await UserModel.updateOne(
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );
+
+        await eclient.update({
+          "script" : "ctx._source.user.reputation+=1",
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     }
     return { status: "OK" };

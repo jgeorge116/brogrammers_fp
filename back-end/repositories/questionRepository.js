@@ -123,6 +123,7 @@ module.exports = class QuestionRepository {
       timestamp: time
     });
     await new_question.save();
+    const user = await UserModel.findOne( {username: username});
     await eclient.index({
       index: "questions",
       type: "question",
@@ -135,13 +136,14 @@ module.exports = class QuestionRepository {
         tags: tags,
         media: media,
         timestamp: time * 1000,
-          score: 0,
-	  accepted_answer_id: "empty"
+        score: 0,
+	accepted_answer_id: "empty",
+        user_reputation: user.reputation,
+        answer_count: 0,
+        view_count: 0
       },
       refresh: true
     });
-    // Add to elastic search too
-    // await elastic.create({index: "searchIndex"});
     return {
       status: "OK",
       data: new_id
@@ -356,20 +358,20 @@ module.exports = class QuestionRepository {
         id: search_results.body.hits.hits[result]._source.id
       });*/
       var question = search_results.body.hits.hits[result]._source;
+      console.log(question);
      /* once jeffrey implements some things */
       question.user = {
-        username: 'i am sammi', // question.username,
-        reputation: 'hi jackie' //question.user_repuation
+        username: question.username,
+        reputation: question.user_reputation
       }
-      question.view_count = 5000; // question.view_count
-      question.answer_count = 30000; //question.answer_count
+      question.view_count = question.view_count;
+      question.answer_count = question.answer_count;
       if (question.accepted_answer_id == 'empty') {
         question.accepted_answer_id = null;
       }
       if (!question.media) question.media = [];
-      // delete question.user_id
       delete question.username;
-      // delete question.user_reputation
+      delete question.user_reputation
       /*var question_info = await this.question_to_api_format(question);
       if (question_info.status == "error") {
         console.log("ai ya, there is an error");
@@ -554,12 +556,9 @@ module.exports = class QuestionRepository {
     if (!found_user) {
       return { status: "error" };
     }
-    // Update the score based on conditions
-    var new_score = found_question.score;
     // Upvoting after already upvoting undoes it
     if (found_upvote && found_upvote.value === upvote) {
-      new_score = new_score - upvote;
-      await UpvoteModel.updateMany(
+      await UpvoteModel.updateOne(
         {
           question_id: found_upvote.question_id,
           username: username,
@@ -568,20 +567,30 @@ module.exports = class QuestionRepository {
         { value: 0 }
       );
       if (found_user.reputation + -upvote >= 1) {
-        await UserModel.updateMany(
+        await UserModel.updateOne(
           { username: found_question.username },
           { $inc: { reputation: -upvote } }
         );
+        
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_question.id,
+          "body": {
+            doc: {
+              "user": {
+                "reputation": -upvote
+              }
+            }
+          }
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     } else if (found_upvote) {
       //   console.log("votes changed");
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-	if (found_upvote.value === 0) {
-		new_score = new_score + upvote;
-	} else {
-	      new_score = new_score + upvote + upvote;
-	}
-      await UpvoteModel.updateMany(
+      await UpvoteModel.updateOne(
         {
           question_id: found_upvote.question_id,
           username: username,
@@ -591,14 +600,28 @@ module.exports = class QuestionRepository {
       );
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateMany(
+        await UserModel.updateOne(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
+
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_question.id,
+          "body": {
+            doc: {
+              "user": {
+                "reputation": upvote
+              }
+            }
+          }
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     } else {
       // Create and save upvote
-      new_score = new_score + upvote;
       const new_upvote = new UpvoteModel({
         type: "question",
         username: username,
@@ -608,16 +631,27 @@ module.exports = class QuestionRepository {
       await new_upvote.save();
 
       if (found_user.reputation + upvote >= 1) {
-        await UserModel.updateMany(
+        await UserModel.updateOne(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
+
+        await eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_question.id,
+          "body": {
+            doc: {
+              "user": {
+                "reputation": upvote
+              }
+            }
+          }
+        }, (err, { body }) => {
+        if (err) console.log(err)
+        });
       }
     }
-    await QuestionModel.updateMany(
-      { id: questionID },
-      { $set: {score: new_score} }
-    );
     return { status: "OK" };
   }
 
