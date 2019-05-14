@@ -214,6 +214,12 @@ module.exports = class QuestionRepository {
       { id: id },
       { $inc: { view_count: 1 } }
     )
+    await eclient.update({
+      "script": "ctx._source.view_count+=1",
+      "index": "questions",
+      "type": "question",
+      "id": id
+    });
   }
 
   /**
