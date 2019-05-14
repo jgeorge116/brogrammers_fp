@@ -663,6 +663,7 @@ module.exports = class QuestionRepository {
     await eclient.update({
       "index": "questions",
       "type": "question",
+      "id": found_question.id,
       "body": {
         "doc": {
           "score": new_score
