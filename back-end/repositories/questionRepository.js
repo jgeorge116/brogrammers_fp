@@ -209,6 +209,11 @@ module.exports = class QuestionRepository {
       });
       await new_view.save();
     }
+    // Increment the view counter
+    await QuestionModel.updateMany(
+      { id: id },
+      { $inc: { view_count: 1 } }
+    )
   }
 
   /**
@@ -380,13 +385,13 @@ module.exports = class QuestionRepository {
         data: "User who created question does not exist"
       };
     }
+    /*
     const view_count = await ViewQuestionModel.countDocuments({
       question_id: format_question.id
     });
     const answer_count = await AnswerModel.countDocuments({
       question_id: format_question.id
     });
-    /*
     const upvote_count = await UpvoteModel.countDocuments({
       question_id: format_question.id,
       type: "question",
@@ -411,8 +416,8 @@ module.exports = class QuestionRepository {
       title: format_question.title,
       body: format_question.body,
       score: format_question.score,
-      view_count: view_count,
-      answer_count: answer_count,
+      view_count: format_question.view_count,
+      answer_count: format_question.answer_count,
       timestamp: format_question.timestamp,
       media: format_question.media,
       tags: format_question.tags,

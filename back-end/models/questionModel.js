@@ -14,7 +14,9 @@ var QuestionModelSchema = new Schema(
     tags: { type: [String], default: [] },
     media: { type: [String], default: [] },
     accepted_answer_id: { type: String, default: null },
-      timestamp: {type: Number, es_type: 'double'}
+    timestamp: {type: Number, es_type: 'double'},
+    answer_count: { type: Number, default: 0 },
+    view_count: { type: Number, default: 0 }
   },
   { autoIndex: false }
 );
