@@ -124,7 +124,7 @@ module.exports = class QuestionRepository {
     });
     await new_question.save();
     const user = await UserModel.findOne( {username: username});
-    await eclient.index({
+    eclient.index({
       index: "questions",
       type: "question",
       id: new_id,
@@ -216,7 +216,7 @@ module.exports = class QuestionRepository {
       { id: id },
       { $inc: { view_count: 1 } }
     )
-    await eclient.update({
+    eclient.update({
       "index": "questions",
       "type": "question",
       "id": id,
@@ -510,7 +510,7 @@ module.exports = class QuestionRepository {
       });
     await AnswerModel.deleteMany({ question_id: id });
     await QuestionModel.deleteMany({ id: id });
-    await eclient.deleteByQuery({
+    eclient.deleteByQuery({
       index: "questions",
       type: "question",
       body: {
@@ -587,18 +587,6 @@ module.exports = class QuestionRepository {
           { username: found_question.username },
           { $inc: { reputation: -upvote } }
         );
-        /*
-        await eclient.update({
-          "index": "questions",
-          "type": "question",
-          "id": found_question.id,
-	  "body": {
-	  	"script" : "ctx._source.user_reputation-="+upvote
-          },
-	  "refresh": true
-        }, (err, { body }) => {
-        if (err) console.log("\n\nERROR IN UPVOTE QUESTION IF", err)
-        });*/
         new_upvote2 = -upvote;
       }
     } else if (found_upvote) {
@@ -622,18 +610,6 @@ module.exports = class QuestionRepository {
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
-        /*
-        await eclient.update({
-          "index": "questions",
-          "type": "question",
-          "id": found_question.id,
-          "body": {
-                "script" : "ctx._source.user_reputation+="+upvote
-          },
-          "refresh": true
-        }, (err, { body }) => {
-        if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE IF", err)
-        });*/
         new_upvote2 = upvote;
       }
     } else {
@@ -651,18 +627,6 @@ module.exports = class QuestionRepository {
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
-          /*
-        await eclient.update({
-          "index": "questions",
-          "type": "question",
-          "id": found_question.id,
-          "body": {
-                "script" : "ctx._source.user_reputation+="+upvote
-          },
-          "refresh": true
-        }, (err, { body }) => {
-        if (err) console.log("\n\nERROR IN UPVOTE QUESTION ELSE", err)
-        });*/
         new_upvote2 = upvote;
       }
     }
@@ -670,7 +634,7 @@ module.exports = class QuestionRepository {
       { id: found_question.id },
       { $set: { score: new_score }}
     );
-    await eclient.update({
+    eclient.update({
       "index": "questions",
       "type": "question",
       "id": found_question.id,

@@ -120,7 +120,7 @@ module.exports = class AnswerRepository {
       { id: question_id },
       { $inc: { answer_count: 1 } }
     )
-    await eclient.update({
+    eclient.update({
       "index": "questions",
       "type": "question",
       "id": question_id,
@@ -231,7 +231,7 @@ module.exports = class AnswerRepository {
           { username: found_answer.username },
           { $inc: { reputation: -upvote } }
         );
-        await eclient.update({
+        eclient.update({
           "index": "questions",
           "type": "question",
           "id": found_answer.question_id,
@@ -263,7 +263,7 @@ module.exports = class AnswerRepository {
           { $inc: { reputation: upvote } }
         );
         
-        await eclient.update({
+        eclient.update({
           "index": "questions",
           "type": "question",
           "id": found_answer.question_id,
@@ -291,7 +291,7 @@ module.exports = class AnswerRepository {
           { $inc: { reputation: upvote } }
         );
 
-        await eclient.update({
+        eclient.update({
           "index": "questions",
           "type": "question",
           "id": found_answer.question_id,
@@ -336,7 +336,7 @@ module.exports = class AnswerRepository {
     );
       console.log(found_question.id);
       console.log(answerID);
-    await eclient.update({
+    eclient.update({
       "index": "questions",
       "type": "question",
 	"id": found_question.id,
