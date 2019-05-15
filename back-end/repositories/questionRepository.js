@@ -518,7 +518,7 @@ module.exports = class QuestionRepository {
           match: { id: id }
         }
       },
-      refresh: "wait_for"
+      refresh: "true"
     });
     return { status: "OK", data: "Success" };
   }
