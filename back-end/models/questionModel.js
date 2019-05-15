@@ -26,6 +26,7 @@ QuestionModelSchema.set("collection", "questions");
 //  host: "192.168.122.49",
 //  port: 9200
 //});
+QuestionModelSchema.index({ id: 1 });
 
 var questionModel = mongoose.model("QuestionModel", QuestionModelSchema);
 module.exports = questionModel;

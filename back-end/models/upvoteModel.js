@@ -10,4 +10,5 @@ var UpvoteModelSchema = new Schema({
 });
 
 UpvoteModelSchema.set("collection", "upvotes");
+UpvoteModelSchema.index({ username: 1 });
 module.exports = mongoose.model("UpvoteModel", UpvoteModelSchema);

@@ -12,4 +12,5 @@ var AnswerModelSchema = new Schema({
 });
 
 AnswerModelSchema.set("collection", "answers");
+AnswerModelSchema.index({ id: 1 });
 module.exports = mongoose.model("AnswerModel", AnswerModelSchema);
