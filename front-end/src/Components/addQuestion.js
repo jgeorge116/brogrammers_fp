@@ -31,6 +31,8 @@ class questions extends Component {
       alert("ONE OR MORE OF THE FIELDS ARE EMPTY!");
     } else {
       (async () => {
+	const tagsArr = this.state.tags.split(",").map((item) => item.trim());
+	const mediaArr = this.state.media.split(",").map((item) => item.trim());
         const res = await fetch("/questions/add", {
           method: "POST",
           credentials: "include",
@@ -42,8 +44,8 @@ class questions extends Component {
           body: JSON.stringify({
             title: this.state.title,
             body: this.state.body,
-            tags: this.state.tags,
-            media: this.state.media
+            tags: tagsArr,
+            media: mediaArr
           })
         });
         let content = await res.json();
