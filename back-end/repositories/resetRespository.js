@@ -29,7 +29,7 @@ module.exports = class ResetRespository {
     });
 
     var query1 =
-      "CREATE KEYSPACE IF NOT EXISTS somedia WITH replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': '2'}  AND durable_writes = true";
+      "CREATE KEYSPACE IF NOT EXISTS somedia WITH replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': '1'}  AND durable_writes = true";
     await client.execute(query1, function(err) {
       if (err) console.log(err);
       else console.log("created keyspace somedia");
