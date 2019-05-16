@@ -94,7 +94,8 @@ class Search extends Component {
       return (
         <div className={classes.questionPost}>
           <Post
-            key={i}
+            key={item.id}
+            id={item.id}
             username={item.user.username}
             rep={item.user.reputation}
             title={item.title}
