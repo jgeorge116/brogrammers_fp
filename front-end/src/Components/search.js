@@ -242,13 +242,6 @@ class Search extends Component {
               </Button>
             </div>
           </form>
-          <div className="searchButtons">
-            {/* <Button id="clear" onClick={this.clearSearch}>
-            Clear Search Results
-          </Button> */}
-            {/* {this.showResults(data)} */}
-          </div>
-          {/* <Paper>{this.showResults(data)}</Paper> */}
         </div>
         <Grid container justify="center">
           <Grid item md={9}>
