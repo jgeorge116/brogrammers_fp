@@ -124,7 +124,8 @@ class viewQuestion extends Component {
       body: "",
       media: [],
       answers: [],
-      allMedia: [],
+      allMediaQuestion: [],
+      allMediaAnswer: [],
       isLoadingMedia: true
     };
   }
@@ -261,29 +262,49 @@ class viewQuestion extends Component {
   };
 
   getMedia = _ => {
-    let allMedia = [];
-    console.log(this.state.question);
+    let allMediaQuestion = [];
     if (this.state.question[0].media[0]) {
       for (let i = 0; i < this.state.question[0].media.length; i++) {
         fetch(`/media/${this.state.question[0].media[i]}`)
           .then(response => response.blob())
           .then(data => {
-            console.log(data);
             if (data) {
               var reader = new FileReader();
               reader.onload = e => {
-                allMedia.push(e.target.result);
-                this.setState({ allMedia: allMedia });
+                allMediaQuestion.push(e.target.result);
+                this.setState({ allMediaQuestion: allMediaQuestion });
               };
               reader.readAsDataURL(data);
-              console.log("inside the loop");
             }
           })
           .catch(err => console.error(err));
       }
     }
     this.setState({ isLoadingMedia: false });
-    console.log("outside the loop");
+  };
+
+  getMediaAnswer = _ => {
+    let allMediaAnswer = [];
+    for(let i = 0; i < this.state.answers; i++) {
+      if (this.state.answers[i].media[0]) {
+        for (let i = 0; i < this.state.answers[i].media.length; i++) {
+          fetch(`/media/${this.state.answers[i].media[i]}`)
+            .then(response => response.blob())
+            .then(data => {
+              if (data) {
+                var reader = new FileReader();
+                reader.onload = e => {
+                  allMediaAnswer.push(e.target.result);
+                  this.setState({ allMediaAnswer: allMediaAnswer });
+                };
+                reader.readAsDataURL(data);
+              }
+            })
+            .catch(err => console.error(err));
+        }
+      }
+      this.setState({ isLoadingMedia: false });
+    }
   };
 
   getUpvoteStatus = _ => {
@@ -425,7 +446,7 @@ class viewQuestion extends Component {
               <div className={classes.descriptionContainer}>
                 <div className={classes.questionDescription}>{body}</div>
                 <div className={classes.questionMedia}>
-                  {this.state.allMedia.map(el => (
+                  {this.state.allMediaQuestion.map(el => (
                     <img key={el} src={el} alt="" />
                   ))}
                 </div>
@@ -468,6 +489,11 @@ class viewQuestion extends Component {
         <div className={classes.questionAnswerBody}>
           {this.renderAnswerVoteArea(id, score, upvoteStatus)}
           <div className={classes.descriptionContainer}>
+            <div className={classes.answerMedia}>
+              {this.state.allMediaAnswer.map(el => (
+                <img key={el} src={el} alt="" />
+              ))}
+            </div>
             <div className={classes.answerDescriptionAccepted}>
               <div className={classes.answerDescription}>
                 <div>{body}</div>
@@ -522,6 +548,18 @@ class viewQuestion extends Component {
                   type="text"
                   name="body"
                   label="Body"
+                  onChange={this.handleChange}
+                  margin="normal"
+                  variant="outlined"
+                  fullWidth
+                  multiline
+                />
+                <br />
+                <TextField
+                  className="textFields"
+                  type="text"
+                  name="media"
+                  label="Media"
                   onChange={this.handleChange}
                   margin="normal"
                   variant="outlined"

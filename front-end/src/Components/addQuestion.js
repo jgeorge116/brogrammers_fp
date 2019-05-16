@@ -31,8 +31,10 @@ class questions extends Component {
       alert("ONE OR MORE OF THE FIELDS ARE EMPTY!");
     } else {
       (async () => {
-	const tagsArr = this.state.tags.split(",").map((item) => item.trim());
-	const mediaArr = this.state.media.split(",").map((item) => item.trim());
+        const tagsArr = this.state.tags.split(",").map((item) => item.trim());
+        var mediaArr = [];
+        if(this.state.media.length!=0)
+	        mediaArr = this.state.media.split(",").map((item) => item.trim());
         const res = await fetch("/questions/add", {
           method: "POST",
           credentials: "include",
@@ -97,7 +99,7 @@ class questions extends Component {
               className="textFields"
               type="text"
               name="tags"
-              label="Tags"
+              label="Comma-separated List"
               onChange={this.handleChange}
               margin="normal"
               variant="outlined"
@@ -107,7 +109,7 @@ class questions extends Component {
               className="textFields"
               type="text"
               name="media"
-              label="Media"
+              label="Comma-separated List (Optional)"
               onChange={this.handleChange}
               margin="normal"
               variant="outlined"

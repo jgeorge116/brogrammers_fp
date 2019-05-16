@@ -156,21 +156,6 @@ class Navbar extends Component {
                     />
                   </div>
                   <div />
-                  <div className={ClassNames(classes.navlink)}>
-                    <IconButton onClick={this.handleAddMedia} color="inherit">
-                      <AddPhotoAlternate />
-                    </IconButton>
-                  </div>
-                  <div className={ClassNames(classes.navlink)}>
-                    <IconButton onClick={this.handleAddQuestion} color="inherit">
-                      <QuestionAnswer />
-                    </IconButton>
-                  </div>
-                  <div className={ClassNames(classes.profile, classes.navlink)}>
-                    <IconButton onClick={this.handleProfile} color="inherit">
-                      <AccountCircle />
-                    </IconButton>
-                  </div>
                   <Typography noWrap onClick={this.handleRegister} color="inherit">
                     <Link
                       className={classes.navlink}

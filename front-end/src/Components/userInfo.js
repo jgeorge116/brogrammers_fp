@@ -53,20 +53,20 @@ class ViewUserInfo extends Component {
       .catch(err => console.log(err));
   }
 
-  getUserAnswers() {
-    fetch(`/user/${this.props.match.params.id}/answers`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === "error")
-          this.setState({
-            answers: ["User didn't answer anything yet :("],
-            isLoading: false
-          });
-        else this.setState({ answers: data.answers, isLoading: false });
-        console.log(data);
-      })
-      .catch(err => console.log(err));
-  }
+  // getUserAnswers() {
+  //   fetch(`/user/${this.props.match.params.id}/answers`)
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       if (data.status === "error")
+  //         this.setState({
+  //           answers: ["User didn't answer anything yet :("],
+  //           isLoading: false
+  //         });
+  //       else this.setState({ answers: data.answers, isLoading: false });
+  //       console.log(data);
+  //     })
+  //     .catch(err => console.log(err));
+  // }
 
   showQuestions() {
     if (this.state.questions) {
@@ -82,13 +82,13 @@ class ViewUserInfo extends Component {
     }
   }
 
-  showAnswers() {
-    return this.state.answers.map(ans => (
-      <div key={ans}>
-        <p>{ans}</p>
-      </div>
-    ));
-  }
+  // showAnswers() {
+  //   return this.state.answers.map(ans => (
+  //     <div key={ans}>
+  //       <p>{ans}</p>
+  //     </div>
+  //   ));
+  // }
 
   render() {
     if (this.state.isLoading) return <p>Loading ...</p>;
@@ -108,8 +108,6 @@ class ViewUserInfo extends Component {
               <h3>User Question Ids: </h3>
               {this.showQuestions()}
               <br />
-              <h3>User Answer Ids: </h3>
-              {this.showAnswers()}
             </div>
           </div>
         </div>
