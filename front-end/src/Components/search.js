@@ -30,8 +30,8 @@ class Search extends Component {
     super();
     this.state = {
       limit: 25,
-      accepted: "false",
-      media: "false",
+      accepted: false,
+      media: false,
       timestamp: 0,
       show: false,
       search_str: ""
