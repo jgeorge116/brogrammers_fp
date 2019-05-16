@@ -129,7 +129,8 @@ class viewQuestion extends Component {
       answers: [],
       allMediaQuestion: [],
       allMediaAnswer: [],
-      isLoadingMedia: true
+      isLoadingMedia: true,
+      isLoadingAnswerMedia: true
     };
   }
 
@@ -306,7 +307,7 @@ class viewQuestion extends Component {
             .catch(err => console.error(err));
         }
       }
-      this.setState({ isLoadingMedia: false });
+      this.setState({ isLoadingAnswerMedia: false });
     }
   };
 
