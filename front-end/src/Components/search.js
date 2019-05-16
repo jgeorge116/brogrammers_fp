@@ -128,9 +128,9 @@ class Search extends Component {
   componentWillMount() {
     const parsed = queryString.parse(this.props.location.search);
     if (parsed.q) {
-      this.getResults(parsed.q, Date.now(), 25, false, [], "timestamp", []);
+      this.getResults(parsed.q, Date.now(), 25, false, false, "timestamp", null);
     } else {
-        this.getResults("", Date.now(), 25, false, [], "timestamp", []);
+        this.getResults("", Date.now(), 25, false, false, "timestamp", null);
     }
   }
   render() {
