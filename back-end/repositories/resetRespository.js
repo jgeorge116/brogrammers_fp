@@ -6,8 +6,8 @@ const UpvoteModel = require("../models/upvoteModel");
 
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
-//   contactPoints: ["130.245.171.138", "130.245.171.191"], //, "192.168.122.49"],
-  contactPoints: ["127.0.0.1"],
+  contactPoints: ["130.245.171.138", "130.245.171.191"], //, "192.168.122.49"],
+//   contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1",
   readTimeout: 0
 });
