@@ -111,6 +111,9 @@ const styles = theme => ({
     "& :hover": {
       color: "#00897b"
     }
+  },
+  images: {
+    maxWidth:"100%"
   }
 });
 class viewQuestion extends Component {
@@ -337,6 +340,9 @@ class viewQuestion extends Component {
     if (this.state.body === "") alert("BODY IS EMPTY!");
     else {
       (async () => {
+        var mediaArr = [];
+        if(this.state.media.length!==0)
+	        mediaArr = this.state.media.split(",").map((item) => item.trim());
         const res = await fetch(`/questions/${this.state.id}/answers/add`, {
           method: "POST",
           credentials: "include",
@@ -347,7 +353,7 @@ class viewQuestion extends Component {
           },
           body: JSON.stringify({
             body: this.state.body,
-            media: this.state.media
+            media: mediaArr
           })
         });
         let content = await res.json();
@@ -447,7 +453,7 @@ class viewQuestion extends Component {
                 <div className={classes.questionDescription}>{body}</div>
                 <div className={classes.questionMedia}>
                   {this.state.allMediaQuestion.map(el => (
-                    <img key={el} src={el} alt="" />
+                    <img key={el} src={el} className={classes.images} alt="" />
                   ))}
                 </div>
                 <div className={classes.infoSection}>
@@ -491,7 +497,7 @@ class viewQuestion extends Component {
           <div className={classes.descriptionContainer}>
             <div className={classes.answerMedia}>
               {this.state.allMediaAnswer.map(el => (
-                <img key={el} src={el} alt="" />
+                <img key={el} src={el} className={classes.images} alt="" />
               ))}
             </div>
             <div className={classes.answerDescriptionAccepted}>

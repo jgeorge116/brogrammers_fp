@@ -33,7 +33,7 @@ class questions extends Component {
       (async () => {
         const tagsArr = this.state.tags.split(",").map((item) => item.trim());
         var mediaArr = [];
-        if(this.state.media.length!=0)
+        if(this.state.media.length!==0)
 	        mediaArr = this.state.media.split(",").map((item) => item.trim());
         const res = await fetch("/questions/add", {
           method: "POST",
