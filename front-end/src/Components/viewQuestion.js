@@ -290,8 +290,8 @@ class viewQuestion extends Component {
     let allMediaAnswer = [];
     for(let i = 0; i < this.state.answers; i++) {
       if (this.state.answers[i].media[0]) {
-        for (let i = 0; i < this.state.answers[i].media.length; i++) {
-          fetch(`/media/${this.state.answers[i].media[i]}`)
+        for (let j = 0; j < this.state.answers[i].media.length; i++) {
+          fetch(`/media/${this.state.answers[i].media[j]}`)
             .then(response => response.blob())
             .then(data => {
               if (data) {
