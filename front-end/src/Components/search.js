@@ -40,7 +40,8 @@ class Search extends Component {
 
   getResults(search_string, timestamp, limit, accepted, media, sort_by, tags) {
     (async () => {
-      const tagsArr = tags.split(",");
+      var tagsArr = [];
+      if (tags) tagsArr = tags.split(",");
       const body = JSON.stringify({
         timestamp: timestamp,
         limit: limit,
