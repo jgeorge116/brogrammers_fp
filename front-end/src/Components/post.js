@@ -6,7 +6,7 @@ function Post(props) {
       <h1>
         By: {props.username} 
       </h1>
-      <a href={"/questions/" + props.id}>
+      <a href={"/fquestions/" + props.id}>
         <h2>{props.title}</h2>
       </a>
       <h3>{props.body}</h3>
