@@ -103,7 +103,7 @@ const styles = theme => ({
     justifyContent: "space-between"
   },
   CheckCircle: {
-    color: "#00c853",
+    color: "#00c853"
   },
   CheckCircleOutline: {
     cursor: "pointer",
@@ -113,7 +113,7 @@ const styles = theme => ({
     }
   },
   images: {
-    maxWidth:"100%"
+    maxWidth: "100%"
   }
 });
 class viewQuestion extends Component {
@@ -128,9 +128,9 @@ class viewQuestion extends Component {
       media: [],
       answers: [],
       allMediaQuestion: [],
-      allMediaAnswer: [],
-      isLoadingMedia: true,
-      isLoadingAnswerMedia: true
+      //   allMediaAnswer: [],
+    //   isLoadingMedia: true,
+    //   isLoadingAnswerMedia: false
     };
   }
 
@@ -147,15 +147,18 @@ class viewQuestion extends Component {
 
   handleDeleteQuestion = e => {
     (async () => {
-      const res = await fetch(`/questions/${this.state.id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: "Bearer " + Cookies.get("access_token")
+      const res = await fetch(
+        `/questions/${this.state.id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            Authorization: "Bearer " + Cookies.get("access_token")
+          }
         }
-      });
+      );
       let content = await res.json();
       if (content.status === "error") alert("Error: " + content.error);
       else {
@@ -170,18 +173,21 @@ class viewQuestion extends Component {
     e.preventDefault();
     (async () => {
       //   console.log(Cookies.get("access_token"));
-      const res = await fetch(`/questions/${this.state.id}/upvote`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: "Bearer " + Cookies.get("access_token")
-        },
-        body: JSON.stringify({
-          upvote: voteChoice
-        })
-      });
+      const res = await fetch(
+        `/questions/${this.state.id}/upvote`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            Authorization: "Bearer " + Cookies.get("access_token")
+          },
+          body: JSON.stringify({
+            upvote: voteChoice
+          })
+        }
+      );
       let content = await res.json();
       if (content.status === "error") alert("Error: " + content.error);
       else {
@@ -194,18 +200,21 @@ class viewQuestion extends Component {
   handleVoteAnswer(answer_id, voteChoice, e) {
     e.preventDefault();
     (async () => {
-      const res = await fetch(`/answers/${answer_id}/upvote`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: "Bearer " + Cookies.get("access_token")
-        },
-        body: JSON.stringify({
-          upvote: voteChoice
-        })
-      });
+      const res = await fetch(
+        `/answers/${answer_id}/upvote`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            Authorization: "Bearer " + Cookies.get("access_token")
+          },
+          body: JSON.stringify({
+            upvote: voteChoice
+          })
+        }
+      );
       let content = await res.json();
       if (content.status === "error") alert("Error: " + content.error);
       else {
@@ -217,19 +226,22 @@ class viewQuestion extends Component {
   handleAcceptAnswer(answer_id, e) {
     e.preventDefault();
     (async () => {
-      const res = await fetch(`/answers/${answer_id}/accept`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: "Bearer " + Cookies.get("access_token")
+      const res = await fetch(
+        `/answers/${answer_id}/accept`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json; charset=utf-8",
+            Authorization: "Bearer " + Cookies.get("access_token")
+          }
         }
-      });
+      );
       let content = await res.json();
       if (content.status === "error") alert("Error: " + content.error);
       else {
-          this.getAnswers();
+        this.getAnswers();
         this.getQuestion();
       }
     })();
@@ -237,29 +249,38 @@ class viewQuestion extends Component {
   getQuestion = _ => {
     fetch(`/questions/${this.props.match.params.id}`)
       .then(response => response.json())
-      .then(data =>
-        this.setState({ question: [data.question], isLoading: false })
+      .then(data => {
+        this.setState({ question: [data.question], isLoading: false });
+        this.getMedia();  
+    }
       )
       .catch(err => console.error(err));
   };
 
   getAnswers = _ => {
-    fetch(`/questions/${this.props.match.params.id}/answers`)
+    fetch(
+      `/questions/${this.props.match.params.id}/answers`
+    )
       .then(response => response.json())
       .then(data => {
         // this.setState({ answers: [data.answers], isLoadingAnswers: true });
         if (data.answers.length) {
           this.setState({ answers: [data.answers], isLoadingAnswers: true });
           for (let i = 0; i < data.answers.length; i++) {
-            fetch(`/answers/${data.answers[i].id}/upvotestatus`)
+            fetch(
+              `/answers/${data.answers[i].id}/upvotestatus`
+            )
               .then(response => response.json())
               .then(upvote => {
                 //   console.log(prev_answers);
                 let prev_answers = this.state.answers;
+                // console.log(prev_answers);
                 prev_answers[0][i].upvoteStatus = upvote.upvote;
                 this.setState({ answers: prev_answers });
               });
           }
+        //   this.setState({ isLoadingAnswerMedia: true });
+        this.getMediaAnswer();
         }
       })
       .catch(err => console.error(err));
@@ -276,7 +297,7 @@ class viewQuestion extends Component {
               var reader = new FileReader();
               reader.onload = e => {
                 allMediaQuestion.push(e.target.result);
-                this.setState({ allMediaQuestion: allMediaQuestion });
+                this.setState({ allMediaQuestion: allMediaQuestion })
               };
               reader.readAsDataURL(data);
             }
@@ -284,43 +305,59 @@ class viewQuestion extends Component {
           .catch(err => console.error(err));
       }
     }
-    this.setState({ isLoadingMedia: false });
+    // this.setState({ isLoadingMedia: false });
   };
 
   getMediaAnswer = _ => {
-    let allMediaAnswer = [];
-    for(let i = 0; i < this.state.answers; i++) {
-      if (this.state.answers[i].media[0]) {
-        for (let j = 0; j < this.state.answers[i].media.length; i++) {
-          fetch(`/media/${this.state.answers[i].media[j]}`)
-            .then(response => response.blob())
-            .then(data => {
-              if (data) {
-                var reader = new FileReader();
-                reader.onload = e => {
-                  allMediaAnswer.push(e.target.result);
-                  this.setState({ allMediaAnswer: allMediaAnswer });
-                };
-                reader.readAsDataURL(data);
-              }
-            })
-            .catch(err => console.error(err));
+    let answers = this.state.answers;
+    // console.log(answers);
+    // if (answers) {
+    //     console.log(answers[0]);
+    // }
+    // console.log('answers above and answer length below');
+    // console.log(answers.length);
+    if (answers[0]) {
+      for (let i = 0; i < answers[0].length; i++) {
+        console.log(i);
+        console.log(answers[0][i]);
+        if (answers[0][i].media) {
+          let mediaSrc = [];
+          for (let j = 0; j < answers[0][i].media.length; j++) {
+            fetch(`/media/${answers[0][i].media[j]}`)
+              .then(response => response.blob())
+              .then(data => {
+                if (data) {
+                  var reader = new FileReader();
+                  reader.onload = e => {
+                    answers[0][i].mediaSrc = mediaSrc;
+                    mediaSrc.push(e.target.result);
+                    this.setState({ answers: answers });
+                  };
+                  reader.readAsDataURL(data);
+                }
+              })
+              .catch(err => console.error(err));
+          }
         }
       }
-      this.setState({ isLoadingAnswerMedia: false });
     }
   };
 
   getUpvoteStatus = _ => {
-    fetch(`/questions/${this.props.match.params.id}/upvotestatus`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: "Bearer " + Cookies.get("access_token")
+    fetch(
+      `/questions/${
+        this.props.match.params.id
+      }/upvotestatus`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: "Bearer " + Cookies.get("access_token")
+        }
       }
-    })
+    )
       .then(response => response.json())
       .then(data => {
         if (!data.upvote) data.upvote = 0;
@@ -342,21 +379,24 @@ class viewQuestion extends Component {
     else {
       (async () => {
         var mediaArr = [];
-        if(this.state.media.length!==0)
-	        mediaArr = this.state.media.split(",").map((item) => item.trim());
-        const res = await fetch(`/questions/${this.state.id}/answers/add`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json; charset=utf-8",
-            Authorization: "Bearer " + Cookies.get("access_token")
-          },
-          body: JSON.stringify({
-            body: this.state.body,
-            media: mediaArr
-          })
-        });
+        if (this.state.media.length !== 0)
+          mediaArr = this.state.media.split(",").map(item => item.trim());
+        const res = await fetch(
+          `/questions/${this.state.id}/answers/add`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json; charset=utf-8",
+              Authorization: "Bearer " + Cookies.get("access_token")
+            },
+            body: JSON.stringify({
+              body: this.state.body,
+              media: mediaArr
+            })
+          }
+        );
         let content = await res.json();
         if (content.status === "error") alert("Error: " + content.error);
         else {
@@ -407,7 +447,7 @@ class viewQuestion extends Component {
   renderAcceptance = (answer_id, is_accepted) => {
     const { classes } = this.props;
     if (this.state.question[0].accepted_answer_id) {
-        console.log(is_accepted);
+      console.log(is_accepted);
       if (is_accepted) {
         return <CheckCircle className={classes.CheckCircle} />;
       }
@@ -488,22 +528,25 @@ class viewQuestion extends Component {
     is_accepted,
     timestamp,
     media,
-    upvoteStatus
+    upvoteStatus,
+    mediaSrc
   }) => {
     const { classes } = this.props;
+    if (!mediaSrc) mediaSrc = [];
+    // console.log(mediaSrc);
     return (
       <div key={id} className={classes.answer}>
         <div className={classes.questionAnswerBody}>
           {this.renderAnswerVoteArea(id, score, upvoteStatus)}
           <div className={classes.descriptionContainer}>
-            <div className={classes.answerMedia}>
-              {this.state.allMediaAnswer.map(el => (
-                <img key={el} src={el} className={classes.images} alt="" />
-              ))}
-            </div>
             <div className={classes.answerDescriptionAccepted}>
               <div className={classes.answerDescription}>
                 <div>{body}</div>
+                <div className={classes.answerMedia}>
+                  {mediaSrc.map(el => (
+                    <img key={el} src={el} className={classes.images} alt="" />
+                  ))}
+                </div>
               </div>
               {this.renderAcceptance(id, is_accepted)}
             </div>
@@ -512,7 +555,6 @@ class viewQuestion extends Component {
                 <p className={classes.pNoSpace}>
                   Answered by: {user} at {timestamp}
                 </p>
-                <p className={classes.pNoSpace}>Accepted: {is_accepted}</p>
               </div>
             </div>
           </div>
@@ -534,55 +576,61 @@ class viewQuestion extends Component {
 
   render() {
     if (this.state.isLoading) {
+      //   console.log("still loading");
       return <CircularProgress size="100" />;
-    } else if (this.state.isLoadingMedia) {
-      this.getMedia();
-      return <CircularProgress size="100" />;
-    } else {
-      return (
-        <div>
-          <Fragment>
-            <Navbar />
-          </Fragment>
-          <div className="question">
-            {this.state.question.map(this.renderQuestion)}
-            {this.state.isLoadingAnswers ? this.showQuestions() : null}
-            <div className="submitAnswer">
-              <h1>Your Answer</h1>
-              <form onSubmit={this.handleRequest}>
-                <TextField
-                  className="textFields"
-                  type="text"
-                  name="body"
-                  label="Body"
-                  onChange={this.handleChange}
-                  margin="normal"
-                  variant="outlined"
-                  fullWidth
-                  multiline
-                />
-                <br />
-                <TextField
-                  className="textFields"
-                  type="text"
-                  name="media"
-                  label="Media"
-                  onChange={this.handleChange}
-                  margin="normal"
-                  variant="outlined"
-                  fullWidth
-                  multiline
-                />
-                <br />
-                <Button id="sub" type="submit">
-                  Submit
-                </Button>
-              </form>
-            </div>
+    }
+    // if (this.state.isLoadingMedia) {
+    // this.getMedia();
+    //   return <CircularProgress size="100" />;
+    // }
+    // if (this.state.isLoadingAnswerMedia) {
+    // //   this.getMediaAnswer();
+    //   return <CircularProgress size="100" />;
+    // }
+    console.log("not loading anything");
+    return (
+      <div>
+        <Fragment>
+          <Navbar />
+        </Fragment>
+        <div className="question">
+          {this.state.question.map(this.renderQuestion)}
+          {this.state.isLoadingAnswers ? this.showQuestions() : null}
+          <div className="submitAnswer">
+            <h1>Your Answer</h1>
+            <form onSubmit={this.handleRequest}>
+              <TextField
+                className="textFields"
+                type="text"
+                name="body"
+                label="Body"
+                onChange={this.handleChange}
+                margin="normal"
+                variant="outlined"
+                fullWidth
+                multiline
+              />
+              <br />
+              <TextField
+                className="textFields"
+                type="text"
+                name="media"
+                label="Media"
+                onChange={this.handleChange}
+                margin="normal"
+                variant="outlined"
+                fullWidth
+                multiline
+              />
+              <br />
+              <Button id="sub" type="submit">
+                Submit
+              </Button>
+            </form>
           </div>
         </div>
-      );
-    }
+      </div>
+    );
   }
 }
 export default withStyles(styles)(viewQuestion);

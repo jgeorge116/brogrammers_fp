@@ -53,21 +53,6 @@ class ViewUserInfo extends Component {
       .catch(err => console.log(err));
   }
 
-  // getUserAnswers() {
-  //   fetch(`/user/${this.props.match.params.id}/answers`)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       if (data.status === "error")
-  //         this.setState({
-  //           answers: ["User didn't answer anything yet :("],
-  //           isLoading: false
-  //         });
-  //       else this.setState({ answers: data.answers, isLoading: false });
-  //       console.log(data);
-  //     })
-  //     .catch(err => console.log(err));
-  // }
-
   showQuestions() {
     if (this.state.questions) {
       return this.state.questions.map(item => (
@@ -78,17 +63,9 @@ class ViewUserInfo extends Component {
         </div>
       ));
     } else {
-      return "User didn't post anything yet :(";
+      return "No questions to display.";
     }
   }
-
-  // showAnswers() {
-  //   return this.state.answers.map(ans => (
-  //     <div key={ans}>
-  //       <p>{ans}</p>
-  //     </div>
-  //   ));
-  // }
 
   render() {
     if (this.state.isLoading) return <p>Loading ...</p>;

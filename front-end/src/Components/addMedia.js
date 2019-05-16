@@ -72,7 +72,7 @@ class addMedia extends Component {
                     filesLimit={1}
                 />
               </div><br />
-              <Button variant="contained" type="submit">yeah boy!</Button>
+              <Button variant="contained" type="submit">Upload File</Button>
            </form>
         </div>
       </div>

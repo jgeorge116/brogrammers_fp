@@ -99,7 +99,7 @@ class questions extends Component {
               className="textFields"
               type="text"
               name="tags"
-              label="Comma-separated List"
+              label="Comma-separated List (no spaces)"
               onChange={this.handleChange}
               margin="normal"
               variant="outlined"
@@ -109,7 +109,7 @@ class questions extends Component {
               className="textFields"
               type="text"
               name="media"
-              label="Comma-separated List (Optional)"
+              label="Comma-separated List (Optional and no spaces)"
               onChange={this.handleChange}
               margin="normal"
               variant="outlined"
