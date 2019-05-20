@@ -1,30 +1,23 @@
-# Tempory Fix 
-## Type this before starting new submission 
-curl -XDELETE 'http://192.168.122.49:9200/questions/question/_query' -d '{"query":{"match_all":{}}' -H 'Content-Type: application/json'
-## Indexing for full text search (delete indexes first)
-curl -X DELETE 192.168.122.49:9200/questions
+# StackOverflow Clone 
+## Tools
+:information_desk_person: Apache Cassandra 
 
-db.questions.createIndex({ title: "text", body: "text" }, { default_language: "none" })
+:blowfish: ElasticSearch 
 
+:bullettrain_front: Express.js 
 
-# Helpful Tutorials
+:leaves: MongoDB
 
-## Postfix: 
-Install postfix
+:bus: Nginx
 
-https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-on-ubuntu-18-04
+:email: PostFix
 
-Add no-reply to aliases as the following thing says:
+:rabbit: RabbitMQ 
 
-https://anandarajpandey.com/2014/09/10/how-to-change-default-root-email-address-linux-postfix-centos/
+:open_mouth: React.JS 
+## Set Up 
+You must have an instance of Cassandra, MongoDB, PostFix, RabbitMQ, and ElasticSearch running on separate instances. How many instances is up to how many requests are required to be handled at any given time.
 
-## RabbitMQ: 
-Install RabbitMQ
+To set up the Express/React apps, on both the back-end and front-end folders `npm install`. The front-end will be listening on port 3000 and back-end will be listening on port 4000.
 
-https://www.rabbitmq.com/install-debian.html
-
-Alternate option / easier to read 
-
-https://tecadmin.net/install-rabbitmq-server-on-ubuntu/
-
-
+Use Nginx to route requests to the appropriate instance.
