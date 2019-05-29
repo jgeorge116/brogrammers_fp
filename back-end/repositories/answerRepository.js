@@ -6,11 +6,14 @@ const UpvoteModel = require("../models/upvoteModel");
 const uuidv4 = require("uuid/v4");
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
-  contactPoints: ["192.168.122.50"], // "192.168.122.49"],
-  //   contactPoints: ["127.0.0.1"],
+  contactPoints: ["130.245.171.138", "130.245.171.191"], // "192.168.122.49"],
+    // contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1",
   readTimeout: 0
 });
+
+const { Client } = require("@elastic/elasticsearch");
+const eclient = new Client({ node: "http://130.245.170.230:9200" });
 
 module.exports = class AnswerRepository {
   /**
@@ -45,44 +48,45 @@ module.exports = class AnswerRepository {
     }
     const new_id = uuidv4();
     if (media) {
-    //   console.log(
-    //     '"*******************************"' +
-    //       "author: " +
-    //       username +
-    //       "\n" +
-    //       "length of media: " +
-    //       media.length +
-    //       "\n" +
-    //       `all the media: ${media}` +
-    //       "\n" +
-    //       "id: " +
-    //       new_id +
-    //       "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-    //   );
+      //   console.log(
+      //     '"*******************************"' +
+      //       "author: " +
+      //       username +
+      //       "\n" +
+      //       "length of media: " +
+      //       media.length +
+      //       "\n" +
+      //       `all the media: ${media}` +
+      //       "\n" +
+      //       "id: " +
+      //       new_id +
+      //       "\n &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+      //   );
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
         var results2 = await client.execute(query2, params2, { prepare: true });
         if (results2.rowLength == 0) {
           console.log(
-        '"FAILURE ANSWER CREATE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
-          "author: " +
-          username +
-          "\n" +
-          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n" +
-          "length of media: " +
-          media.length +
-          "\n" +
-          `all the media: ${media}` +
-          "\n" +
-          "id : " +
-          new_id +
-          "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
-      );
+            '"FAILURE ANSWER CREATE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
+              "author: " +
+              username +
+              "\n" +
+              `MEDIA DOES NOT EXIST: ${media[i]}` +
+              "\n" +
+              "length of media: " +
+              media.length +
+              "\n" +
+              `all the media: ${media}` +
+              "\n" +
+              "id : " +
+              new_id +
+              "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
+          );
           return {
             status: "error",
             data: "Media does not exist"
-          }
+          };
         }
         if (results2.rows[0].username != username) {
           return {
@@ -111,6 +115,23 @@ module.exports = class AnswerRepository {
       media: media
     });
     await new_answer.save();
+    // Increment the question's answer_count
+    await QuestionModel.updateMany(
+      { id: question_id },
+      { $inc: { answer_count: 1 } }
+    )
+    eclient.update({
+      "index": "questions",
+      "type": "question",
+      "id": question_id,
+      "body": {
+          "script" : "ctx._source.answer_count+=1"
+      },
+      "refresh": "wait_for"
+    }, (err, { body }) => {
+    if (err) console.log("\n\nERROR IN CREATE ANSWER", err)
+    });
+
     return { status: "OK", data: new_id };
   }
 
@@ -160,7 +181,7 @@ module.exports = class AnswerRepository {
       username: username
     });
     if (!found_user) {
-      return { status: "error", data: "User does not exit"};
+      return { status: "error", data: "User does not exit" };
     }
     let found_answers = await AnswerModel.find({ username: username });
     let all_answers = [];
@@ -175,7 +196,7 @@ module.exports = class AnswerRepository {
    * @param {Boolean} upvote
    * @param {String} username
    */
-  async upvote_answer(answerID, upvote, username) {
+   async upvote_answer(answerID, upvote, username) {
     const found_answer = await AnswerModel.findOne({
       id: answerID
     });
@@ -210,6 +231,17 @@ module.exports = class AnswerRepository {
           { username: found_answer.username },
           { $inc: { reputation: -upvote } }
         );
+        eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id,
+          "body": {
+              "script" : "ctx._source.user_reputation-="+upvote
+          },
+          "refresh": "wait_for"
+        }, (err, { body }) => {
+        if (err) console.log("\n\nERROR IN UPVOTE ANSWER IF", err)
+        });
       }
     }
     // Upvoting after downvoting or vice versa, deletes previous upvote
@@ -230,6 +262,18 @@ module.exports = class AnswerRepository {
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );
+        
+        eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id,
+	  "body": {
+              "script" : "ctx._source.user_reputation+="+upvote
+          },
+	  "refresh": "wait_for"
+        }, (err, { body }) => {
+        if (err) console.log("\n\nERROR IN UPVOTE ANSWER ELSE IF", err)
+        });
       }
     } else {
       // Create and save upvote
@@ -246,6 +290,18 @@ module.exports = class AnswerRepository {
           { username: found_answer.username },
           { $inc: { reputation: upvote } }
         );
+
+        eclient.update({
+          "index": "questions",
+          "type": "question",
+          "id": found_answer.question_id,
+          "body": {
+              "script" : "ctx._source.user_reputation+="+upvote
+          },
+          "refresh": "wait_for"
+        }, (err, { body }) => {
+        if (err) console.log("\n\nERROR IN UPVOTE ANSWER ELSE", err)
+        });
       }
     }
     return { status: "OK" };
@@ -278,6 +334,21 @@ module.exports = class AnswerRepository {
       { id: found_question.id },
       { accepted_answer_id: answerID }
     );
+      console.log(found_question.id);
+      console.log(answerID);
+    eclient.update({
+      "index": "questions",
+      "type": "question",
+	"id": found_question.id,
+	"body": {
+	    doc: {
+		"accepted_answer_id": answerID
+	    }
+  },
+    refresh: "wait_for"
+    });
+
+      
     return { status: "OK" };
   }
 

@@ -67,7 +67,7 @@ class App extends Component {
           Login
         </Button>
         <div className="registerContainer">
-          <h1> Register For StackOverFlow!!</h1>
+          <h1> Register For StackOverFlow</h1>
           <form onSubmit={this.handleRequest}>
             <TextField
               className="textFields"

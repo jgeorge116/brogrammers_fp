@@ -6,8 +6,8 @@ const UpvoteModel = require("../models/upvoteModel");
 
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
-  contactPoints: ["192.168.122.50"], //, "192.168.122.49"],
-  // contactPoints: ["127.0.0.1"],
+  contactPoints: ["130.245.171.138", "130.245.171.191"], //, "192.168.122.49"],
+//   contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1",
   readTimeout: 0
 });
@@ -29,7 +29,7 @@ module.exports = class ResetRespository {
     });
 
     var query1 =
-      "CREATE KEYSPACE IF NOT EXISTS somedia WITH replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': '2'}  AND durable_writes = true";
+      "CREATE KEYSPACE IF NOT EXISTS somedia WITH replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': '1'}  AND durable_writes = true";
     await client.execute(query1, function(err) {
       if (err) console.log(err);
       else console.log("created keyspace somedia");

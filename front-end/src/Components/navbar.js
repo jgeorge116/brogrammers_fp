@@ -90,6 +90,14 @@ class Navbar extends Component {
     this.props.history.push("/faddmedia");
   };
 
+  handleLogin = () => {
+    this.props.history.push("/flogin");
+  };
+
+  handleRegister = () => {
+    this.props.history.push("/fadduser");
+  };
+
   handleLogout = () => {
     Cookies.remove("access_token");
     localStorage.removeItem("username");
@@ -115,72 +123,130 @@ class Navbar extends Component {
 
   render() {
     const { classes } = this.props;
-    // if (!localStorage.getItem("username")) {
-    //   this.props.history.push("/flogin");
-    // }
-    return (
-      <MuiThemeProvider theme={theme}>
-        <div className={classes.root}>
-          <AppBar position="static">
-            <Toolbar>
-              <div className={classes.mainBar}>
-                <Typography color="inherit" noWrap>
-                  <Link
-                    className={ClassNames(classes.title, classes.navlink)}
-                    color="inherit"
-                    variant="h6"
-                    underline="none"
-                    href="/"
-                  >
-                    {" "}
-                    Stack Overflow{" "}
-                  </Link>
-                </Typography>
-                <div className={classes.search}>
-                  <div className={classes.searchIcon}>
-                    <SearchIcon />
+    if (!localStorage.getItem("username")) {
+      return (
+        <MuiThemeProvider theme={theme}>
+          <div className={classes.root}>
+            <AppBar position="static">
+              <Toolbar>
+                <div className={classes.mainBar}>
+                  <Typography color="inherit" noWrap>
+                    <Link
+                      className={ClassNames(classes.title, classes.navlink)}
+                      color="inherit"
+                      variant="h6"
+                      underline="none"
+                      href="/"
+                    >
+                      {" "}
+                      Stack Overflow{" "}
+                    </Link>
+                  </Typography>
+                  <div className={classes.search}>
+                    <div className={classes.searchIcon}>
+                      <SearchIcon />
+                    </div>
+                    <InputBase
+                      placeholder="Search…"
+                      classes={{
+                        root: classes.inputRoot,
+                        input: classes.inputInput
+                      }}
+                      onKeyDown={this.handleSearchChange}
+                    />
                   </div>
-                  <InputBase
-                    placeholder="Search…"
-                    classes={{
-                      root: classes.inputRoot,
-                      input: classes.inputInput
-                    }}
-                    onKeyDown={this.handleSearchChange}
-                  />
+                  <div />
+                  <Typography noWrap onClick={this.handleRegister} color="inherit">
+                    <Link
+                      className={classes.navlink}
+                      color="inherit"
+                      variant="h6"
+                      underline="none"
+                    >
+                      Register
+                    </Link>
+                  </Typography>&nbsp;&nbsp;
+                  <Typography noWrap onClick={this.handleLogin} color="inherit">
+                    <Link
+                      className={classes.navlink}
+                      color="inherit"
+                      variant="h6"
+                      underline="none"
+                    >
+                      Login
+                    </Link>
+                  </Typography>
                 </div>
-                <div />
-                <div className={ClassNames(classes.navlink)}>
-                  <IconButton onClick={this.handleAddMedia} color="inherit">
-                    <AddPhotoAlternate />
-                  </IconButton>
+              </Toolbar>
+            </AppBar>
+          </div>
+        </MuiThemeProvider>
+      );
+    } else {
+      return (
+        <MuiThemeProvider theme={theme}>
+          <div className={classes.root}>
+            <AppBar position="static">
+              <Toolbar>
+                <div className={classes.mainBar}>
+                  <Typography color="inherit" noWrap>
+                    <Link
+                      className={ClassNames(classes.title, classes.navlink)}
+                      color="inherit"
+                      variant="h6"
+                      underline="none"
+                      href="/"
+                    >
+                      {" "}
+                      Stack Overflow{" "}
+                    </Link>
+                  </Typography>
+                  <div className={classes.search}>
+                    <div className={classes.searchIcon}>
+                      <SearchIcon />
+                    </div>
+                    <InputBase
+                      placeholder="Search…"
+                      classes={{
+                        root: classes.inputRoot,
+                        input: classes.inputInput
+                      }}
+                      onKeyDown={this.handleSearchChange}
+                    />
+                  </div>
+                  <div />
+                  <div className={ClassNames(classes.navlink)}>
+                    <IconButton onClick={this.handleAddMedia} color="inherit">
+                      <AddPhotoAlternate />
+                    </IconButton>
+                  </div>
+                  <div className={ClassNames(classes.navlink)}>
+                    <IconButton onClick={this.handleAddQuestion} color="inherit">
+                      <QuestionAnswer />
+                    </IconButton>
+                  </div>
+                  <div className={ClassNames(classes.profile, classes.navlink)}>
+                    <IconButton onClick={this.handleProfile} color="inherit">
+                      <AccountCircle />
+                    </IconButton>
+                  </div>
+                  <Typography noWrap onClick={this.handleLogout} color="inherit">
+                    <Link
+                      className={classes.navlink}
+                      color="inherit"
+                      variant="h6"
+                      underline="none"
+                    >
+                      Logout
+                    </Link>
+                  </Typography>
                 </div>
-                <div className={ClassNames(classes.navlink)}>
-                  <IconButton onClick={this.handleAddQuestion} color="inherit">
-                    <QuestionAnswer />
-                  </IconButton>
-                </div>
-                <div className={ClassNames(classes.profile, classes.navlink)}>
-                  <IconButton onClick={this.handleProfile} color="inherit">
-                    <AccountCircle />
-                  </IconButton>
-                </div>
-                <Typography noWrap onClick={this.handleLogout} color="inherit">
-                  <Link
-                    className={classes.navlink}
-                    color="inherit"
-                    variant="h6"
-                    underline="none"
-                  >
-                    Logout
-                  </Link>
-                </Typography>
-              </div>
-            </Toolbar>
-          </AppBar>
-        </div>
-      </MuiThemeProvider>
-    );
+              </Toolbar>
+            </AppBar>
+          </div>
+        </MuiThemeProvider>
+      );
+    }
   }
 }
 

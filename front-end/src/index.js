@@ -6,7 +6,6 @@ import { BrowserRouter, Route, Switch} from "react-router-dom";
 import verify from "./Components/verifyUser";
 import home from "./Components/home";
 import login from "./Components/login";
-import logout from "./Components/logout";
 import Search from "./Components/search";
 import questions from "./Components/addQuestion";
 import viewQuestion from "./Components/viewQuestion";
@@ -21,7 +20,6 @@ ReactDOM.render(
       <Route path="/fadduser" component={App} />
       <Route path="/fverify" component={verify} />
       <Route path="/flogin" component={login} />
-      {/* <Route path="/flogout" component={logout} /> */}
       <Route path="/fsearch" component={Search} />
       <Route path="/fquestions/add" component={questions} />
       <Route path="/fquestions/:id" component={viewQuestion} />

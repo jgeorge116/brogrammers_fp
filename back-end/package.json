@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jgeorge116/brogrammers_fp#readme",
   "dependencies": {
+    "@elastic/elasticsearch": "^7.0.0",
     "amqplib": "^0.5.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
@@ -31,6 +32,7 @@
     "helmet": "^3.15.1",
     "jsonwebtoken": "^8.5.0",
     "mmmagic": "^0.5.3",
+    "mongoosastic": "^4.4.1",
     "mongoose": "^5.4.19",
     "morgan": "^1.9.1",
     "nodemailer": "^5.1.1",

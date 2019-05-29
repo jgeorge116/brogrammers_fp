@@ -12,4 +12,5 @@ var UserModelSchema = new Schema({
 });
 
 UserModelSchema.set("collection", "users");
+UserModelSchema.index({ username: 1 });
 module.exports = mongoose.model("UserModel", UserModelSchema);

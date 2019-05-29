@@ -8,4 +8,5 @@ var ViewQuestionModelSchema = new Schema({
 });
 
 ViewQuestionModelSchema.set("collection", "views");
+ViewQuestionModelSchema.index({ question_id: 1 });
 module.exports = mongoose.model("ViewQuestionModel", ViewQuestionModelSchema);

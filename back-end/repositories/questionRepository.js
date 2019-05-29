@@ -7,11 +7,14 @@ const UpvoteModel = require("../models/upvoteModel");
 const uuidv4 = require("uuid/v4");
 const cassandra = require("cassandra-driver");
 const client = new cassandra.Client({
-  contactPoints: ["192.168.122.50"], //, "192.168.122.49"],
-  //   contactPoints: ["127.0.0.1"],
+  contactPoints: ["130.245.171.138", "130.245.171.191"], //, "192.168.122.49"],
+    // contactPoints: ["127.0.0.1"],
   localDataCenter: "datacenter1",
   readTimeout: 0
 });
+
+const { Client } = require("@elastic/elasticsearch");
+const eclient = new Client({ node: "http://130.245.170.230:9200" });
 
 module.exports = class QuestionRepository {
   /**
@@ -61,8 +64,6 @@ module.exports = class QuestionRepository {
     // console.log("author: " + username);
     const new_id = uuidv4();
     if (media) {
-
-
       for (let i = 0; i < media.length; i++) {
         var query2 = "SELECT username FROM somedia.media WHERE id = ?;";
         var params2 = [media[i]];
@@ -70,24 +71,25 @@ module.exports = class QuestionRepository {
         //console.log(results2);
         if (results2.rowLength == 0) {
           console.log(
-        '"FAILURE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
-          "author: " +
-          username +
-          "\n" +
-          `MEDIA DOES NOT EXIST: ${media[i]}` + "\n" +
-          "length of media: " +
-          media.length +
-          "\n" +
-          `all the media: ${media}` +
-          "\n" +
-          "id : " +
-          new_id +
-          "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
-      );
+            '"FAILURE ~~~~~~~~~~~~~~~~~~~~~~~~"' +
+              "author: " +
+              username +
+              "\n" +
+              `MEDIA DOES NOT EXIST: ${media[i]}` +
+              "\n" +
+              "length of media: " +
+              media.length +
+              "\n" +
+              `all the media: ${media}` +
+              "\n" +
+              "id : " +
+              new_id +
+              "\n  ~~~~~~~~~~~~~~~~~~~~~~~~"
+          );
           return {
             status: "error",
             data: "Media does not exist"
-          }
+          };
         }
         if (results2.rows[0].username != username) {
           return {
@@ -110,7 +112,7 @@ module.exports = class QuestionRepository {
     // console.log(
     //   `~~~~~ add question finished with no errors \n with ID of ${new_id}`
     // );
-
+    const time = Date.now() / 1000;
     const new_question = new QuestionModel({
       id: new_id,
       username: username,
@@ -118,9 +120,30 @@ module.exports = class QuestionRepository {
       body: body,
       tags: tags,
       media: media,
-      timestamp: Date.now() / 1000
+      timestamp: time
     });
     await new_question.save();
+    const user = await UserModel.findOne( {username: username});
+    eclient.index({
+      index: "questions",
+      type: "question",
+      id: new_id,
+      body: {
+        id: new_id,
+        username: username,
+        title: title,
+        body: body,
+        tags: tags,
+        media: media,
+        timestamp: time * 1000,
+        score: 0,
+	accepted_answer_id: "empty",
+        user_reputation: user.reputation,
+        answer_count: 0,
+        view_count: 0
+      },
+      refresh: "wait_for"
+    });
     return {
       status: "OK",
       data: new_id
@@ -173,7 +196,7 @@ module.exports = class QuestionRepository {
         question_id: id,
         ip: info.query
       });
-      new_view.save();
+      await new_view.save();
     } else {
       // Don't increment if there is a view with this username
       const find_view = await ViewQuestionModel.findOne({
@@ -186,8 +209,22 @@ module.exports = class QuestionRepository {
         question_id: id,
         username: info.query
       });
-      new_view.save();
+      await new_view.save();
     }
+    // Increment the view counter
+    await QuestionModel.updateMany(
+      { id: id },
+      { $inc: { view_count: 1 } }
+    )
+    eclient.update({
+      "index": "questions",
+      "type": "question",
+      "id": id,
+	"body": {
+      		"script": "ctx._source.view_count+=1"
+	},
+      "refresh": "wait_for"
+    });
   }
 
   /**
@@ -209,10 +246,13 @@ module.exports = class QuestionRepository {
     tags,
     has_media
   ) {
-    var search_timestamp = timestamp;
-    if (!search_timestamp) {
+      var search_timestamp;
+    if (!timestamp) {
       search_timestamp = new Date().getTime();
+    } else {
+	search_timestamp = timestamp * 1000;
     }
+      console.log(`TIME ${search_timestamp}`);
     if (search_timestamp < 0) {
       return {
         status: "error",
@@ -221,15 +261,14 @@ module.exports = class QuestionRepository {
     }
     // Search limit defaults to 25, and maxes out at 100
     var search_limit = limit;
-    if (!search_limit) {
+    if (!search_limit || search_limit < 1) {
       search_limit = 25;
     }
-    var parsed_int = search_limit;
-    if (parsed_int < 1) parsed_int = 25;
-
-    if (parsed_int > 100) {
-      parsed_int = 100;
+    if (search_limit > 100) {
+      search_limit = 100;
     }
+
+    // check if question is accepted
     var search_accepted = accepted;
     if (!search_accepted) {
       search_accepted = false;
@@ -241,9 +280,19 @@ module.exports = class QuestionRepository {
       };
     }
     var search_q = q;
-    console.log(search_q);
     if (!search_q) {
       search_q = "";
+    }
+    var query_input = {};
+    if (search_q === "") {
+      query_input = { match_all: {} };
+    } else {
+      query_input = {
+        multi_match: {
+          query: search_q,
+          fields: ["title", "body"]
+        }
+      };
     }
     if (typeof search_q !== "string") {
       return {
@@ -254,42 +303,98 @@ module.exports = class QuestionRepository {
     sort_by = sort_by === "timestamp" ? sort_by : "score";
     tags = tags ? tags : null;
     has_media = has_media ? true : false;
+    let query = {
+      index: "questions",
+      body: {
+        size: search_limit,
+        sort: { score: { order: "desc" } },
+        query: {
+          bool: {
+            must: [
+              query_input,
 
-    var search_results;
-    let query = { timestamp: { $lte: search_timestamp } };
-    if (search_q) query.$text = { $search: search_q };
-    //   console.log(query);
-    if (search_accepted) {
-      query.accepted_answer_id = { $ne: null };
+              {
+                range: {
+                  timestamp: {
+                    lte: search_timestamp
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    };
+    const accepted_exists = search_accepted
+      ? { term: { accepted_answer_id: "empty" } }
+      : null;
+    const media_exists = has_media ? { exists: { field: "media" } } : null;
+    const tags_array = [];
+    if (tags) {
+      tags.map(function(value) {
+        return {
+          term: { tags: value }
+        };
+      });
+    }
+    // Use the must (and) clause to search for accepted answer, media, and or tags
+    const must_array = query.body.query.bool.must;
+    //console.log(accepted_exists);
+    if (accepted_exists) {
+      query.body.query.bool.must_not = accepted_exists;
+    }
+    if (media_exists) {
+      must_array.push(media_exists);
     }
     if (tags) {
-      query.tags = tags;
+      must_array.push(...tags_array);
     }
-    if (has_media) {
-      query.media = { $ne: [] };
-    }
+    // Sort
     if (sort_by === "timestamp") {
-      search_results = await QuestionModel.find(query)
-        .limit(parsed_int)
-        .sort({ timestamp: -1 });
-    } else {
-      // console.log('QUERY', query);
-      // console.log(sort_field);
-      search_results = await QuestionModel.find(query)
-        .limit(parsed_int)
-	.sort({ score: -1 });
+      query.body.sort = { timestamp: { order: "desc" } };
+    }
+
+      query.body.query.bool.must = must_array;
+      /*console.log('must');
+      console.log(query.body.query.bool.must);
+      console.log('must not below');
+      console.log(query.body.query.bool.must_not);
+      console.log(query.body.query.bool.filter);*/
+    try {
+      var search_results = await eclient.search(query);
+    } catch (e) {
+      return { 
+        status: "OK", 
+        data: [] 
+      };
     }
     var all_questions = [];
-    for (var result in search_results) {
-      var question_info = await this.question_to_api_format(
-        search_results[result]
-      );
-      if (question_info.status == "error")
+    for (var result in search_results.body.hits.hits) {
+      /*var question = await QuestionModel.findOne({
+        id: search_results.body.hits.hits[result]._source.id
+      });*/
+      var question = search_results.body.hits.hits[result]._source;
+      question.user = {
+        username: question.username,
+        reputation: question.user_reputation
+      }
+      question.view_count = question.view_count;
+      question.answer_count = question.answer_count;
+      if (question.accepted_answer_id == 'empty') {
+        question.accepted_answer_id = null;
+      }
+      if (!question.media) question.media = [];
+      delete question.username;
+      delete question.user_reputation
+      /*var question_info = await this.question_to_api_format(question);
+      if (question_info.status == "error") {
+        console.log("ai ya, there is an error");
         return {
           status: "error",
           data: "Error fetching question data"
         };
-      all_questions.push(question_info.data);
+      }*/
+      all_questions.push(question);
     }
     return {
       status: "OK",
@@ -311,13 +416,13 @@ module.exports = class QuestionRepository {
         data: "User who created question does not exist"
       };
     }
+    /*
     const view_count = await ViewQuestionModel.countDocuments({
       question_id: format_question.id
     });
     const answer_count = await AnswerModel.countDocuments({
       question_id: format_question.id
     });
-    /*
     const upvote_count = await UpvoteModel.countDocuments({
       question_id: format_question.id,
       type: "question",
@@ -342,8 +447,8 @@ module.exports = class QuestionRepository {
       title: format_question.title,
       body: format_question.body,
       score: format_question.score,
-      view_count: view_count,
-      answer_count: answer_count,
+      view_count: format_question.view_count,
+      answer_count: format_question.answer_count,
       timestamp: format_question.timestamp,
       media: format_question.media,
       tags: format_question.tags,
@@ -367,8 +472,13 @@ module.exports = class QuestionRepository {
       return { status: "error", data: "Question does not exist!" };
     }
     if (found_question.username != username) {
-      console.log("Author of question: "  + found_question.username + "\n"
-      + "Current user: " + username);
+      console.log(
+        "Author of question: " +
+          found_question.username +
+          "\n" +
+          "Current user: " +
+          username
+      );
       return { status: "error", data: "User must be the original asker!" };
     }
     if (found_question.media) {
@@ -378,7 +488,7 @@ module.exports = class QuestionRepository {
         await client.execute(query, params);
       }
     }
-    AnswerModel.find({ question_id: id })
+    await AnswerModel.find({ question_id: id })
       .stream()
       .on("data", async function(doc) {
         if (doc.media) {
@@ -400,6 +510,16 @@ module.exports = class QuestionRepository {
       });
     await AnswerModel.deleteMany({ question_id: id });
     await QuestionModel.deleteMany({ id: id });
+    eclient.deleteByQuery({
+      index: "questions",
+      type: "question",
+      body: {
+        query: {
+          match: { id: id }
+        }
+      },
+      refresh: "true"
+    });
     return { status: "OK", data: "Success" };
   }
 
@@ -429,7 +549,7 @@ module.exports = class QuestionRepository {
    * @param {Boolean} upvote
    * @param {String} username
    */
-  async upvote_question(questionID, upvote, username) {
+   async upvote_question(questionID, upvote, username) {
     const found_question = await QuestionModel.findOne({
       id: questionID
     });
@@ -449,12 +569,10 @@ module.exports = class QuestionRepository {
     if (!found_user) {
       return { status: "error" };
     }
-    // Update the score based on conditions
-    var new_score = found_question.score;
     // Upvoting after already upvoting undoes it
+    var new_score = found_question.score;
+    var new_upvote2 = 0;
     if (found_upvote && found_upvote.value === upvote) {
-	console.log("type 1");
-      new_score = new_score - upvote;
       await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
@@ -463,20 +581,17 @@ module.exports = class QuestionRepository {
         },
         { value: 0 }
       );
+      new_score -= upvote;
       if (found_user.reputation + -upvote >= 1) {
         await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: -upvote } }
         );
+        new_upvote2 = -upvote;
       }
     } else if (found_upvote) {
       //   console.log("votes changed");
       //   await UpvoteModel.deleteOne(found_upvote); // Might not have to await
-	if (found_upvote.value === 0) {
-		new_score = new_score + upvote;
-	} else {
-	      new_score = new_score + upvote + upvote;
-	}
       await UpvoteModel.updateMany(
         {
           question_id: found_upvote.question_id,
@@ -485,16 +600,20 @@ module.exports = class QuestionRepository {
         },
         { value: upvote }
       );
-
+        if (found_upvote.value === 0) {
+          new_score += upvote;
+        } else {
+          new_score = new_score + upvote + upvote;
+        }
       if (found_user.reputation + upvote >= 1) {
         await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
+        new_upvote2 = upvote;
       }
     } else {
       // Create and save upvote
-      new_score = new_score + upvote;
       const new_upvote = new UpvoteModel({
         type: "question",
         username: username,
@@ -502,18 +621,28 @@ module.exports = class QuestionRepository {
         value: upvote
       });
       await new_upvote.save();
-
+      new_score += upvote;
       if (found_user.reputation + upvote >= 1) {
         await UserModel.updateMany(
           { username: found_question.username },
           { $inc: { reputation: upvote } }
         );
+        new_upvote2 = upvote;
       }
     }
     await QuestionModel.updateMany(
-      { id: questionID },
-      { $set: {score: new_score} }
+      { id: found_question.id },
+      { $set: { score: new_score }}
     );
+    eclient.update({
+      "index": "questions",
+      "type": "question",
+      "id": found_question.id,
+      "body": {
+        "script": "ctx._source.score="+new_score+";ctx._source.user_reputation+="+new_upvote2
+      },
+      "refresh": "wait_for"
+    });
     return { status: "OK" };
   }
 

@@ -5,7 +5,10 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Post from "./post";
 import Chip from "@material-ui/core/Chip";
 import Navbar from "./navbar";
-import { Grid, Paper } from "@material-ui/core";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
+import { Grid, Paper, RadioGroup, Radio } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 const queryString = require("query-string");
 
@@ -28,14 +31,27 @@ class Search extends Component {
     this.state = {
       limit: 25,
       accepted: false,
+      media: false,
       timestamp: 0,
       show: false,
       search_str: ""
     };
   }
 
-  getResults(search_string, timestamp, limit, accepted) {
+  getResults(search_string, timestamp, limit, accepted, media, sort_by, tags) {
     (async () => {
+      var tagsArr = [];
+      if (tags) tagsArr = tags.split(",");
+      const body = JSON.stringify({
+        timestamp: timestamp,
+        limit: limit,
+        accepted: accepted,
+        has_media: media,
+        sort_by: sort_by,
+        tags: tagsArr,
+        q: search_string //milestone 2
+      });
+      console.log(body);
       const res = await fetch("/search", {
         method: "POST",
         credentials: "include",
@@ -43,12 +59,7 @@ class Search extends Component {
           Accept: "application/json",
           "Content-Type": "application/json; charset=utf-8"
         },
-        body: JSON.stringify({
-          timestamp: timestamp,
-          limit: limit,
-          accepted: accepted,
-          q: search_string //milestone 2
-        })
+        body: body
       });
       let content = await res.json();
       //   console.log(content);
@@ -64,7 +75,10 @@ class Search extends Component {
       this.state.timestamp,
       this.state.limit,
       this.state.accepted,
-      this.state.search_str
+      this.state.search_str,
+      this.state.media,
+      this.state.sort_by,
+      this.state.tags
     );
   };
 
@@ -80,7 +94,8 @@ class Search extends Component {
       return (
         <div className={classes.questionPost}>
           <Post
-            key={i}
+            key={item.id}
+            id={item.id}
             username={item.user.username}
             rep={item.user.reputation}
             title={item.title}
@@ -104,6 +119,8 @@ class Search extends Component {
     const value =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
     const name = e.target.name;
+    // console.log(name);
+    // console.log(value);
     this.setState({
       [name]: value
     });
@@ -112,7 +129,9 @@ class Search extends Component {
   componentWillMount() {
     const parsed = queryString.parse(this.props.location.search);
     if (parsed.q) {
-      this.getResults(parsed.q, Date.now(), 25, false);
+      this.getResults(parsed.q, Date.now(), 25, false, false, "timestamp", null);
+    } else {
+        this.getResults("", Date.now(), 25, false, false, "timestamp", null);
     }
   }
   render() {
@@ -134,7 +153,7 @@ class Search extends Component {
                   className="textFields"
                   type="text"
                   name="search_str"
-                  label="Search"
+                  label="Query"
                   onChange={this.handleInputChange}
                   margin="normal"
                   variant="outlined"
@@ -168,8 +187,17 @@ class Search extends Component {
                 />
               </Grid>
             </Grid>
+            <TextField
+              className="textFields"
+              name="tags"
+              label="Tags (comma-separated with no space)"
+              onChange={this.handleInputChange}
+              margin="normal"
+              variant="outlined"
+              fullWidth
+            />
             <label>
-              By Accepted Answer? :
+              Accepted Answers Only? :
               <Checkbox
                 name="accepted"
                 type="checkbox"
@@ -177,19 +205,44 @@ class Search extends Component {
                 onChange={this.handleInputChange}
               />
             </label>
+            <label>
+              Has Media?
+              <Checkbox
+                name="media"
+                type="checkbox"
+                value={this.state.media}
+                onChange={this.handleInputChange}
+              />
+            </label>
+            <br />
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Sort By</FormLabel>
+              <RadioGroup
+                name="sort_by"
+                value={this.state.value}
+                onChange={this.handleInputChange}
+                row
+              >
+                <FormControlLabel
+                  value="timestamp"
+                  control={<Radio color="primary" />}
+                  label="Timestamp"
+                  labelPlacement="start"
+                />
+                <FormControlLabel
+                  value="score"
+                  control={<Radio color="primary" />}
+                  label="Score"
+                  labelPlacement="start"
+                />
+              </RadioGroup>
+            </FormControl>
             <div className="searchButtons">
               <Button id="sub" type="submit">
                 Submit
               </Button>
             </div>
           </form>
-          <div className="searchButtons">
-            {/* <Button id="clear" onClick={this.clearSearch}>
-            Clear Search Results
-          </Button> */}
-            {/* {this.showResults(data)} */}
-          </div>
-          {/* <Paper>{this.showResults(data)}</Paper> */}
         </div>
         <Grid container justify="center">
           <Grid item md={9}>

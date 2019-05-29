@@ -45,7 +45,7 @@ class viewMedia extends Component {
                     <Fragment>
                         <Navbar />
                     </Fragment>
-                    
+                    <h1>Your Media ID is: {this.state.id}</h1>
                     <img src={this.state.url} alt="" />
                 </div>
             );
